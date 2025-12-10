@@ -46,6 +46,8 @@ export default function LocalVendorsModal({
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [coordinates, setCoordinates] = useState<{latitude: number, longitude: number} | null>(null);
 
   const searchVendors = async () => {
     if (!location.trim()) {
