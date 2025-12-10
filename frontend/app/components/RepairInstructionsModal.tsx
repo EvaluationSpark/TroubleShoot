@@ -50,6 +50,46 @@ export default function RepairInstructionsModal({
     }
   };
 
+  const toggleStep = (stepIndex: number) => {
+    const newChecked = new Set(checkedSteps);
+    if (newChecked.has(stepIndex)) {
+      newChecked.delete(stepIndex);
+    } else {
+      newChecked.add(stepIndex);
+    }
+    setCheckedSteps(newChecked);
+  };
+
+  const getMoreHelp = async (stepNumber: number, stepText: string) => {
+    setSelectedStep({ number: stepNumber, text: stepText });
+    setShowDetailModal(true);
+    setLoadingDetails(true);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/get-step-details`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_type: repairData.item_type,
+          step_text: stepText,
+          step_number: stepNumber,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStepDetails(data.detailed_explanation);
+      } else {
+        Alert.alert('Error', 'Failed to get detailed explanation');
+      }
+    } catch (error) {
+      console.error('Error getting step details:', error);
+      Alert.alert('Error', 'Failed to get detailed explanation');
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
   const submitFeedback = async (helpful: boolean) => {
     try {
       await fetch(`${BACKEND_URL}/api/feedback`, {
