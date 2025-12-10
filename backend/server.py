@@ -411,12 +411,13 @@ For each vendor, provide:
 2. Specialization (what they repair)
 3. Full address
 4. Phone number (format: (XXX) XXX-XXXX)
-5. Rating (1-5, realistic decimal)
-6. Number of reviews
-7. Distance from location (in miles)
-8. Estimated repair cost range
-9. Business hours
-10. Website (optional)
+5. Email address (professional format: info@businessname.com or contact@businessname.com)
+6. Rating (1-5, realistic decimal)
+7. Number of reviews
+8. Distance from location (in miles)
+9. Estimated repair cost range
+10. Business hours
+11. Website (optional)
 
 Format response as JSON array:
 [
@@ -425,6 +426,7 @@ Format response as JSON array:
     "specialization": "...",
     "address": "...",
     "phone": "...",
+    "email": "info@example.com",
     "rating": 4.5,
     "reviews_count": 123,
     "distance": "2.3 miles",
