@@ -218,23 +218,41 @@ export default function LocalVendorsModal({
                 placeholderTextColor="#666"
                 value={location}
                 onChangeText={setLocation}
+                editable={!gettingLocation}
               />
             </View>
 
-            <TouchableOpacity
-              style={[styles.searchButton, loading && styles.disabledButton]}
-              onPress={searchVendors}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <>
-                  <Ionicons name="search" size={20} color="#fff" />
-                  <Text style={styles.searchButtonText}>Find Repair Shops</Text>
-                </>
-              )}
-            </TouchableOpacity>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.gpsButton, gettingLocation && styles.disabledButton]}
+                onPress={getCurrentLocation}
+                disabled={gettingLocation || loading}
+              >
+                {gettingLocation ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <>
+                    <Ionicons name="navigate" size={20} color="#fff" />
+                    <Text style={styles.gpsButtonText}>Use My Location</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.searchButton, loading && styles.disabledButton]}
+                onPress={searchVendors}
+                disabled={loading || gettingLocation}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <>
+                    <Ionicons name="search" size={20} color="#fff" />
+                    <Text style={styles.searchButtonText}>Search</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Vendors List */}
