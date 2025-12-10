@@ -452,6 +452,7 @@ export default function RepairInstructionsModal({
         <LocalVendorsModal
           visible={showVendorsModal}
           itemType={repairData.item_type}
+          repairData={repairData}
           onClose={() => setShowVendorsModal(false)}
         />
 
