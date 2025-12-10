@@ -378,6 +378,40 @@ export default function RepairInstructionsModal({
           itemType={repairData.item_type}
           onClose={() => setShowVendorsModal(false)}
         />
+
+        {/* Step Detail Modal */}
+        <Modal visible={showDetailModal} animationType="slide" onRequestClose={() => setShowDetailModal(false)}>
+          <View style={styles.detailModalContainer}>
+            <View style={styles.detailModalHeader}>
+              <View>
+                <Text style={styles.detailModalTitle}>Step {selectedStep?.number}</Text>
+                <Text style={styles.detailModalSubtitle}>Detailed Instructions</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowDetailModal(false)}>
+                <Ionicons name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.detailModalContent} contentContainerStyle={styles.detailScrollContent}>
+              {selectedStep && (
+                <View style={styles.stepSummaryCard}>
+                  <Text style={styles.stepSummaryText}>{selectedStep.text}</Text>
+                </View>
+              )}
+
+              {loadingDetails ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color="#00D9FF" />
+                  <Text style={styles.loadingText}>Getting detailed instructions...</Text>
+                </View>
+              ) : (
+                <View style={styles.detailContent}>
+                  <Text style={styles.detailText}>{stepDetails}</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </Modal>
       </View>
     </Modal>
   );
