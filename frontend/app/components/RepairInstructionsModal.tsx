@@ -214,6 +214,36 @@ export default function RepairInstructionsModal({
             </View>
           )}
 
+          {/* Options: DIY or Get Professional Help */}
+          <View style={styles.optionsSection}>
+            <Text style={styles.optionsTitle}>Choose Your Approach</Text>
+            
+            <TouchableOpacity style={styles.optionCard}>
+              <View style={styles.optionIcon}>
+                <Ionicons name="build" size={32} color="#00D9FF" />
+              </View>
+              <View style={styles.optionContent}>
+                <Text style={styles.optionTitle}>DIY Repair</Text>
+                <Text style={styles.optionDescription}>Follow our step-by-step guide and fix it yourself</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#666" />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.optionCard, styles.vendorCard]} 
+              onPress={() => setShowVendorsModal(true)}
+            >
+              <View style={[styles.optionIcon, styles.vendorIcon]}>
+                <Ionicons name="business" size={32} color="#fbbf24" />
+              </View>
+              <View style={styles.optionContent}>
+                <Text style={styles.optionTitle}>Get Professional Help</Text>
+                <Text style={styles.optionDescription}>Find local repair shops near you</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#666" />
+            </TouchableOpacity>
+          </View>
+
           {/* Save Session */}
           <View style={styles.actionSection}>
             {!showSaveForm ? (
