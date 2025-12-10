@@ -458,6 +458,7 @@ Format response as JSON array:
                 specialization=vendor_dict.get('specialization', ''),
                 address=vendor_dict.get('address', ''),
                 phone=vendor_dict.get('phone', ''),
+                email=vendor_dict.get('email'),
                 rating=vendor_dict.get('rating', 4.0),
                 reviews_count=vendor_dict.get('reviews_count', 0),
                 distance=vendor_dict.get('distance', 'Unknown'),
