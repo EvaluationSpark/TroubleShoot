@@ -31,6 +31,11 @@ export default function RepairInstructionsModal({
   const [sessionTitle, setSessionTitle] = useState('');
   const [showSaveForm, setShowSaveForm] = useState(false);
   const [showVendorsModal, setShowVendorsModal] = useState(false);
+  const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedStep, setSelectedStep] = useState<{number: number, text: string} | null>(null);
+  const [stepDetails, setStepDetails] = useState<string>('');
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
