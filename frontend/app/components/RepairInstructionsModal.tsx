@@ -206,13 +206,41 @@ export default function RepairInstructionsModal({
           {/* Tab Content */}
           {activeTab === 'instructions' && (
             <View style={styles.tabContent}>
-              <Text style={styles.sectionTitle}>Repair Steps</Text>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Repair Steps</Text>
+                <Text style={styles.progressText}>
+                  {checkedSteps.size} / {repairData.repair_steps.length} completed
+                </Text>
+              </View>
               {repairData.repair_steps.map((step: string, index: number) => (
-                <View key={index} style={styles.stepContainer}>
-                  <View style={styles.stepNumber}>
-                    <Text style={styles.stepNumberText}>{index + 1}</Text>
+                <View key={index} style={[styles.stepContainer, checkedSteps.has(index) && styles.stepCompleted]}>
+                  <TouchableOpacity
+                    style={styles.checkbox}
+                    onPress={() => toggleStep(index)}
+                  >
+                    <Ionicons
+                      name={checkedSteps.has(index) ? 'checkbox' : 'square-outline'}
+                      size={28}
+                      color={checkedSteps.has(index) ? '#4ade80' : '#666'}
+                    />
+                  </TouchableOpacity>
+                  <View style={styles.stepContent}>
+                    <View style={styles.stepHeader}>
+                      <View style={styles.stepNumber}>
+                        <Text style={styles.stepNumberText}>{index + 1}</Text>
+                      </View>
+                      <Text style={[styles.stepText, checkedSteps.has(index) && styles.stepTextCompleted]}>
+                        {step}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.helpButton}
+                      onPress={() => getMoreHelp(index + 1, step)}
+                    >
+                      <Ionicons name="help-circle" size={20} color="#00D9FF" />
+                      <Text style={styles.helpButtonText}>More Help</Text>
+                    </TouchableOpacity>
                   </View>
-                  <Text style={styles.stepText}>{step}</Text>
                 </View>
               ))}
             </View>
