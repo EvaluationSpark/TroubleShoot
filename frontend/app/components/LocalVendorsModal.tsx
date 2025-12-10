@@ -179,6 +179,72 @@ export default function LocalVendorsModal({
     Linking.openURL(`https://maps.google.com/?q=${encodedAddress}`);
   };
 
+  const sendEmailToVendor = (vendor: Vendor) => {
+    if (!vendor.email) {
+      Alert.alert('No Email', 'This repair shop does not have an email address listed.');
+      return;
+    }
+
+    if (!repairData) {
+      Alert.alert('No Repair Data', 'Please analyze an item first before contacting shops.');
+      return;
+    }
+
+    // Create professional email body
+    const subject = encodeURIComponent(`Repair Request: ${repairData.item_type}`);
+    
+    const emailBody = `
+Dear ${vendor.name},
+
+I am writing to request a repair service for my ${repairData.item_type}.
+
+ITEM DETAILS:
+-------------
+Item Type: ${repairData.item_type}
+Issue: ${repairData.damage_description}
+Estimated Difficulty: ${repairData.repair_difficulty}
+Estimated Time: ${repairData.estimated_time}
+
+REPAIR REQUIREMENTS:
+-------------------
+${repairData.repair_steps.map((step: string, index: number) => `${index + 1}. ${step}`).join('\n')}
+
+TOOLS NEEDED:
+------------
+${repairData.tools_needed.join('\n- ')}
+
+PARTS NEEDED:
+------------
+${repairData.parts_needed.map((part: any) => `- ${part.name}${part.price ? ` (${part.price})` : ''}`).join('\n')}
+
+SAFETY CONSIDERATIONS:
+---------------------
+${repairData.safety_tips.join('\n- ')}
+
+Could you please provide:
+1. Confirmation if you can handle this repair
+2. Your estimated cost
+3. Estimated completion time
+4. Any additional requirements or information you need
+
+I would be happy to provide photographs of the item if needed.
+
+Thank you for your time and I look forward to hearing from you.
+
+Best regards
+    `.trim();
+
+    const mailto = `mailto:${vendor.email}?subject=${subject}&body=${encodeURIComponent(emailBody)}`;
+    
+    Linking.canOpenURL(mailto).then((supported) => {
+      if (supported) {
+        Linking.openURL(mailto);
+      } else {
+        Alert.alert('Error', 'Unable to open email client');
+      }
+    });
+  };
+
   const renderStars = (rating: number) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
