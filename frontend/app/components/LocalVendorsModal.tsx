@@ -387,6 +387,14 @@ Best regards
                 <Ionicons name="chevron-forward" size={16} color="#666" />
               </TouchableOpacity>
 
+              {/* Email if available */}
+              {vendor.email && (
+                <View style={styles.emailRow}>
+                  <Ionicons name="mail" size={16} color="#fbbf24" />
+                  <Text style={styles.emailText}>{vendor.email}</Text>
+                </View>
+              )}
+
               {/* Action Buttons */}
               <View style={styles.actionsContainer}>
                 <TouchableOpacity
@@ -396,6 +404,16 @@ Best regards
                   <Ionicons name="call" size={20} color="#fff" />
                   <Text style={styles.actionButtonText}>Call</Text>
                 </TouchableOpacity>
+
+                {vendor.email && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.emailButton]}
+                    onPress={() => sendEmailToVendor(vendor)}
+                  >
+                    <Ionicons name="mail" size={20} color="#fbbf24" />
+                    <Text style={[styles.actionButtonText, { color: '#fbbf24' }]}>Email Quote</Text>
+                  </TouchableOpacity>
+                )}
 
                 {vendor.website && (
                   <TouchableOpacity
