@@ -497,6 +497,54 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+  optionsSection: {
+    marginBottom: 32,
+  },
+  optionsTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 16,
+  },
+  optionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    gap: 12,
+  },
+  vendorCard: {
+    backgroundColor: '#2a2a00',
+    borderWidth: 2,
+    borderColor: '#fbbf24',
+  },
+  optionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#002a33',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  vendorIcon: {
+    backgroundColor: '#3a3000',
+  },
+  optionContent: {
+    flex: 1,
+  },
+  optionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  optionDescription: {
+    fontSize: 13,
+    color: '#aaa',
+    lineHeight: 18,
+  },
   actionSection: {
     marginBottom: 24,
   },
