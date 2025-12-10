@@ -298,6 +298,13 @@ export default function RepairInstructionsModal({
             </View>
           </View>
         </ScrollView>
+
+        {/* Local Vendors Modal */}
+        <LocalVendorsModal
+          visible={showVendorsModal}
+          itemType={repairData.item_type}
+          onClose={() => setShowVendorsModal(false)}
+        />
       </View>
     </Modal>
   );
