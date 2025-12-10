@@ -410,7 +410,27 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  gpsButton: {
+    flex: 1,
+    backgroundColor: '#4ade80',
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  gpsButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   searchButton: {
+    flex: 1,
     backgroundColor: '#00D9FF',
     padding: 16,
     borderRadius: 12,
@@ -421,7 +441,7 @@ const styles = StyleSheet.create({
   },
   searchButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   disabledButton: {
