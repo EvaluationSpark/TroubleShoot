@@ -407,7 +407,7 @@ export default function RepairInstructionsModal({
                 </View>
               ) : (
                 <View style={styles.detailContent}>
-                  <Text style={styles.detailText}>{stepDetails}</Text>
+                  {parseDetailedInstructions(stepDetails)}
                 </View>
               )}
             </ScrollView>
