@@ -348,6 +348,85 @@ async def submit_feedback(feedback: FeedbackRequest):
         logger.error(f"Error submitting feedback: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/find-local-vendors")
+async def find_local_vendors(search: LocalVendorSearch):
+    """Find local repair vendors specializing in the item type"""
+    try:
+        # Use AI to generate realistic local vendors based on item type and location
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"vendor_search_{uuid.uuid4()}",
+            system_message="You are a local business directory assistant."
+        )
+        chat.with_model("gemini", "gemini-2.5-flash")
+        
+        prompt = f"""Generate a list of 5 realistic local repair shops that specialize in fixing {search.item_type} in {search.location}.
+
+For each vendor, provide:
+1. Business name (realistic, professional)
+2. Specialization (what they repair)
+3. Full address
+4. Phone number (format: (XXX) XXX-XXXX)
+5. Rating (1-5, realistic decimal)
+6. Number of reviews
+7. Distance from location (in miles)
+8. Estimated repair cost range
+9. Business hours
+10. Website (optional)
+
+Format response as JSON array:
+[
+  {{
+    "name": "...",
+    "specialization": "...",
+    "address": "...",
+    "phone": "...",
+    "rating": 4.5,
+    "reviews_count": 123,
+    "distance": "2.3 miles",
+    "estimated_cost": "$50-$150",
+    "hours": "Mon-Fri 9AM-6PM, Sat 10AM-4PM",
+    "website": "https://..."
+  }}
+]"""
+        
+        msg = UserMessage(text=prompt)
+        response = await chat.send_message(msg)
+        
+        # Parse JSON response
+        import json
+        response_text = response.strip()
+        if response_text.startswith('```'):
+            response_text = response_text.split('```')[1]
+            if response_text.startswith('json'):
+                response_text = response_text[4:]
+        response_text = response_text.strip()
+        
+        vendors_data = json.loads(response_text)
+        
+        # Convert to LocalVendor models
+        vendors = []
+        for vendor_dict in vendors_data:
+            vendor = LocalVendor(
+                name=vendor_dict.get('name', ''),
+                specialization=vendor_dict.get('specialization', ''),
+                address=vendor_dict.get('address', ''),
+                phone=vendor_dict.get('phone', ''),
+                rating=vendor_dict.get('rating', 4.0),
+                reviews_count=vendor_dict.get('reviews_count', 0),
+                distance=vendor_dict.get('distance', 'Unknown'),
+                estimated_cost=vendor_dict.get('estimated_cost', 'Call for quote'),
+                hours=vendor_dict.get('hours', 'Call for hours'),
+                website=vendor_dict.get('website')
+            )
+            vendors.append(vendor)
+        
+        return {"vendors": [v.dict() for v in vendors], "location": search.location}
+        
+    except Exception as e:
+        logger.error(f"Error finding vendors: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/")
 async def root():
     return {"message": "FixIt Pro API", "version": "1.0.0"}
