@@ -615,12 +615,27 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#aaa',
   },
+  emailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 12,
+    backgroundColor: '#2a2a00',
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  emailText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#fbbf24',
+  },
   actionsContainer: {
     flexDirection: 'row',
-    gap: 12,
+    flexWrap: 'wrap',
+    gap: 8,
   },
   actionButton: {
-    flex: 1,
+    minWidth: '48%',
     backgroundColor: '#00D9FF',
     padding: 12,
     borderRadius: 8,
@@ -628,6 +643,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
+  },
+  emailButton: {
+    backgroundColor: '#2a2a00',
+    borderWidth: 2,
+    borderColor: '#fbbf24',
   },
   websiteButton: {
     backgroundColor: '#2a2a2a',
@@ -637,7 +657,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
   },
 });
