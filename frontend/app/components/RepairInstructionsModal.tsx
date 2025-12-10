@@ -798,4 +798,65 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  detailModalContainer: {
+    flex: 1,
+    backgroundColor: '#0f0f0f',
+  },
+  detailModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    paddingTop: 50,
+  },
+  detailModalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#00D9FF',
+  },
+  detailModalSubtitle: {
+    fontSize: 14,
+    color: '#aaa',
+    marginTop: 4,
+  },
+  detailModalContent: {
+    flex: 1,
+  },
+  detailScrollContent: {
+    padding: 20,
+  },
+  stepSummaryCard: {
+    backgroundColor: '#1a1a1a',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 24,
+    borderLeftWidth: 4,
+    borderLeftColor: '#00D9FF',
+  },
+  stepSummaryText: {
+    color: '#fff',
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    color: '#aaa',
+    fontSize: 16,
+    marginTop: 16,
+  },
+  detailContent: {
+    backgroundColor: '#1a1a1a',
+    padding: 20,
+    borderRadius: 16,
+  },
+  detailText: {
+    color: '#ccc',
+    fontSize: 15,
+    lineHeight: 24,
+  },
 });
