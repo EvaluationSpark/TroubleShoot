@@ -49,12 +49,54 @@ export default function LocalVendorsModal({
   const [gettingLocation, setGettingLocation] = useState(false);
   const [coordinates, setCoordinates] = useState<{latitude: number, longitude: number} | null>(null);
 
-  const searchVendors = async () => {
-    if (!location.trim()) {
-      Alert.alert('Location Required', 'Please enter your city or zip code');
+  const getCurrentLocation = async () => {
+    if (Platform.OS === 'web') {
+      Alert.alert('Not Available', 'GPS location is not available on web. Please enter your location manually.');
       return;
     }
 
+    setGettingLocation(true);
+    try {
+      // Request location permission
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location permission is required to find nearby repair shops.');
+        setGettingLocation(false);
+        return;
+      }
+
+      // Get current position
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      const { latitude, longitude } = position.coords;
+      setCoordinates({ latitude, longitude });
+
+      // Reverse geocode to get city name
+      const addresses = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      if (addresses.length > 0) {
+        const address = addresses[0];
+        const locationText = `${address.city || address.subregion || address.region}, ${address.country}`;
+        setLocation(locationText);
+      }
+
+      setGettingLocation(false);
+      
+      // Automatically search with GPS location
+      searchVendorsWithCoords(latitude, longitude);
+    } catch (error) {
+      console.error('Error getting location:', error);
+      Alert.alert('Error', 'Failed to get your current location. Please enter it manually.');
+      setGettingLocation(false);
+    }
+  };
+
+  const searchVendorsWithCoords = async (lat: number, lng: number) => {
     setLoading(true);
     try {
       const response = await fetch(`${BACKEND_URL}/api/find-local-vendors`, {
@@ -62,7 +104,9 @@ export default function LocalVendorsModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           item_type: itemType,
-          location: location,
+          location: location || `${lat}, ${lng}`,
+          latitude: lat,
+          longitude: lng,
         }),
       });
 
@@ -78,6 +122,42 @@ export default function LocalVendorsModal({
       Alert.alert('Error', 'Failed to search for vendors');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const searchVendors = async () => {
+    if (!location.trim() && !coordinates) {
+      Alert.alert('Location Required', 'Please enter your city/zip code or use GPS location');
+      return;
+    }
+
+    if (coordinates) {
+      searchVendorsWithCoords(coordinates.latitude, coordinates.longitude);
+    } else {
+      setLoading(true);
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/find-local-vendors`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            item_type: itemType,
+            location: location,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setVendors(data.vendors);
+          setSearched(true);
+        } else {
+          Alert.alert('Error', 'Failed to find local vendors');
+        }
+      } catch (error) {
+        console.error('Error searching vendors:', error);
+        Alert.alert('Error', 'Failed to search for vendors');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
