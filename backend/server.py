@@ -92,6 +92,7 @@ class LocalVendor(BaseModel):
     specialization: str
     address: str
     phone: str
+    email: Optional[str] = None
     rating: float  # 1-5
     reviews_count: int
     distance: str
