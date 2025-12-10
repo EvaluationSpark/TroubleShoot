@@ -517,10 +517,39 @@ const styles = StyleSheet.create({
   tabContent: {
     marginBottom: 32,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#4ade80',
+    fontWeight: '600',
+  },
   stepContainer: {
     flexDirection: 'row',
-    marginBottom: 16,
+    marginBottom: 20,
     gap: 12,
+    backgroundColor: '#1a1a1a',
+    padding: 16,
+    borderRadius: 12,
+  },
+  stepCompleted: {
+    opacity: 0.6,
+    backgroundColor: '#1a2a1a',
+  },
+  checkbox: {
+    marginTop: 4,
+  },
+  stepContent: {
+    flex: 1,
+  },
+  stepHeader: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
   },
   stepNumber: {
     width: 32,
@@ -540,6 +569,27 @@ const styles = StyleSheet.create({
     color: '#ccc',
     fontSize: 15,
     lineHeight: 22,
+  },
+  stepTextCompleted: {
+    textDecorationLine: 'line-through',
+    color: '#666',
+  },
+  helpButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00D9FF',
+  },
+  helpButtonText: {
+    color: '#00D9FF',
+    fontSize: 13,
+    fontWeight: '600',
   },
   listItem: {
     flexDirection: 'row',
