@@ -42,6 +42,7 @@ interface Vendor {
 export default function LocalVendorsModal({
   visible,
   itemType,
+  repairData,
   onClose,
 }: LocalVendorsModalProps) {
   const [location, setLocation] = useState('');
