@@ -329,6 +329,12 @@ export default function RepairInstructionsModal({
                 <View key={index} style={styles.listItem}>
                   <Ionicons name="build" size={18} color="#00D9FF" />
                   <Text style={styles.listItemText}>{tool}</Text>
+                  <TouchableOpacity 
+                    style={styles.amazonButton}
+                    onPress={() => searchAmazon(tool)}
+                  >
+                    <Ionicons name="cart" size={16} color="#ffa500" />
+                  </TouchableOpacity>
                 </View>
               ))}
 
@@ -337,15 +343,18 @@ export default function RepairInstructionsModal({
                 <View key={index} style={styles.partItem}>
                   <View style={styles.partInfo}>
                     <Ionicons name="hardware-chip" size={18} color="#00D9FF" />
-                    <Text style={styles.listItemText}>{part.name}</Text>
+                    <View style={styles.partTextContainer}>
+                      <Text style={styles.listItemText}>{part.name}</Text>
+                      {part.price && <Text style={styles.priceText}>{part.price}</Text>}
+                    </View>
                   </View>
-                  {part.price && <Text style={styles.priceText}>{part.price}</Text>}
-                  {part.link && (
-                    <TouchableOpacity style={styles.linkButton}>
-                      <Ionicons name="cart" size={16} color="#00D9FF" />
-                      <Text style={styles.linkText}>Buy</Text>
-                    </TouchableOpacity>
-                  )}
+                  <TouchableOpacity 
+                    style={styles.amazonBuyButton}
+                    onPress={() => searchAmazon(part.name)}
+                  >
+                    <Ionicons name="cart" size={18} color="#fff" />
+                    <Text style={styles.amazonBuyText}>Buy on Amazon</Text>
+                  </TouchableOpacity>
                 </View>
               ))}
             </View>
