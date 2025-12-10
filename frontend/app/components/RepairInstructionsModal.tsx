@@ -30,6 +30,7 @@ export default function RepairInstructionsModal({
   const [rating, setRating] = useState(0);
   const [sessionTitle, setSessionTitle] = useState('');
   const [showSaveForm, setShowSaveForm] = useState(false);
+  const [showVendorsModal, setShowVendorsModal] = useState(false);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
