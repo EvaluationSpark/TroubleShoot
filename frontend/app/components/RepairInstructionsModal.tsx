@@ -91,6 +91,81 @@ export default function RepairInstructionsModal({
     }
   };
 
+  const parseDetailedInstructions = (text: string) => {
+    if (!text) return null;
+
+    const lines = text.split('\n');
+    const elements: JSX.Element[] = [];
+    let key = 0;
+
+    lines.forEach((line, index) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+
+      // Section headers (bold text with **)
+      if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+        const headerText = trimmed.replace(/\*\*/g, '');
+        elements.push(
+          <Text key={key++} style={styles.detailSectionHeader}>
+            {headerText}
+          </Text>
+        );
+      }
+      // Numbered lists (1., 2., etc.)
+      else if (/^\d+\.\s/.test(trimmed)) {
+        const match = trimmed.match(/^(\d+)\.\s(.+)$/);
+        if (match) {
+          elements.push(
+            <View key={key++} style={styles.detailNumberedItem}>
+              <View style={styles.detailNumberBadge}>
+                <Text style={styles.detailNumberText}>{match[1]}</Text>
+              </View>
+              <Text style={styles.detailItemText}>{match[2]}</Text>
+            </View>
+          );
+        }
+      }
+      // Bullet points (-, •, or *)
+      else if (/^[-•\*]\s/.test(trimmed)) {
+        const text = trimmed.replace(/^[-•\*]\s/, '');
+        elements.push(
+          <View key={key++} style={styles.detailBulletItem}>
+            <View style={styles.detailBulletDot} />
+            <Text style={styles.detailItemText}>{text}</Text>
+          </View>
+        );
+      }
+      // Warning/Caution text (starts with ⚠️ or Warning:)
+      else if (trimmed.startsWith('⚠️') || trimmed.toLowerCase().startsWith('warning:') || trimmed.toLowerCase().startsWith('caution:')) {
+        elements.push(
+          <View key={key++} style={styles.detailWarningBox}>
+            <Ionicons name="warning" size={20} color="#fbbf24" />
+            <Text style={styles.detailWarningText}>{trimmed}</Text>
+          </View>
+        );
+      }
+      // Tip text (starts with 💡 or Tip:)
+      else if (trimmed.startsWith('💡') || trimmed.toLowerCase().startsWith('tip:')) {
+        elements.push(
+          <View key={key++} style={styles.detailTipBox}>
+            <Ionicons name="bulb" size={20} color="#00D9FF" />
+            <Text style={styles.detailTipText}>{trimmed}</Text>
+          </View>
+        );
+      }
+      // Regular paragraph
+      else {
+        elements.push(
+          <Text key={key++} style={styles.detailParagraph}>
+            {trimmed}
+          </Text>
+        );
+      }
+    });
+
+    return elements;
+  };
+
   const submitFeedback = async (helpful: boolean) => {
     try {
       await fetch(`${BACKEND_URL}/api/feedback`, {
