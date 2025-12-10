@@ -20,6 +20,7 @@ const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 interface LocalVendorsModalProps {
   visible: boolean;
   itemType: string;
+  repairData?: any;
   onClose: () => void;
 }
 
@@ -29,6 +30,7 @@ interface Vendor {
   specialization: string;
   address: string;
   phone: string;
+  email?: string;
   rating: number;
   reviews_count: number;
   distance: string;
