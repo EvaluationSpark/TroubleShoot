@@ -711,14 +711,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     flex: 1,
   },
+  amazonButton: {
+    padding: 8,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ffa500',
+  },
   partItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
     gap: 12,
     marginBottom: 12,
-    padding: 12,
+    padding: 16,
     backgroundColor: '#1a1a1a',
-    borderRadius: 8,
+    borderRadius: 12,
   },
   partInfo: {
     flexDirection: 'row',
@@ -726,23 +732,28 @@ const styles = StyleSheet.create({
     gap: 12,
     flex: 1,
   },
+  partTextContainer: {
+    flex: 1,
+  },
   priceText: {
     color: '#4ade80',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
+    marginTop: 4,
   },
-  linkButton: {
+  amazonBuyButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    padding: 6,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 6,
+    justifyContent: 'center',
+    gap: 8,
+    padding: 12,
+    backgroundColor: '#ff9900',
+    borderRadius: 8,
   },
-  linkText: {
-    color: '#00D9FF',
-    fontSize: 12,
-    fontWeight: '600',
+  amazonBuyText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   safetyItem: {
     flexDirection: 'row',
