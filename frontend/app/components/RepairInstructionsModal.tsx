@@ -209,6 +209,25 @@ export default function RepairInstructionsModal({
     }
   };
 
+  const searchAmazon = async (itemName: string) => {
+    try {
+      // Create Amazon search query with item type for better results
+      const searchQuery = `${itemName} ${repairData.item_type} repair part`;
+      const encodedQuery = encodeURIComponent(searchQuery);
+      const amazonUrl = `https://www.amazon.com/s?k=${encodedQuery}`;
+      
+      const supported = await Linking.canOpenURL(amazonUrl);
+      if (supported) {
+        await Linking.openURL(amazonUrl);
+      } else {
+        Alert.alert('Error', 'Unable to open Amazon');
+      }
+    } catch (error) {
+      console.error('Error opening Amazon:', error);
+      Alert.alert('Error', 'Failed to open Amazon search');
+    }
+  };
+
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={styles.container}>
