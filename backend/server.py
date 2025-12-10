@@ -80,6 +80,25 @@ class FeedbackRequest(BaseModel):
     comment: Optional[str] = None
     was_helpful: bool
 
+class LocalVendorSearch(BaseModel):
+    item_type: str
+    location: str  # City or zip code
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
+class LocalVendor(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    specialization: str
+    address: str
+    phone: str
+    rating: float  # 1-5
+    reviews_count: int
+    distance: str
+    estimated_cost: str
+    hours: str
+    website: Optional[str] = None
+
 # ============ HELPER FUNCTIONS ============
 
 async def analyze_broken_item(image_base64: str, language: str = "en") -> Dict[str, Any]:
