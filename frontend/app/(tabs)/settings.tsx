@@ -138,44 +138,6 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Language Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Language</Text>
-          <View style={styles.settingItem}>
-            <View style={styles.settingInfo}>
-              <Ionicons name="language" size={24} color="#00D9FF" />
-              <View style={styles.settingTextContainer}>
-                <Text style={styles.settingLabel}>App Language</Text>
-                <Text style={styles.settingDescription}>Current: {language}</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </View>
-          
-          {/* Language Options */}
-          <View style={styles.languageGrid}>
-            {languages.map((lang) => (
-              <TouchableOpacity
-                key={lang.code}
-                style={[
-                  styles.languageButton,
-                  language === lang.name && styles.languageButtonActive,
-                ]}
-                onPress={() => handleLanguageChange(lang)}
-              >
-                <Text
-                  style={[
-                    styles.languageButtonText,
-                    language === lang.name && styles.languageButtonTextActive,
-                  ]}
-                >
-                  {lang.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
         {/* About Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
