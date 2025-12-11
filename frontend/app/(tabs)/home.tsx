@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -126,53 +127,108 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Fix Your Items</Text>
-          <Text style={styles.subtitle}>Snap a photo of broken items and get AI-powered repair instructions</Text>
-        </View>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Hero Section with Gradient */}
+        <LinearGradient
+          colors={['#001a1a', '#003333', '#00524d']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroSection}
+        >
+          <View style={styles.heroContent}>
+            <View style={styles.logoContainer}>
+              <LinearGradient
+                colors={['#00D9FF', '#00a8cc']}
+                style={styles.logoGradient}
+              >
+                <Ionicons name="construct" size={40} color="#fff" />
+              </LinearGradient>
+            </View>
+            <Text style={styles.title}>Pix-Fix</Text>
+            <Text style={styles.subtitle}>AI-Powered Repair Assistant</Text>
+            <Text style={styles.description}>
+              Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI
+            </Text>
+          </View>
+        </LinearGradient>
 
         {/* Image Preview */}
         {selectedImage ? (
-          <View style={styles.imageContainer}>
-            <Image
-              source={{ uri: `data:image/jpeg;base64,${selectedImage}` }}
-              style={styles.previewImage}
-              resizeMode="cover"
-            />
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => setSelectedImage(null)}
-            >
-              <Ionicons name="close-circle" size={32} color="#fff" />
-            </TouchableOpacity>
+          <View style={styles.imageSection}>
+            <View style={styles.imageCard}>
+              <Image
+                source={{ uri: `data:image/jpeg;base64,${selectedImage}` }}
+                style={styles.previewImage}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.7)']}
+                style={styles.imageOverlay}
+              />
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => setSelectedImage(null)}
+              >
+                <LinearGradient
+                  colors={['#ff4444', '#cc0000']}
+                  style={styles.removeButtonGradient}
+                >
+                  <Ionicons name="close" size={20} color="#fff" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
         ) : (
-          <View style={styles.placeholderContainer}>
-            <Ionicons name="camera" size={64} color="#555" />
-            <Text style={styles.placeholderText}>No image selected</Text>
+          <View style={styles.placeholderSection}>
+            <View style={styles.placeholderCard}>
+              <LinearGradient
+                colors={['#1a2a2a', '#0f1f1f']}
+                style={styles.placeholderGradient}
+              >
+                <View style={styles.placeholderIcon}>
+                  <Ionicons name="camera-outline" size={64} color="#00D9FF" />
+                </View>
+                <Text style={styles.placeholderTitle}>No Image Selected</Text>
+                <Text style={styles.placeholderText}>Take a photo or choose from gallery to get started</Text>
+              </LinearGradient>
+            </View>
           </View>
         )}
 
         {/* Action Buttons */}
-        <View style={styles.buttonContainer}>
+        <View style={styles.actionsSection}>
           <TouchableOpacity
             style={styles.actionButton}
             onPress={takePhoto}
             disabled={loading}
+            activeOpacity={0.8}
           >
-            <Ionicons name="camera" size={24} color="#fff" />
-            <Text style={styles.actionButtonText}>Take Photo</Text>
+            <LinearGradient
+              colors={['#2a2a2a', '#1a1a1a']}
+              style={styles.actionButtonGradient}
+            >
+              <View style={styles.actionIconContainer}>
+                <Ionicons name="camera" size={28} color="#00D9FF" />
+              </View>
+              <Text style={styles.actionButtonText}>Take Photo</Text>
+            </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.actionButton}
             onPress={pickImage}
             disabled={loading}
+            activeOpacity={0.8}
           >
-            <Ionicons name="images" size={24} color="#fff" />
-            <Text style={styles.actionButtonText}>Choose from Gallery</Text>
+            <LinearGradient
+              colors={['#2a2a2a', '#1a1a1a']}
+              style={styles.actionButtonGradient}
+            >
+              <View style={styles.actionIconContainer}>
+                <Ionicons name="images" size={28} color="#00D9FF" />
+              </View>
+              <Text style={styles.actionButtonText}>Gallery</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
@@ -182,36 +238,85 @@ export default function HomeScreen() {
             style={[styles.analyzeButton, loading && styles.disabledButton]}
             onPress={analyzeImage}
             disabled={loading}
+            activeOpacity={0.9}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" size="small" />
-            ) : (
-              <>
-                <Ionicons name="construct" size={24} color="#fff" />
-                <Text style={styles.analyzeButtonText}>Analyze & Get Repair Guide</Text>
-              </>
-            )}
+            <LinearGradient
+              colors={['#00D9FF', '#00a8cc', '#008299']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.analyzeButtonGradient}
+            >
+              {loading ? (
+                <>
+                  <ActivityIndicator color="#fff" size="small" />
+                  <Text style={styles.analyzeButtonText}>Analyzing...</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="sparkles" size={24} color="#fff" />
+                  <Text style={styles.analyzeButtonText}>Analyze & Get Repair Guide</Text>
+                  <Ionicons name="arrow-forward" size={20} color="#fff" />
+                </>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
         )}
 
-        {/* Features */}
-        <View style={styles.featuresContainer}>
-          <Text style={styles.featuresTitle}>What You'll Get:</Text>
-          <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#00D9FF" />
-            <Text style={styles.featureText}>Step-by-step repair instructions</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#00D9FF" />
-            <Text style={styles.featureText}>Tools and parts needed</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#00D9FF" />
-            <Text style={styles.featureText}>Visual repair diagrams</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#00D9FF" />
-            <Text style={styles.featureText}>Safety tips and warnings</Text>
+        {/* Features Grid */}
+        <View style={styles.featuresSection}>
+          <Text style={styles.featuresTitle}>What You'll Get</Text>
+          <View style={styles.featuresGrid}>
+            <View style={styles.featureCard}>
+              <LinearGradient
+                colors={['#1a2a2a', '#0f1f1f']}
+                style={styles.featureCardGradient}
+              >
+                <View style={styles.featureIconContainer}>
+                  <Ionicons name="list" size={28} color="#00D9FF" />
+                </View>
+                <Text style={styles.featureTitle}>Step-by-Step</Text>
+                <Text style={styles.featureDescription}>Detailed repair instructions</Text>
+              </LinearGradient>
+            </View>
+
+            <View style={styles.featureCard}>
+              <LinearGradient
+                colors={['#1a2a2a', '#0f1f1f']}
+                style={styles.featureCardGradient}
+              >
+                <View style={styles.featureIconContainer}>
+                  <Ionicons name="build" size={28} color="#4ade80" />
+                </View>
+                <Text style={styles.featureTitle}>Tools & Parts</Text>
+                <Text style={styles.featureDescription}>Everything you need</Text>
+              </LinearGradient>
+            </View>
+
+            <View style={styles.featureCard}>
+              <LinearGradient
+                colors={['#1a2a2a', '#0f1f1f']}
+                style={styles.featureCardGradient}
+              >
+                <View style={styles.featureIconContainer}>
+                  <Ionicons name="shield-checkmark" size={28} color="#fbbf24" />
+                </View>
+                <Text style={styles.featureTitle}>Safety Tips</Text>
+                <Text style={styles.featureDescription}>Stay protected</Text>
+              </LinearGradient>
+            </View>
+
+            <View style={styles.featureCard}>
+              <LinearGradient
+                colors={['#1a2a2a', '#0f1f1f']}
+                style={styles.featureCardGradient}
+              >
+                <View style={styles.featureIconContainer}>
+                  <Ionicons name="location" size={28} color="#f87171" />
+                </View>
+                <Text style={styles.featureTitle}>Local Shops</Text>
+                <Text style={styles.featureDescription}>Find experts nearby</Text>
+              </LinearGradient>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -231,118 +336,235 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
+    backgroundColor: '#0a0a0a',
   },
   scrollContent: {
-    padding: 20,
+    paddingBottom: 40,
   },
-  header: {
-    marginBottom: 24,
+  heroSection: {
+    padding: 24,
+    paddingTop: 32,
+    paddingBottom: 40,
+  },
+  heroContent: {
+    alignItems: 'center',
+  },
+  logoContainer: {
+    marginBottom: 16,
+  },
+  logoGradient: {
+    width: 80,
+    height: 80,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#00D9FF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 12,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 42,
+    fontWeight: '800',
     color: '#fff',
     marginBottom: 8,
+    letterSpacing: -1,
   },
   subtitle: {
     fontSize: 16,
-    color: '#aaa',
-    lineHeight: 22,
+    fontWeight: '600',
+    color: '#00D9FF',
+    marginBottom: 12,
+    letterSpacing: 0.5,
   },
-  imageContainer: {
-    width: '100%',
-    height: 300,
-    borderRadius: 16,
+  description: {
+    fontSize: 15,
+    color: '#aaa',
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 20,
+  },
+  imageSection: {
+    paddingHorizontal: 20,
+    marginTop: -20,
+  },
+  imageCard: {
+    height: 320,
+    borderRadius: 24,
     overflow: 'hidden',
-    marginBottom: 24,
-    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.6,
+    shadowRadius: 24,
+    elevation: 16,
   },
   previewImage: {
     width: '100%',
     height: '100%',
   },
+  imageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+  },
   removeButton: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 20,
+    top: 16,
+    right: 16,
   },
-  placeholderContainer: {
-    width: '100%',
-    height: 300,
-    borderRadius: 16,
-    backgroundColor: '#1a1a1a',
+  removeButtonGradient: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    shadowColor: '#ff0000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  placeholderSection: {
+    paddingHorizontal: 20,
+    marginTop: -20,
+  },
+  placeholderCard: {
+    borderRadius: 24,
+    overflow: 'hidden',
     borderWidth: 2,
-    borderColor: '#333',
+    borderColor: '#1a2a2a',
     borderStyle: 'dashed',
   },
-  placeholderText: {
-    color: '#555',
-    fontSize: 16,
-    marginTop: 12,
+  placeholderGradient: {
+    padding: 48,
+    alignItems: 'center',
   },
-  buttonContainer: {
+  placeholderIcon: {
+    marginBottom: 20,
+  },
+  placeholderTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  placeholderText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  actionsSection: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
+    paddingHorizontal: 20,
+    gap: 16,
+    marginTop: 24,
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#2a2a2a',
-    padding: 16,
-    borderRadius: 12,
-    flexDirection: 'row',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  actionButtonGradient: {
+    padding: 20,
     alignItems: 'center',
+  },
+  actionIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 217, 255, 0.1)',
     justifyContent: 'center',
-    gap: 8,
+    alignItems: 'center',
+    marginBottom: 12,
   },
   actionButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
   },
   analyzeButton: {
-    backgroundColor: '#00D9FF',
-    padding: 18,
-    borderRadius: 12,
+    marginHorizontal: 20,
+    marginTop: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#00D9FF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  analyzeButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    marginBottom: 32,
+    padding: 20,
+    gap: 12,
   },
   analyzeButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   disabledButton: {
-    opacity: 0.5,
+    opacity: 0.6,
   },
-  featuresContainer: {
-    backgroundColor: '#1a1a1a',
-    padding: 20,
-    borderRadius: 16,
+  featuresSection: {
+    paddingHorizontal: 20,
+    marginTop: 40,
   },
   featuresTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '700',
     color: '#fff',
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  featureItem: {
+  featuresGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  featureCard: {
+    width: '47%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  featureCardGradient: {
+    padding: 20,
+    minHeight: 140,
+  },
+  featureIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
     marginBottom: 12,
   },
-  featureText: {
-    color: '#ccc',
-    fontSize: 14,
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 6,
+  },
+  featureDescription: {
+    fontSize: 13,
+    color: '#888',
+    lineHeight: 18,
   },
 });
