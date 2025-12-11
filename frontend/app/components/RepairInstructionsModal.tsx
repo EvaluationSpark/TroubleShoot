@@ -546,32 +546,34 @@ export default function RepairInstructionsModal({
             </TouchableOpacity>
           </View>
 
-          {/* Save Session */}
+          {/* Save Session - New Buttons */}
           <View style={styles.actionSection}>
-            {!showSaveForm ? (
-              <TouchableOpacity style={styles.saveButton} onPress={() => setShowSaveForm(true)}>
-                <Ionicons name="bookmark" size={20} color="#fff" />
-                <Text style={styles.saveButtonText}>Save for Later</Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.saveForm}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter repair title..."
-                  placeholderTextColor="#666"
-                  value={sessionTitle}
-                  onChangeText={setSessionTitle}
-                />
-                <View style={styles.saveFormButtons}>
-                  <TouchableOpacity style={styles.cancelButton} onPress={() => setShowSaveForm(false)}>
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.confirmButton} onPress={saveSession}>
-                    <Text style={styles.confirmButtonText}>Save</Text>
-                  </TouchableOpacity>
+            <Text style={styles.actionSectionTitle}>Save This Repair</Text>
+            <Text style={styles.actionSectionSubtitle}>Track your progress or save for future reference</Text>
+            
+            <View style={styles.saveButtonsContainer}>
+              <TouchableOpacity style={styles.startRepairButton} onPress={startRepair}>
+                <View style={styles.buttonIcon}>
+                  <Ionicons name="play-circle" size={24} color="#fff" />
                 </View>
-              </View>
-            )}
+                <View style={styles.buttonContent}>
+                  <Text style={styles.buttonTitle}>Start Repair</Text>
+                  <Text style={styles.buttonSubtitle}>Begin tracking progress</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#fff" />
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.saveForLaterButton} onPress={saveForLater}>
+                <View style={styles.buttonIcon}>
+                  <Ionicons name="bookmark" size={24} color="#00D9FF" />
+                </View>
+                <View style={styles.buttonContent}>
+                  <Text style={[styles.buttonTitle, { color: '#00D9FF' }]}>Save for Later</Text>
+                  <Text style={[styles.buttonSubtitle, { color: '#aaa' }]}>Bookmark for future use</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#00D9FF" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Feedback */}
