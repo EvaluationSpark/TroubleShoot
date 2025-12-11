@@ -11,39 +11,20 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import i18n, { saveLanguagePreference } from '../i18n';
 import { requestNotificationPermissions, checkNotificationPermissions } from '../utils/notifications';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(true);
   const [notifications, setNotifications] = useState(false);
-  const [language, setLanguage] = useState('English');
-
-  const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'fr', name: 'Français' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'zh', name: '中文' },
-    { code: 'ja', name: '日本語' },
-  ];
 
   useEffect(() => {
     loadNotificationStatus();
-    loadCurrentLanguage();
   }, []);
 
   const loadNotificationStatus = async () => {
     const hasPermission = await checkNotificationPermissions();
     setNotifications(hasPermission);
-  };
-
-  const loadCurrentLanguage = () => {
-    const currentLang = languages.find(lang => lang.code === i18n.locale);
-    if (currentLang) {
-      setLanguage(currentLang.name);
-    }
   };
 
   const handleNotificationToggle = async (value: boolean) => {
@@ -62,21 +43,6 @@ export default function SettingsScreen() {
         'Notifications Disabled',
         'You can re-enable notifications anytime from settings.'
       );
-    }
-  };
-
-  const handleLanguageChange = async (lang: { code: string; name: string }) => {
-    try {
-      await saveLanguagePreference(lang.code);
-      setLanguage(lang.name);
-      Alert.alert(
-        'Language Changed',
-        `App language set to ${lang.name}. Some screens may require restart for full effect.`,
-        [{ text: 'OK', style: 'default' }]
-      );
-    } catch (error) {
-      console.error('Error changing language:', error);
-      Alert.alert('Error', 'Failed to change language');
     }
   };
 
