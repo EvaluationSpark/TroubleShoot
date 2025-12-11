@@ -15,8 +15,9 @@ import i18n, { saveLanguagePreference } from '../i18n';
 import { requestNotificationPermissions, checkNotificationPermissions } from '../utils/notifications';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const [darkMode, setDarkMode] = useState(true);
-  const [notifications, setNotifications] = useState(true);
+  const [notifications, setNotifications] = useState(false);
   const [language, setLanguage] = useState('English');
 
   const languages = [
@@ -28,13 +29,64 @@ export default function SettingsScreen() {
     { code: 'ja', name: '日本語' },
   ];
 
+  useEffect(() => {
+    loadNotificationStatus();
+    loadCurrentLanguage();
+  }, []);
+
+  const loadNotificationStatus = async () => {
+    const hasPermission = await checkNotificationPermissions();
+    setNotifications(hasPermission);
+  };
+
+  const loadCurrentLanguage = () => {
+    const currentLang = languages.find(lang => lang.code === i18n.locale);
+    if (currentLang) {
+      setLanguage(currentLang.name);
+    }
+  };
+
+  const handleNotificationToggle = async (value: boolean) => {
+    if (value) {
+      const granted = await requestNotificationPermissions();
+      setNotifications(granted);
+      if (!granted) {
+        Alert.alert(
+          'Permission Required',
+          'Please enable notifications in your device settings to receive updates.'
+        );
+      }
+    } else {
+      setNotifications(false);
+      Alert.alert(
+        'Notifications Disabled',
+        'You can re-enable notifications anytime from settings.'
+      );
+    }
+  };
+
+  const handleLanguageChange = async (lang: { code: string; name: string }) => {
+    try {
+      await saveLanguagePreference(lang.code);
+      setLanguage(lang.name);
+      Alert.alert(
+        'Language Changed',
+        `App language set to ${lang.name}. Some screens may require restart for full effect.`,
+        [{ text: 'OK', style: 'default' }]
+      );
+    } catch (error) {
+      console.error('Error changing language:', error);
+      Alert.alert('Error', 'Failed to change language');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>Customize your FixIt Pro experience</Text>
+          <Text style={styles.headerSubtitle}>Customize your Pix-Fix experience</Text>
         </View>
 
         {/* App Version */}
@@ -42,7 +94,7 @@ export default function SettingsScreen() {
           <View style={styles.appIconContainer}>
             <Ionicons name="construct" size={40} color="#00D9FF" />
           </View>
-          <Text style={styles.appName}>FixIt Pro</Text>
+          <Text style={styles.appName}>Pix-Fix</Text>
           <Text style={styles.versionText}>Version 1.0.0</Text>
         </View>
 
@@ -79,7 +131,7 @@ export default function SettingsScreen() {
             </View>
             <Switch
               value={notifications}
-              onValueChange={setNotifications}
+              onValueChange={handleNotificationToggle}
               trackColor={{ false: '#2a2a2a', true: '#00D9FF' }}
               thumbColor="#fff"
             />
@@ -109,7 +161,7 @@ export default function SettingsScreen() {
                   styles.languageButton,
                   language === lang.name && styles.languageButtonActive,
                 ]}
-                onPress={() => setLanguage(lang.name)}
+                onPress={() => handleLanguageChange(lang)}
               >
                 <Text
                   style={[
@@ -128,7 +180,10 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
           
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => router.push('/screens/HelpSupportScreen')}
+          >
             <View style={styles.settingInfo}>
               <Ionicons name="help-circle" size={24} color="#00D9FF" />
               <Text style={styles.settingLabel}>Help & Support</Text>
@@ -136,7 +191,10 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => router.push('/screens/TermsOfServiceScreen')}
+          >
             <View style={styles.settingInfo}>
               <Ionicons name="document-text" size={24} color="#00D9FF" />
               <Text style={styles.settingLabel}>Terms of Service</Text>
@@ -144,7 +202,10 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.settingItem}>
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => router.push('/screens/PrivacyPolicyScreen')}
+          >
             <View style={styles.settingInfo}>
               <Ionicons name="shield-checkmark" size={24} color="#00D9FF" />
               <Text style={styles.settingLabel}>Privacy Policy</Text>
