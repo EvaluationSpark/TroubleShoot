@@ -10,13 +10,23 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+const REPAIRS_STORAGE_KEY = '@pix_fix_repairs';
 
 export default function ProgressScreen() {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Fetch sessions when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchSessions();
+    }, [])
+  );
 
   useEffect(() => {
     fetchSessions();
@@ -24,16 +34,63 @@ export default function ProgressScreen() {
 
   const fetchSessions = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/repair-sessions`);
-      if (response.ok) {
-        const data = await response.json();
-        setSessions(data);
-      }
+      // Fetch from both sources
+      const [backendSessions, localSessions] = await Promise.all([
+        fetchBackendSessions(),
+        fetchLocalSessions(),
+      ]);
+
+      // Merge and deduplicate sessions (prefer backend data)
+      const allSessions = [...backendSessions];
+      const backendIds = new Set(backendSessions.map((s: any) => s.repair_id));
+      
+      // Add local sessions that aren't in backend
+      localSessions.forEach((localSession: any) => {
+        if (!backendIds.has(localSession.repair_id)) {
+          allSessions.push(localSession);
+        }
+      });
+
+      // Sort by updated_at or timestamp
+      allSessions.sort((a: any, b: any) => {
+        const dateA = new Date(a.updated_at || a.timestamp || 0);
+        const dateB = new Date(b.updated_at || b.timestamp || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+
+      setSessions(allSessions);
     } catch (error) {
       console.error('Error fetching sessions:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  const fetchBackendSessions = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/repair-sessions`);
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
+      return [];
+    } catch (error) {
+      console.log('Backend fetch failed, using local data only');
+      return [];
+    }
+  };
+
+  const fetchLocalSessions = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(REPAIRS_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching local sessions:', error);
+      return [];
     }
   };
 
