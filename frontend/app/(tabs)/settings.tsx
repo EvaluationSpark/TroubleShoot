@@ -254,32 +254,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
   },
-  languageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 12,
-  },
-  languageButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#1a1a1a',
-  },
-  languageButtonActive: {
-    borderColor: '#00D9FF',
-    backgroundColor: '#002a33',
-  },
-  languageButtonText: {
-    color: '#aaa',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  languageButtonTextActive: {
-    color: '#00D9FF',
-  },
   featuresSection: {
     marginBottom: 32,
   },
