@@ -13,9 +13,11 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocalVendorsModal from './LocalVendorsModal';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+const REPAIRS_STORAGE_KEY = '@pix_fix_repairs';
 
 interface RepairInstructionsModalProps {
   visible: boolean;
