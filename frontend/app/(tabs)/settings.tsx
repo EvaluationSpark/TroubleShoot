@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import i18n, { saveLanguagePreference } from '../i18n';
+import { requestNotificationPermissions, checkNotificationPermissions } from '../utils/notifications';
 
 export default function SettingsScreen() {
   const [darkMode, setDarkMode] = useState(true);
