@@ -186,6 +186,128 @@ export default function RepairInstructionsModal({
     }
   };
 
+  const generateRepairTitle = () => {
+    // Auto-generate title from item type and damage description
+    const itemType = repairData.item_type || 'Item';
+    const damage = repairData.damage_description || 'Repair';
+    return `${itemType} - ${damage.substring(0, 50)}${damage.length > 50 ? '...' : ''}`;
+  };
+
+  const saveToAsyncStorage = async (repairSession: any) => {
+    try {
+      const existingRepairs = await AsyncStorage.getItem(REPAIRS_STORAGE_KEY);
+      const repairs = existingRepairs ? JSON.parse(existingRepairs) : [];
+      repairs.unshift(repairSession); // Add to beginning of array
+      await AsyncStorage.setItem(REPAIRS_STORAGE_KEY, JSON.stringify(repairs));
+      console.log('Saved to AsyncStorage:', repairSession.id);
+    } catch (error) {
+      console.error('Error saving to AsyncStorage:', error);
+    }
+  };
+
+  const startRepair = async () => {
+    try {
+      const title = generateRepairTitle();
+      const repairSession = {
+        id: `local_${Date.now()}`,
+        repair_id: repairData.repair_id,
+        title: title,
+        notes: repairData.damage_description,
+        progress_percentage: 0,
+        timestamp: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        // Store full repair data for offline access
+        item_type: repairData.item_type,
+        repair_steps: repairData.repair_steps,
+        tools_needed: repairData.tools_needed,
+        parts_needed: repairData.parts_needed,
+        diagram_base64: repairData.diagram_base64,
+        repair_difficulty: repairData.repair_difficulty,
+        estimated_time: repairData.estimated_time,
+      };
+
+      // Save to backend
+      try {
+        await fetch(`${BACKEND_URL}/api/save-repair-session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            repair_id: repairData.repair_id,
+            title: title,
+            notes: repairData.damage_description,
+            progress_percentage: 0,
+          }),
+        });
+      } catch (backendError) {
+        console.log('Backend save failed, continuing with local save');
+      }
+
+      // Save to local storage (always)
+      await saveToAsyncStorage(repairSession);
+
+      Alert.alert(
+        '🔧 Repair Started!',
+        `"${title}" has been saved. Track your progress in the Progress tab.`,
+        [{ text: 'Got it!', style: 'default' }]
+      );
+    } catch (error) {
+      console.error('Error starting repair:', error);
+      Alert.alert('Error', 'Failed to start repair session');
+    }
+  };
+
+  const saveForLater = async () => {
+    try {
+      const title = generateRepairTitle();
+      const repairSession = {
+        id: `local_${Date.now()}`,
+        repair_id: repairData.repair_id,
+        title: title,
+        notes: 'Saved for later review',
+        progress_percentage: 0,
+        timestamp: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        saved_for_later: true,
+        // Store full repair data
+        item_type: repairData.item_type,
+        repair_steps: repairData.repair_steps,
+        tools_needed: repairData.tools_needed,
+        parts_needed: repairData.parts_needed,
+        diagram_base64: repairData.diagram_base64,
+        repair_difficulty: repairData.repair_difficulty,
+        estimated_time: repairData.estimated_time,
+      };
+
+      // Save to backend
+      try {
+        await fetch(`${BACKEND_URL}/api/save-repair-session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            repair_id: repairData.repair_id,
+            title: title,
+            notes: 'Saved for later review',
+            progress_percentage: 0,
+          }),
+        });
+      } catch (backendError) {
+        console.log('Backend save failed, continuing with local save');
+      }
+
+      // Save to local storage (always)
+      await saveToAsyncStorage(repairSession);
+
+      Alert.alert(
+        '📌 Saved for Later!',
+        `"${title}" has been bookmarked. Access it anytime from the Progress tab.`,
+        [{ text: 'Got it!', style: 'default' }]
+      );
+    } catch (error) {
+      console.error('Error saving for later:', error);
+      Alert.alert('Error', 'Failed to save repair');
+    }
+  };
+
   const saveSession = async () => {
     if (!sessionTitle.trim()) {
       Alert.alert('Error', 'Please enter a title for this repair session');
