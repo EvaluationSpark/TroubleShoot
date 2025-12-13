@@ -59,8 +59,8 @@ const DIAGNOSTIC_QUESTIONS: Record<string, any> = {
         id: 1,
         question: 'What is the main issue with your washing machine?',
         options: [
-          'Won\\'t start at all',
-          'Won\\'t spin or agitate',
+          "Won't start at all",
+          "Won't spin or agitate",
           'Leaking water',
           'Making loud noises',
           'Not draining',
