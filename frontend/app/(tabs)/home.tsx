@@ -154,7 +154,11 @@ export default function HomeScreen() {
           </BlurView>
 
           {/* Main Content */}
-          <View style={styles.content}>
+          <ScrollView 
+            style={styles.content}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
             {/* Hero Section */}
             <BlurView
               intensity={theme.colors.glassBlur}
