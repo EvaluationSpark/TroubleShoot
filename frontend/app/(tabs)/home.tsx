@@ -89,7 +89,10 @@ export default function HomeScreen() {
       const response = await fetch(`${BACKEND_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: base64 }),
+        body: JSON.stringify({ 
+          image: base64,
+          skill_level: skillLevel,
+        }),
       });
 
       if (response.ok) {
