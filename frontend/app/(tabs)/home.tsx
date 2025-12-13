@@ -19,8 +19,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
 import DiagnosticQuestionsModal from '../components/DiagnosticQuestionsModal';
+import SafetyGatingModal from '../components/SafetyGatingModal';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSkillLevel } from '../contexts/SkillLevelContext';
+import { RiskLevel } from '../types/models';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -32,6 +34,7 @@ export default function HomeScreen() {
   const [repairData, setRepairData] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
+  const [showSafetyGating, setShowSafetyGating] = useState(false);
   const [initialAnalysis, setInitialAnalysis] = useState<any>(null);
 
   const pickImage = async (useCamera: boolean) => {
