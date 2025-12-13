@@ -248,17 +248,17 @@ export default function DiagnosticQuestionsModal({
             style={[styles.header, { borderColor: theme.colors.glassBorder }]}
           >
             <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-              <Ionicons name=\"arrow-back\" size={24} color={theme.colors.primary} />
+              <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
             <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Diagnostic Questions</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name=\"close\" size={24} color={theme.colors.textSecondary} />
+              <Ionicons name="close" size={24} color={theme.colors.textSecondary} />
             </TouchableOpacity>
           </BlurView>
 
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size=\"large\" color={theme.colors.primary} />
+              <ActivityIndicator size="large" color={theme.colors.primary} />
               <Text style={[styles.loadingText, { color: theme.colors.text }]}>
                 Analyzing your answers...
               </Text>
@@ -294,7 +294,7 @@ export default function DiagnosticQuestionsModal({
                     colors={theme.gradients.primary}
                     style={styles.iconGradient}
                   >
-                    <Ionicons name=\"help-circle\" size={32} color=\"#fff\" />
+                    <Ionicons name="help-circle" size={32} color="#fff" />
                   </LinearGradient>
                 </View>
                 <Text style={[styles.questionText, { color: theme.colors.text }]}>
@@ -360,7 +360,7 @@ export default function DiagnosticQuestionsModal({
                 tint={theme.colors.glassTint}
                 style={[styles.helpCard, { borderColor: theme.colors.glassBorder }]}
               >
-                <Ionicons name=\"information-circle\" size={20} color={theme.colors.info} />
+                <Ionicons name="information-circle" size={20} color={theme.colors.info} />
                 <Text style={[styles.helpText, { color: theme.colors.textSecondary }]}>
                   These questions help our AI provide more accurate repair guidance tailored to your specific issue.
                 </Text>
