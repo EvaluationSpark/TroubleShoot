@@ -133,15 +133,30 @@ Analyze this image of a broken item and provide a detailed repair analysis in {l
 USER SKILL LEVEL: {skill_level.upper()}
 {skill_prompt}
 
+CRITICAL SAFETY ASSESSMENT:
+- Detect if repair involves: ELECTRICAL work, GAS systems, HVAC, STRUCTURAL repairs, or HIGH-RISK scenarios
+- Assess your CONFIDENCE level (0-100) in the diagnosis
+- If confidence < 70% OR high-risk category detected, set stop_and_call_pro = true
+
 Please provide:
 1. Item Type (e.g., 'Smartphone', 'Chair', 'Laptop', etc.)
 2. Damage Description (what's broken)
 3. Repair Difficulty (easy/medium/hard)
 4. Estimated Time (e.g., '30 minutes', '2 hours')
-5. Step-by-step Repair Instructions (adapt detail level to skill level)
-6. Tools Needed (list - consider skill level for tool assumptions)
-7. Parts Needed (list with estimated prices if applicable)
-8. Safety Tips (list - more warnings for beginners, fewer for pros)
+5. RISK LEVEL (low/medium/high/critical) - CRITICAL for electrical/gas/structural
+6. CONFIDENCE SCORE (0-100) - How certain are you about this diagnosis?
+7. STOP_AND_CALL_PRO (true/false) - Should user call a professional instead?
+8. ASSUMPTIONS (list) - What are you assuming about the problem?
+9. Step-by-step Repair Instructions (adapt detail level to skill level)
+10. Tools Needed (list - consider skill level for tool assumptions)
+11. Parts Needed (list with estimated prices if applicable)
+12. Safety Tips (list - CRITICAL warnings for high-risk repairs)
+
+RISK LEVEL GUIDELINES:
+- LOW: Cosmetic repairs, simple replacements, no power/gas involved
+- MEDIUM: Requires tools, some technical skill, minor risks
+- HIGH: Complex repairs, potential for injury, requires expertise
+- CRITICAL: ELECTRICAL/GAS/STRUCTURAL - ALWAYS recommend professional
 
 Format your response as JSON with these exact keys:
 {{
@@ -149,6 +164,10 @@ Format your response as JSON with these exact keys:
   "damage_description": "...",
   "repair_difficulty": "...",
   "estimated_time": "...",
+  "risk_level": "low|medium|high|critical",
+  "confidence_score": 85,
+  "stop_and_call_pro": false,
+  "assumptions": ["assumption 1", "assumption 2"],
   "repair_steps": [...],
   "tools_needed": [...],
   "parts_needed": [{{"name": "...", "price": "...", "link": "https://example.com"}}],
