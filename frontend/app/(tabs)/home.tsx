@@ -19,11 +19,13 @@ import { BlurView } from 'expo-blur';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
 import DiagnosticQuestionsModal from '../components/DiagnosticQuestionsModal';
 import { useTheme } from '../contexts/ThemeContext';
+import { useSkillLevel } from '../contexts/SkillLevelContext';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function HomeScreen() {
   const { theme } = useTheme();
+  const { skillLevel } = useSkillLevel();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [repairData, setRepairData] = useState<any>(null);
