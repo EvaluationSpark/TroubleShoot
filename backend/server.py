@@ -48,6 +48,10 @@ class RepairAnalysisResponse(BaseModel):
     tools_needed: List[str]
     parts_needed: List[Dict[str, str]]  # [{"name": "...", "link": "..."}]
     safety_tips: List[str]
+    risk_level: Optional[str] = "low"  # low, medium, high, critical
+    confidence_score: Optional[int] = 85  # 0-100
+    stop_and_call_pro: Optional[bool] = False
+    assumptions: Optional[List[str]] = []
     diagram_base64: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
