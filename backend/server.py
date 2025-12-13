@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 class RepairAnalysisRequest(BaseModel):
     image_base64: str
     language: str = "en"
+    skill_level: Optional[str] = "diy"  # beginner, diy, pro
 
 class RepairAnalysisResponse(BaseModel):
     repair_id: str
