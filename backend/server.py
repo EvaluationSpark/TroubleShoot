@@ -103,13 +103,22 @@ class LocalVendor(BaseModel):
 
 # ============ HELPER FUNCTIONS ============
 
-async def analyze_broken_item(image_base64: str, language: str = "en") -> Dict[str, Any]:
+async def analyze_broken_item(image_base64: str, language: str = "en", skill_level: str = "diy") -> Dict[str, Any]:
     """Analyze a broken item using Gemini Vision API"""
     try:
+        # Adapt instructions based on skill level
+        skill_context = {
+            "beginner": "This user is NEW TO REPAIRS. Provide VERY DETAILED, step-by-step instructions with extra safety warnings. Assume they only have basic household tools. Suggest alternatives for specialized tools. Use simple, non-technical language.",
+            "diy": "This user has BASIC REPAIR EXPERIENCE. Provide clear, standard instructions. Assume they have a typical DIY toolkit. Use moderate technical terminology.",
+            "pro": "This user is an EXPERIENCED TECHNICIAN. Provide CONCISE, professional-level instructions. Assume they have professional tools. Use technical terminology freely. Minimize basic warnings."
+        }
+        
+        skill_prompt = skill_context.get(skill_level.lower(), skill_context["diy"])
+        
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"analysis_{uuid.uuid4()}",
-            system_message="You are an expert repair technician who can identify broken items and provide detailed repair instructions."
+            system_message=f"You are an expert repair technician who can identify broken items and provide detailed repair instructions. {skill_prompt}"
         )
         
         chat.with_model("gemini", "gemini-2.5-flash")
@@ -117,15 +126,18 @@ async def analyze_broken_item(image_base64: str, language: str = "en") -> Dict[s
         prompt = f"""
 Analyze this image of a broken item and provide a detailed repair analysis in {language}.
 
+USER SKILL LEVEL: {skill_level.upper()}
+{skill_prompt}
+
 Please provide:
 1. Item Type (e.g., 'Smartphone', 'Chair', 'Laptop', etc.)
 2. Damage Description (what's broken)
 3. Repair Difficulty (easy/medium/hard)
 4. Estimated Time (e.g., '30 minutes', '2 hours')
-5. Step-by-step Repair Instructions (numbered list)
-6. Tools Needed (list)
+5. Step-by-step Repair Instructions (adapt detail level to skill level)
+6. Tools Needed (list - consider skill level for tool assumptions)
 7. Parts Needed (list with estimated prices if applicable)
-8. Safety Tips (list of important warnings)
+8. Safety Tips (list - more warnings for beginners, fewer for pros)
 
 Format your response as JSON with these exact keys:
 {{
