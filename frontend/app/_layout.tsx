@@ -1,12 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { loadLanguagePreference } from './i18n';
+import SplashScreen from './components/SplashScreen';
 
 export default function RootLayout() {
+  const [showSplash, setShowSplash] = useState(true);
+
   useEffect(() => {
     // Load saved language preference on app start
     loadLanguagePreference();
   }, []);
+
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
