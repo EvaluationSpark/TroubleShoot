@@ -142,15 +142,27 @@ Please provide:
 1. Item Type (e.g., 'Smartphone', 'Chair', 'Laptop', etc.)
 2. Damage Description (what's broken)
 3. Repair Difficulty (easy/medium/hard)
-4. Estimated Time (e.g., '30 minutes', '2 hours')
-5. RISK LEVEL (low/medium/high/critical) - CRITICAL for electrical/gas/structural
-6. CONFIDENCE SCORE (0-100) - How certain are you about this diagnosis?
-7. STOP_AND_CALL_PRO (true/false) - Should user call a professional instead?
-8. ASSUMPTIONS (list) - What are you assuming about the problem?
-9. Step-by-step Repair Instructions (adapt detail level to skill level)
-10. Tools Needed (list - consider skill level for tool assumptions)
-11. Parts Needed (list with estimated prices if applicable)
-12. Safety Tips (list - CRITICAL warnings for high-risk repairs)
+4. COST ESTIMATE (USD):
+   - Low: Minimum cost (parts only)
+   - Typical: Most likely total cost (parts + tools)
+   - High: Maximum cost (if complications arise)
+   - Parts breakdown with individual prices
+   - Tools cost (if new tools needed)
+   - Labor hours range (for Pro mode: min-max hours)
+   - Assumptions about pricing
+5. TIME ESTIMATE (minutes):
+   - Prep time: Setup, gathering tools/parts
+   - Active time: Actual hands-on repair work
+   - Cure time: Drying, setting, waiting (if applicable)
+   - Total time: Sum of all phases
+6. RISK LEVEL (low/medium/high/critical) - CRITICAL for electrical/gas/structural
+7. CONFIDENCE SCORE (0-100) - How certain are you about this diagnosis?
+8. STOP_AND_CALL_PRO (true/false) - Should user call a professional instead?
+9. ASSUMPTIONS (list) - What are you assuming about the problem?
+10. Step-by-step Repair Instructions (adapt detail level to skill level)
+11. Tools Needed (list with prices - consider skill level for tool assumptions)
+12. Parts Needed (list with estimated prices and specifications)
+13. Safety Tips (list - CRITICAL warnings for high-risk repairs)
 
 RISK LEVEL GUIDELINES:
 - LOW: Cosmetic repairs, simple replacements, no power/gas involved
