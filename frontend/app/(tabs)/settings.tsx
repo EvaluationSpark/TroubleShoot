@@ -158,6 +158,90 @@ export default function SettingsScreen() {
               />
             </View>
 
+            {/* Skill Level Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Experience Level</Text>
+              <Text style={[styles.sectionSubtitle, { color: theme.colors.textSecondary }]}>
+                Adjust repair instructions based on your experience
+              </Text>
+              
+              <View style={styles.skillLevelContainer}>
+                {[
+                  {
+                    level: SkillLevel.Beginner,
+                    icon: 'school',
+                    title: 'Beginner',
+                    description: 'New to repairs',
+                    color: theme.colors.info,
+                  },
+                  {
+                    level: SkillLevel.DIY,
+                    icon: 'build',
+                    title: 'DIY Enthusiast',
+                    description: 'Comfortable with tools',
+                    color: theme.colors.primary,
+                  },
+                  {
+                    level: SkillLevel.Pro,
+                    icon: 'trophy',
+                    title: 'Professional',
+                    description: 'Advanced skills',
+                    color: theme.colors.warning,
+                  },
+                ].map((item) => (
+                  <TouchableOpacity
+                    key={item.level}
+                    onPress={async () => {
+                      try {
+                        await setSkillLevel(item.level);
+                        Alert.alert(
+                          'Experience Level Updated',
+                          `Set to ${item.title}. Repair instructions will be adjusted accordingly.`
+                        );
+                      } catch (error) {
+                        Alert.alert('Error', 'Failed to update skill level');
+                      }
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <BlurView
+                      intensity={theme.colors.glassBlur}
+                      tint={theme.colors.glassTint}
+                      style={[
+                        styles.skillLevelCard,
+                        {
+                          borderColor: skillLevel === item.level ? item.color : theme.colors.glassBorder,
+                          borderWidth: skillLevel === item.level ? 2 : 1,
+                        },
+                      ]}
+                    >
+                      <View style={[styles.skillIconContainer, { backgroundColor: `${item.color}20` }]}>
+                        <Ionicons name={item.icon as any} size={24} color={item.color} />
+                      </View>
+                      <View style={styles.skillTextContainer}>
+                        <Text
+                          style={[
+                            styles.skillTitle,
+                            {
+                              color: skillLevel === item.level ? item.color : theme.colors.text,
+                            },
+                          ]}
+                        >
+                          {item.title}
+                        </Text>
+                        <Text style={[styles.skillDescription, { color: theme.colors.textSecondary }]}>
+                          {item.description}
+                        </Text>
+                      </View>
+                      {skillLevel === item.level && (
+                        <Ionicons name="checkmark-circle" size={24} color={item.color} />
+                      )}
+                    </BlurView>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
             {/* Notifications Section */}
             <View style={styles.section}>
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Notifications</Text>
