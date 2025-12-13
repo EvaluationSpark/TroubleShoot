@@ -395,7 +395,41 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    marginBottom: 12,
+    marginBottom: 8,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  skillLevelContainer: {
+    gap: 12,
+  },
+  skillLevelCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    gap: 12,
+  },
+  skillIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  skillTextContainer: {
+    flex: 1,
+  },
+  skillTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  skillDescription: {
+    fontSize: 13,
   },
   menuItem: {
     flexDirection: 'row',
