@@ -232,6 +232,92 @@ async def analyze_repair(request: RepairAnalysisRequest):
         logger.error(f"Error in analyze_repair: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/refine-diagnosis")
+async def refine_diagnosis(request: Dict[str, Any]):
+    """Refine diagnosis based on user answers to diagnostic questions"""
+    try:
+        item_type = request.get('item_type', '')
+        initial_analysis = request.get('initial_analysis', {})
+        diagnostic_answers = request.get('diagnostic_answers', {})
+        
+        # Build context from diagnostic answers
+        answers_text = "\n".join([f"Q{qid}: {answer}" for qid, answer in diagnostic_answers.items()])
+        
+        # Use AI to refine the diagnosis
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"refine_{uuid.uuid4()}",
+            system_message="You are an expert repair technician. Refine the repair diagnosis based on user's answers to diagnostic questions."
+        )
+        chat.with_model("gemini", "gemini-2.5-flash")
+        
+        prompt = f"""Based on the initial analysis and user's diagnostic answers, provide a refined, more accurate diagnosis and repair plan.
+
+Initial Analysis:
+Item Type: {item_type}
+Damage: {initial_analysis.get('damage_description', 'Unknown')}
+Initial Steps: {initial_analysis.get('repair_steps', [])}
+
+User's Diagnostic Answers:
+{answers_text}
+
+Please provide:
+1. Refined diagnosis (specific problem identified)
+2. Updated repair steps (more targeted)
+3. Specific parts or tools that are definitely needed
+4. Any safety warnings specific to this diagnosis
+5. Estimated difficulty and time
+
+Format your response as JSON with these exact keys:
+{{
+  "refined_diagnosis": "specific problem description",
+  "repair_steps": ["step 1", "step 2", ...],
+  "tools_needed": ["tool 1", "tool 2", ...],
+  "parts_needed": [{{"name": "part name", "link": "amazon link"}}, ...],
+  "safety_tips": ["tip 1", "tip 2", ...],
+  "repair_difficulty": "easy/medium/hard",
+  "estimated_time": "XX-XX minutes",
+  "confidence_level": "high/medium/low"
+}}"""
+        
+        msg = UserMessage(text=prompt)
+        response = await chat.send_message(msg)
+        
+        # Parse the response
+        import json
+        try:
+            # Try to extract JSON from the response
+            response_text = response if isinstance(response, str) else str(response)
+            # Find JSON in the response
+            start_idx = response_text.find('{')
+            end_idx = response_text.rfind('}') + 1
+            if start_idx != -1 and end_idx != 0:
+                json_str = response_text[start_idx:end_idx]
+                refined_data = json.loads(json_str)
+            else:
+                # Fallback: return initial analysis with refinement note
+                refined_data = {
+                    **initial_analysis,
+                    "refined_diagnosis": f"Based on your answers, the issue is: {response_text[:200]}"
+                }
+        except:
+            # Fallback to initial analysis
+            refined_data = {
+                **initial_analysis,
+                "refined_diagnosis": initial_analysis.get('damage_description', 'Analysis in progress')
+            }
+        
+        # Merge with initial analysis
+        refined_data['item_type'] = item_type
+        refined_data['repair_id'] = initial_analysis.get('repair_id', str(uuid.uuid4()))
+        
+        return {"refined_diagnosis": refined_data}
+        
+    except Exception as e:
+        logger.error(f"Error refining diagnosis: {str(e)}")
+        # Return initial analysis on error
+        return {"refined_diagnosis": request.get('initial_analysis', {})}
+
 @api_router.post("/troubleshoot")
 async def troubleshoot(question: TroubleshootQuestion):
     """Interactive troubleshooting based on user responses"""
