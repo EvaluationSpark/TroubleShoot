@@ -235,7 +235,7 @@ export default function DiagnosticQuestionsModal({
   };
 
   return (
-    <Modal visible={visible} animationType=\"slide\" onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <LinearGradient
         colors={theme.gradients.background}
         style={styles.container}
