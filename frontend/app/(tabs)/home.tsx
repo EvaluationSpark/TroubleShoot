@@ -4,567 +4,445 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   Image,
-  ActivityIndicator,
   Alert,
+  ActivityIndicator,
   Platform,
+  ImageBackground,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
+import { useTheme } from '../contexts/ThemeContext';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function HomeScreen() {
+  const { theme } = useTheme();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [repairData, setRepairData] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const requestCameraPermission = async () => {
-    if (Platform.OS !== 'web') {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Camera permission is required to take photos.');
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const requestGalleryPermission = async () => {
-    if (Platform.OS !== 'web') {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Gallery permission is required to select photos.');
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const takePhoto = async () => {
-    const hasPermission = await requestCameraPermission();
-    if (!hasPermission) return;
-
+  const pickImage = async (useCamera: boolean) => {
     try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-        base64: true,
-      });
-
-      if (!result.canceled && result.assets[0].base64) {
-        setSelectedImage(result.assets[0].base64);
+      let result;
+      if (useCamera) {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'Camera permission is required');
+          return;
+        }
+        result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0.8,
+        });
+      } else {
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0.8,
+        });
       }
-    } catch (error) {
-      console.error('Error taking photo:', error);
-      Alert.alert('Error', 'Failed to take photo');
-    }
-  };
 
-  const pickImage = async () => {
-    const hasPermission = await requestGalleryPermission();
-    if (!hasPermission) return;
-
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-        base64: true,
-      });
-
-      if (!result.canceled && result.assets[0].base64) {
-        setSelectedImage(result.assets[0].base64);
+      if (!result.canceled && result.assets[0]) {
+        const imageUri = result.assets[0].uri;
+        setSelectedImage(imageUri);
+        await analyzeImage(imageUri);
       }
     } catch (error) {
       console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to pick image');
+      Alert.alert('Error', 'Failed to select image');
     }
   };
 
-  const analyzeImage = async () => {
-    if (!selectedImage) {
-      Alert.alert('No Image', 'Please select or take a photo first');
-      return;
-    }
-
+  const analyzeImage = async (imageUri: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`${BACKEND_URL}/api/analyze-repair`, {
+      const base64 = await fetch(imageUri)
+        .then((res) => res.blob())
+        .then(
+          (blob) =>
+            new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const base64String = reader.result as string;
+                resolve(base64String.split(',')[1]);
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            })
+        );
+
+      const response = await fetch(`${BACKEND_URL}/api/analyze`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          image_base64: selectedImage,
-          language: 'en',
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64 }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze image');
+      if (response.ok) {
+        const data = await response.json();
+        setRepairData(data);
+        setShowModal(true);
+      } else {
+        Alert.alert('Error', 'Failed to analyze image');
       }
-
-      const data = await response.json();
-      setRepairData(data);
-      setShowModal(true);
     } catch (error) {
       console.error('Error analyzing image:', error);
-      Alert.alert('Error', 'Failed to analyze the image. Please try again.');
+      Alert.alert('Error', 'Failed to analyze image');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Hero Section with Gradient */}
-        <LinearGradient
-          colors={['#001a1a', '#003333', '#00524d']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.heroSection}
-        >
-          <View style={styles.heroContent}>
-            <View style={styles.logoContainer}>
-              <LinearGradient
-                colors={['#00D9FF', '#00a8cc']}
-                style={styles.logoGradient}
-              >
-                <Ionicons name="construct" size={40} color="#fff" />
-              </LinearGradient>
+    <ImageBackground
+      source={{
+        uri: theme.mode === 'dark'
+          ? 'https://images.unsplash.com/photo-1655393001768-d946c97d6fd1?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080'
+          : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080',
+      }}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={[
+          theme.mode === 'dark' ? 'rgba(10, 10, 10, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          theme.mode === 'dark' ? 'rgba(26, 26, 46, 0.9)' : 'rgba(240, 244, 248, 0.9)',
+        ]}
+        style={styles.gradientOverlay}
+      >
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
+          {/* Header */}
+          <BlurView
+            intensity={theme.colors.glassBlur}
+            tint={theme.colors.glassTint}
+            style={styles.header}
+          >
+            <View style={styles.headerContent}>
+              <View style={styles.logoSection}>
+                <LinearGradient
+                  colors={theme.gradients.primary}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.logoGradient}
+                >
+                  <Text style={styles.logoIcon}>🔧</Text>
+                </LinearGradient>
+                <View>
+                  <Text style={[styles.appName, { color: theme.colors.text }]}>FixIntel AI</Text>
+                  <Text style={[styles.appTagline, { color: theme.colors.primary }]}>Intelligent Repair</Text>
+                </View>
+              </View>
             </View>
-            <Text style={styles.title}>Pix-Fix</Text>
-            <Text style={styles.subtitle}>AI-Powered Repair Assistant</Text>
-            <Text style={styles.description}>
-              Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI
-            </Text>
-          </View>
-        </LinearGradient>
+          </BlurView>
 
-        {/* Image Preview */}
-        {selectedImage ? (
-          <View style={styles.imageSection}>
-            <View style={styles.imageCard}>
-              <Image
-                source={{ uri: `data:image/jpeg;base64,${selectedImage}` }}
-                style={styles.previewImage}
-                resizeMode="cover"
-              />
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.7)']}
-                style={styles.imageOverlay}
-              />
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => setSelectedImage(null)}
+          {/* Main Content */}
+          <View style={styles.content}>
+            {/* Hero Section */}
+            <BlurView
+              intensity={theme.colors.glassBlur}
+              tint={theme.colors.glassTint}
+              style={[styles.heroCard, { borderColor: theme.colors.glassBorder }]}
+            >
+              <View style={styles.heroContent}>
+                <Text style={[styles.heroTitle, { color: theme.colors.text }]}>Fix Anything,{' \n'}Anywhere</Text>
+                <Text style={[styles.heroSubtitle, { color: theme.colors.textSecondary }]}>
+                  Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI
+                </Text>
+              </View>
+            </BlurView>
+
+            {/* Image Preview Card */}
+            {selectedImage ? (
+              <BlurView
+                intensity={theme.colors.glassBlur}
+                tint={theme.colors.glassTint}
+                style={[styles.imagePreviewCard, { borderColor: theme.colors.glassBorder }]}
+              >
+                <Image source={{ uri: selectedImage }} style={styles.previewImage} />
+                {loading && (
+                  <View style={styles.loadingOverlay}>
+                    <ActivityIndicator size="large" color={theme.colors.primary} />
+                    <Text style={[styles.loadingText, { color: theme.colors.text }]}>Analyzing with AI...</Text>
+                  </View>
+                )}
+              </BlurView>
+            ) : (
+              <BlurView
+                intensity={theme.colors.glassBlur}
+                tint={theme.colors.glassTint}
+                style={[styles.placeholderCard, { borderColor: theme.colors.glassBorder }]}
               >
                 <LinearGradient
-                  colors={['#ff4444', '#cc0000']}
-                  style={styles.removeButtonGradient}
+                  colors={theme.gradients.primary}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.placeholderIcon}
                 >
-                  <Ionicons name="close" size={20} color="#fff" />
+                  <Ionicons name="camera" size={48} color="#fff" />
+                </LinearGradient>
+                <Text style={[styles.placeholderTitle, { color: theme.colors.text }]}>No Image Selected</Text>
+                <Text style={[styles.placeholderSubtitle, { color: theme.colors.textSecondary }]}>
+                  Take a photo or choose from gallery to get started
+                </Text>
+              </BlurView>
+            )}
+
+            {/* Action Buttons */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.buttonWrapper}
+                onPress={() => pickImage(true)}
+                disabled={loading}
+              >
+                <LinearGradient
+                  colors={theme.gradients.primary}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.primaryButton}
+                >
+                  <Ionicons name="camera" size={24} color="#fff" />
+                  <Text style={styles.primaryButtonText}>Take Photo</Text>
                 </LinearGradient>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.buttonWrapper}
+                onPress={() => pickImage(false)}
+                disabled={loading}
+              >
+                <BlurView
+                  intensity={theme.colors.glassBlur}
+                  tint={theme.colors.glassTint}
+                  style={[styles.secondaryButton, { borderColor: theme.colors.primary }]}
+                >
+                  <Ionicons name="images" size={24} color={theme.colors.primary} />
+                  <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>Gallery</Text>
+                </BlurView>
+              </TouchableOpacity>
+            </View>
+
+            {/* Features Grid */}
+            <View style={styles.featuresGrid}>
+              {[
+                { icon: 'bulb', title: 'AI-Powered', color: theme.colors.primary },
+                { icon: 'construct', title: 'Step-by-Step', color: theme.colors.accent },
+                { icon: 'shield-checkmark', title: 'Safety Tips', color: theme.colors.success },
+                { icon: 'people', title: 'Community', color: theme.colors.warning },
+              ].map((feature, index) => (
+                <BlurView
+                  key={index}
+                  intensity={theme.colors.glassBlur}
+                  tint={theme.colors.glassTint}
+                  style={[styles.featureCard, { borderColor: theme.colors.glassBorder }]}
+                >
+                  <View style={[styles.featureIconContainer, { backgroundColor: `${feature.color}20` }]}>
+                    <Ionicons name={feature.icon as any} size={24} color={feature.color} />
+                  </View>
+                  <Text style={[styles.featureText, { color: theme.colors.textSecondary }]}>{feature.title}</Text>
+                </BlurView>
+              ))}
             </View>
           </View>
-        ) : (
-          <View style={styles.placeholderSection}>
-            <View style={styles.placeholderCard}>
-              <LinearGradient
-                colors={['#1a2a2a', '#0f1f1f']}
-                style={styles.placeholderGradient}
-              >
-                <View style={styles.placeholderIcon}>
-                  <Ionicons name="camera-outline" size={64} color="#00D9FF" />
-                </View>
-                <Text style={styles.placeholderTitle}>No Image Selected</Text>
-                <Text style={styles.placeholderText}>Take a photo or choose from gallery to get started</Text>
-              </LinearGradient>
-            </View>
-          </View>
-        )}
-
-        {/* Action Buttons */}
-        <View style={styles.actionsSection}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={takePhoto}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={['#2a2a2a', '#1a1a1a']}
-              style={styles.actionButtonGradient}
-            >
-              <View style={styles.actionIconContainer}>
-                <Ionicons name="camera" size={28} color="#00D9FF" />
-              </View>
-              <Text style={styles.actionButtonText}>Take Photo</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={pickImage}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={['#2a2a2a', '#1a1a1a']}
-              style={styles.actionButtonGradient}
-            >
-              <View style={styles.actionIconContainer}>
-                <Ionicons name="images" size={28} color="#00D9FF" />
-              </View>
-              <Text style={styles.actionButtonText}>Gallery</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* Analyze Button */}
-        {selectedImage && (
-          <TouchableOpacity
-            style={[styles.analyzeButton, loading && styles.disabledButton]}
-            onPress={analyzeImage}
-            disabled={loading}
-            activeOpacity={0.9}
-          >
-            <LinearGradient
-              colors={['#00D9FF', '#00a8cc', '#008299']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.analyzeButtonGradient}
-            >
-              {loading ? (
-                <>
-                  <ActivityIndicator color="#fff" size="small" />
-                  <Text style={styles.analyzeButtonText}>Analyzing...</Text>
-                </>
-              ) : (
-                <>
-                  <Ionicons name="sparkles" size={24} color="#fff" />
-                  <Text style={styles.analyzeButtonText}>Analyze & Get Repair Guide</Text>
-                  <Ionicons name="arrow-forward" size={20} color="#fff" />
-                </>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
-        )}
-
-        {/* Features Grid */}
-        <View style={styles.featuresSection}>
-          <Text style={styles.featuresTitle}>What You'll Get</Text>
-          <View style={styles.featuresGrid}>
-            <View style={styles.featureCard}>
-              <LinearGradient
-                colors={['#1a2a2a', '#0f1f1f']}
-                style={styles.featureCardGradient}
-              >
-                <View style={styles.featureIconContainer}>
-                  <Ionicons name="list" size={28} color="#00D9FF" />
-                </View>
-                <Text style={styles.featureTitle}>Step-by-Step</Text>
-                <Text style={styles.featureDescription}>Detailed repair instructions</Text>
-              </LinearGradient>
-            </View>
-
-            <View style={styles.featureCard}>
-              <LinearGradient
-                colors={['#1a2a2a', '#0f1f1f']}
-                style={styles.featureCardGradient}
-              >
-                <View style={styles.featureIconContainer}>
-                  <Ionicons name="build" size={28} color="#4ade80" />
-                </View>
-                <Text style={styles.featureTitle}>Tools & Parts</Text>
-                <Text style={styles.featureDescription}>Everything you need</Text>
-              </LinearGradient>
-            </View>
-
-            <View style={styles.featureCard}>
-              <LinearGradient
-                colors={['#1a2a2a', '#0f1f1f']}
-                style={styles.featureCardGradient}
-              >
-                <View style={styles.featureIconContainer}>
-                  <Ionicons name="shield-checkmark" size={28} color="#fbbf24" />
-                </View>
-                <Text style={styles.featureTitle}>Safety Tips</Text>
-                <Text style={styles.featureDescription}>Stay protected</Text>
-              </LinearGradient>
-            </View>
-
-            <View style={styles.featureCard}>
-              <LinearGradient
-                colors={['#1a2a2a', '#0f1f1f']}
-                style={styles.featureCardGradient}
-              >
-                <View style={styles.featureIconContainer}>
-                  <Ionicons name="location" size={28} color="#f87171" />
-                </View>
-                <Text style={styles.featureTitle}>Local Shops</Text>
-                <Text style={styles.featureDescription}>Find experts nearby</Text>
-              </LinearGradient>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
+        </SafeAreaView>
+      </LinearGradient>
 
       {/* Repair Instructions Modal */}
       {repairData && (
         <RepairInstructionsModal
           visible={showModal}
           repairData={repairData}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedImage(null);
+          }}
         />
       )}
-    </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
   },
-  scrollContent: {
-    paddingBottom: 40,
+  gradientOverlay: {
+    flex: 1,
   },
-  heroSection: {
-    padding: 24,
-    paddingTop: 32,
-    paddingBottom: 40,
+  safeArea: {
+    flex: 1,
   },
-  heroContent: {
+  header: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    overflow: 'hidden',
+  },
+  headerContent: {
+    padding: 16,
+  },
+  logoSection: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  logoContainer: {
-    marginBottom: 16,
+    gap: 12,
   },
   logoGradient: {
-    width: 80,
-    height: 80,
+    width: 48,
+    height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#00D9FF',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 12,
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: 42,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 8,
-    letterSpacing: -1,
+  logoIcon: {
+    fontSize: 24,
   },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#00D9FF',
-    marginBottom: 12,
+  appName: {
+    fontSize: 20,
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
-  description: {
-    fontSize: 15,
-    color: '#aaa',
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 20,
+  appTagline: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
-  imageSection: {
-    paddingHorizontal: 20,
-    marginTop: -20,
+  content: {
+    flex: 1,
+    padding: 20,
+    gap: 20,
   },
-  imageCard: {
-    height: 320,
+  heroCard: {
     borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.6,
-    shadowRadius: 24,
-    elevation: 16,
+  },
+  heroContent: {
+    gap: 8,
+  },
+  heroTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    lineHeight: 38,
+  },
+  heroSubtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  imagePreviewCard: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    height: 220,
   },
   previewImage: {
     width: '100%',
     height: '100%',
   },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 100,
-  },
-  removeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-  },
-  removeButtonGradient: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     alignItems: 'center',
-    shadowColor: '#ff0000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    justifyContent: 'center',
+    gap: 12,
   },
-  placeholderSection: {
-    paddingHorizontal: 20,
-    marginTop: -20,
+  loadingText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   placeholderCard: {
-    borderRadius: 24,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#1a2a2a',
-    borderStyle: 'dashed',
-  },
-  placeholderGradient: {
-    padding: 48,
+    borderRadius: 20,
+    padding: 32,
     alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    height: 220,
+    gap: 12,
+    overflow: 'hidden',
   },
   placeholderIcon: {
-    marginBottom: 20,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   placeholderTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 8,
   },
-  placeholderText: {
+  placeholderSubtitle: {
     fontSize: 14,
-    color: '#666',
     textAlign: 'center',
     lineHeight: 20,
   },
-  actionsSection: {
+  buttonContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
-    gap: 16,
-    marginTop: 24,
-  },
-  actionButton: {
-    flex: 1,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  actionButtonGradient: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  actionIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0, 217, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  actionButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  analyzeButton: {
-    marginHorizontal: 20,
-    marginTop: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#00D9FF',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 12,
-  },
-  analyzeButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
     gap: 12,
   },
-  analyzeButtonText: {
+  buttonWrapper: {
+    flex: 1,
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: 16,
+    borderRadius: 16,
+  },
+  primaryButtonText: {
     color: '#fff',
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
-    letterSpacing: 0.3,
   },
-  disabledButton: {
-    opacity: 0.6,
+  secondaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    overflow: 'hidden',
   },
-  featuresSection: {
-    paddingHorizontal: 20,
-    marginTop: 40,
-  },
-  featuresTitle: {
-    fontSize: 24,
+  secondaryButtonText: {
+    fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 20,
   },
   featuresGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 12,
   },
   featureCard: {
-    width: '47%',
+    flex: 1,
+    minWidth: '45%',
     borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  featureCardGradient: {
-    padding: 20,
-    minHeight: 140,
   },
   featureIconContainer: {
     width: 48,
     height: 48,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    justifyContent: 'center',
+    borderRadius: 24,
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
   },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 6,
-  },
-  featureDescription: {
+  featureText: {
     fontSize: 13,
-    color: '#888',
-    lineHeight: 18,
+    fontWeight: '600',
   },
 });
