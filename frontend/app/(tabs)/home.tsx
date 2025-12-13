@@ -10,6 +10,7 @@ import {
   Platform,
   ImageBackground,
   Animated,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
