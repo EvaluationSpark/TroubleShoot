@@ -65,7 +65,7 @@ const DIAGNOSTIC_QUESTIONS: Record<string, any> = {
           'Making loud noises',
           'Not draining',
           'Not filling with water',
-          'Door won\\'t open/close',
+          "Door won't open/close",
           'Leaving clothes wet',
         ],
       },
@@ -85,10 +85,10 @@ const DIAGNOSTIC_QUESTIONS: Record<string, any> = {
     questions: [
       {
         id: 1,
-        question: 'What\\'s wrong with your smartphone?',
+        question: "What's wrong with your smartphone?",
         options: [
           'Cracked screen',
-          'Won\\'t turn on',
+          "Won't turn on",
           'Battery drains quickly',
           'Charging issues',
           'Camera not working',
@@ -100,7 +100,7 @@ const DIAGNOSTIC_QUESTIONS: Record<string, any> = {
       {
         id: 2,
         question: 'Can you still use the phone?',
-        options: ['Yes, fully functional', 'Partially functional', 'Turns on but has issues', 'Won\\'t turn on at all'],
+        options: ['Yes, fully functional', 'Partially functional', 'Turns on but has issues', "Won't turn on at all"],
       },
       {
         id: 3,
@@ -115,7 +115,7 @@ const DIAGNOSTIC_QUESTIONS: Record<string, any> = {
         id: 1,
         question: 'What issue are you experiencing?',
         options: [
-          'Won\\'t power on',
+          "Won't power on",
           'Screen is black/blank',
           'Keyboard not working',
           'Trackpad not working',
