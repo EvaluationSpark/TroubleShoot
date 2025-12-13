@@ -265,7 +265,7 @@ export default function HomeScreen() {
                 </BlurView>
               ))}
             </View>
-          </View>
+          </ScrollView>
         </SafeAreaView>
       </LinearGradient>
 
