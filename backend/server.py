@@ -176,13 +176,32 @@ Format your response as JSON with these exact keys:
   "damage_description": "...",
   "repair_difficulty": "...",
   "estimated_time": "...",
+  "cost_estimate": {{
+    "low": 25,
+    "typical": 50,
+    "high": 100,
+    "currency": "USD",
+    "parts_breakdown": [
+      {{"name": "Part A", "cost": 20}},
+      {{"name": "Part B", "cost": 15}}
+    ],
+    "tools_cost": 15,
+    "labor_hours_range": {{"min": 1, "max": 2}},
+    "assumptions": ["Using typical retail prices", "Assuming basic tools already owned"]
+  }},
+  "time_estimate": {{
+    "prep_minutes": 10,
+    "active_minutes": 30,
+    "cure_minutes": 0,
+    "total_minutes": 40
+  }},
   "risk_level": "low|medium|high|critical",
   "confidence_score": 85,
   "stop_and_call_pro": false,
   "assumptions": ["assumption 1", "assumption 2"],
   "repair_steps": [...],
-  "tools_needed": [...],
-  "parts_needed": [{{"name": "...", "price": "...", "link": "https://example.com"}}],
+  "tools_needed": [{{"name": "...", "required": true, "estimated_cost": 10}}],
+  "parts_needed": [{{"name": "...", "price": 20, "required": true, "link": "https://example.com"}}],
   "safety_tips": [...]
 }}
 """
