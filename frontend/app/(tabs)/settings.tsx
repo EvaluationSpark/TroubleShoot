@@ -7,16 +7,22 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
+  ImageBackground,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
+import { useTheme } from '../contexts/ThemeContext';
 import { requestNotificationPermissions, checkNotificationPermissions } from '../utils/notifications';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState(true);
+  const { theme, themeMode, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState(false);
+  const scaleAnim = new Animated.Value(1);
 
   useEffect(() => {
     loadNotificationStatus();
@@ -46,134 +52,199 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleThemeToggle = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, { toValue: 0.95, duration: 150, useNativeDriver: true }),
+      Animated.timing(scaleAnim, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start();
+    toggleTheme();
+  };
+
+  const MenuItem = ({ icon, title, subtitle, onPress, showArrow = true, rightComponent }: any) => (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <BlurView
+        intensity={theme.colors.glassBlur}
+        tint={theme.colors.glassTint}
+        style={[styles.menuItem, { borderColor: theme.colors.glassBorder }]}
+      >
+        <View style={styles.menuLeft}>
+          <View style={[styles.iconContainer, { backgroundColor: `${theme.colors.primary}20` }]}>
+            <Ionicons name={icon} size={24} color={theme.colors.primary} />
+          </View>
+          <View style={styles.menuTextContainer}>
+            <Text style={[styles.menuTitle, { color: theme.colors.text }]}>{title}</Text>
+            {subtitle && <Text style={[styles.menuSubtitle, { color: theme.colors.textSecondary }]}>{subtitle}</Text>}
+          </View>
+        </View>
+        {rightComponent || (showArrow && <Ionicons name="chevron-forward" size={20} color={theme.colors.textTertiary} />)}
+      </BlurView>
+    </TouchableOpacity>
+  );
+
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>Customize your Pix-Fix experience</Text>
-        </View>
+    <ImageBackground
+      source={{
+        uri: theme.mode === 'dark'
+          ? 'https://images.unsplash.com/photo-1655393001768-d946c97d6fd1?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080'
+          : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080',
+      }}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={[
+          theme.mode === 'dark' ? 'rgba(10, 10, 10, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          theme.mode === 'dark' ? 'rgba(26, 26, 46, 0.9)' : 'rgba(240, 244, 248, 0.9)',
+        ]}
+        style={styles.gradientOverlay}
+      >
+        <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Settings</Text>
+              <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
+                Customize your FixIntel AI experience
+              </Text>
+            </View>
 
-        {/* App Version */}
-        <View style={styles.versionCard}>
-          <View style={styles.appIconContainer}>
-            <Ionicons name="construct" size={40} color="#00D9FF" />
-          </View>
-          <Text style={styles.appName}>Pix-Fix</Text>
-          <Text style={styles.versionText}>Version 1.0.0</Text>
-        </View>
-
-        {/* Appearance Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Appearance</Text>
-          <View style={styles.settingItem}>
-            <View style={styles.settingInfo}>
-              <Ionicons name="moon" size={24} color="#00D9FF" />
-              <View style={styles.settingTextContainer}>
-                <Text style={styles.settingLabel}>Dark Mode</Text>
-                <Text style={styles.settingDescription}>Use dark theme throughout the app</Text>
+            {/* App Card */}
+            <BlurView
+              intensity={theme.colors.glassBlur}
+              tint={theme.colors.glassTint}
+              style={[styles.appCard, { borderColor: theme.colors.glassBorder }]}
+            >
+              <LinearGradient
+                colors={theme.gradients.primary}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.appIconGradient}
+              >
+                <Text style={styles.appIcon}>🔧</Text>
+              </LinearGradient>
+              <Text style={[styles.appName, { color: theme.colors.text }]}>FixIntel AI</Text>
+              <Text style={[styles.versionText, { color: theme.colors.textSecondary }]}>Version 1.0.0</Text>
+              <View style={styles.badgeContainer}>
+                <View style={[styles.badge, { backgroundColor: `${theme.colors.success}20` }]}>
+                  <Text style={[styles.badgeText, { color: theme.colors.success }]}>AI-Powered</Text>
+                </View>
               </View>
+            </BlurView>
+
+            {/* Appearance Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Appearance</Text>
+              
+              <MenuItem
+                icon={theme.mode === 'dark' ? 'moon' : 'sunny'}
+                title={theme.mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                subtitle={`Currently using ${theme.mode} theme`}
+                showArrow={false}
+                rightComponent={
+                  <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                    <Switch
+                      value={theme.mode === 'dark'}
+                      onValueChange={handleThemeToggle}
+                      trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+                      thumbColor="#fff"
+                      ios_backgroundColor={theme.colors.border}
+                    />
+                  </Animated.View>
+                }
+              />
             </View>
-            <Switch
-              value={darkMode}
-              onValueChange={setDarkMode}
-              trackColor={{ false: '#2a2a2a', true: '#00D9FF' }}
-              thumbColor="#fff"
-            />
-          </View>
-        </View>
 
-        {/* Notifications Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Notifications</Text>
-          <View style={styles.settingItem}>
-            <View style={styles.settingInfo}>
-              <Ionicons name="notifications" size={24} color="#00D9FF" />
-              <View style={styles.settingTextContainer}>
-                <Text style={styles.settingLabel}>Push Notifications</Text>
-                <Text style={styles.settingDescription}>Get updates about your repairs</Text>
-              </View>
+            {/* Notifications Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Notifications</Text>
+              
+              <MenuItem
+                icon="notifications"
+                title="Push Notifications"
+                subtitle="Get updates about your repairs"
+                showArrow={false}
+                rightComponent={
+                  <Switch
+                    value={notifications}
+                    onValueChange={handleNotificationToggle}
+                    trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+                    thumbColor="#fff"
+                    ios_backgroundColor={theme.colors.border}
+                  />
+                }
+              />
             </View>
-            <Switch
-              value={notifications}
-              onValueChange={handleNotificationToggle}
-              trackColor={{ false: '#2a2a2a', true: '#00D9FF' }}
-              thumbColor="#fff"
-            />
-          </View>
-        </View>
 
-        {/* About Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          
-          <TouchableOpacity 
-            style={styles.settingItem}
-            onPress={() => router.push('/screens/HelpSupportScreen')}
-          >
-            <View style={styles.settingInfo}>
-              <Ionicons name="help-circle" size={24} color="#00D9FF" />
-              <Text style={styles.settingLabel}>Help & Support</Text>
+            {/* Support Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Support & Legal</Text>
+              
+              <MenuItem
+                icon="help-circle"
+                title="Help & Support"
+                subtitle="FAQs, tutorials, and contact"
+                onPress={() => router.push('/screens/HelpSupportScreen' as any)}
+              />
+              
+              <MenuItem
+                icon="document-text"
+                title="Terms of Service"
+                subtitle="Legal terms and conditions"
+                onPress={() => router.push('/screens/TermsOfServiceScreen' as any)}
+              />
+              
+              <MenuItem
+                icon="shield-checkmark"
+                title="Privacy Policy"
+                subtitle="How we protect your data"
+                onPress={() => router.push('/screens/PrivacyPolicyScreen' as any)}
+              />
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.settingItem}
-            onPress={() => router.push('/screens/TermsOfServiceScreen')}
-          >
-            <View style={styles.settingInfo}>
-              <Ionicons name="document-text" size={24} color="#00D9FF" />
-              <Text style={styles.settingLabel}>Terms of Service</Text>
+            {/* About Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>About</Text>
+              
+              <MenuItem
+                icon="information-circle"
+                title="About FixIntel AI"
+                subtitle="Learn more about our mission"
+                onPress={() => Alert.alert('FixIntel AI', 'Intelligent repair assistant powered by advanced AI technology.')}
+              />
+              
+              <MenuItem
+                icon="star"
+                title="Rate This App"
+                subtitle="Share your feedback with us"
+                onPress={() => Alert.alert('Thank You!', 'Rate FixIntel AI in the App Store')}
+              />
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.settingItem}
-            onPress={() => router.push('/screens/PrivacyPolicyScreen')}
-          >
-            <View style={styles.settingInfo}>
-              <Ionicons name="shield-checkmark" size={24} color="#00D9FF" />
-              <Text style={styles.settingLabel}>Privacy Policy</Text>
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: theme.colors.textTertiary }]}>
+                Made with ❤️ by FixIntel Team
+              </Text>
+              <Text style={[styles.footerText, { color: theme.colors.textTertiary }]}>
+                © 2025 FixIntel AI. All rights reserved.
+              </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Features Info */}
-        <View style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>Features</Text>
-          <View style={styles.featureCard}>
-            <Ionicons name="camera" size={24} color="#4ade80" />
-            <Text style={styles.featureText}>AI-Powered Image Recognition</Text>
-          </View>
-          <View style={styles.featureCard}>
-            <Ionicons name="book" size={24} color="#4ade80" />
-            <Text style={styles.featureText}>Step-by-Step Repair Guides</Text>
-          </View>
-          <View style={styles.featureCard}>
-            <Ionicons name="people" size={24} color="#4ade80" />
-            <Text style={styles.featureText}>Community Forum</Text>
-          </View>
-          <View style={styles.featureCard}>
-            <Ionicons name="globe" size={24} color="#4ade80" />
-            <Text style={styles.featureText}>Multi-Language Support</Text>
-          </View>
-        </View>
-
-        {/* Footer */}
-        <Text style={styles.footer}>Made with care for DIY enthusiasts</Text>
-      </ScrollView>
-    </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
+  },
+  gradientOverlay: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
   },
   scrollContent: {
     padding: 20,
@@ -182,100 +253,102 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '900',
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: '#aaa',
+    fontSize: 15,
   },
-  versionCard: {
-    backgroundColor: '#1a1a1a',
+  appCard: {
+    borderRadius: 24,
     padding: 24,
-    borderRadius: 16,
     alignItems: 'center',
     marginBottom: 32,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
-  appIconContainer: {
+  appIconGradient: {
     width: 80,
     height: 80,
-    borderRadius: 20,
-    backgroundColor: '#2a2a2a',
-    justifyContent: 'center',
+    borderRadius: 40,
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
+  },
+  appIcon: {
+    fontSize: 40,
   },
   appName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '900',
     marginBottom: 4,
   },
   versionText: {
     fontSize: 14,
-    color: '#666',
+    marginBottom: 12,
+  },
+  badgeContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  badge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   section: {
     marginBottom: 32,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
     marginBottom: 12,
   },
-  settingItem: {
+  menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1a1a1a',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 8,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
-  settingInfo: {
+  menuLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
     gap: 12,
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuTextContainer: {
     flex: 1,
   },
-  settingTextContainer: {
-    flex: 1,
-  },
-  settingLabel: {
+  menuTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
     marginBottom: 2,
   },
-  settingDescription: {
+  menuSubtitle: {
     fontSize: 13,
-    color: '#666',
-  },
-  featuresSection: {
-    marginBottom: 32,
-  },
-  featureCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: '#1a1a1a',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  featureText: {
-    fontSize: 14,
-    color: '#ccc',
-    flex: 1,
   },
   footer: {
-    textAlign: 'center',
-    color: '#666',
+    alignItems: 'center',
+    paddingVertical: 24,
+    gap: 8,
+  },
+  footerText: {
     fontSize: 12,
-    marginTop: 20,
-    marginBottom: 40,
   },
 });
