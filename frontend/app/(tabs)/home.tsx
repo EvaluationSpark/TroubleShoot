@@ -92,8 +92,9 @@ export default function HomeScreen() {
 
       if (response.ok) {
         const data = await response.json();
-        setRepairData(data);
-        setShowModal(true);
+        setInitialAnalysis(data);
+        // Show diagnostic questions first
+        setShowDiagnosticModal(true);
       } else {
         Alert.alert('Error', 'Failed to analyze image');
       }
