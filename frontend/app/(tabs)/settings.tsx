@@ -16,12 +16,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../contexts/ThemeContext';
+import { useSkillLevel } from '../contexts/SkillLevelContext';
+import { SkillLevel } from '../types/models';
 import { requestNotificationPermissions, checkNotificationPermissions } from '../utils/notifications';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { theme, themeMode, toggleTheme } = useTheme();
+  const { skillLevel, setSkillLevel, skillLevelLabel, skillLevelDescription } = useSkillLevel();
   const [notifications, setNotifications] = useState(false);
+  const [showSkillLevelPicker, setShowSkillLevelPicker] = useState(false);
   const scaleAnim = new Animated.Value(1);
 
   useEffect(() => {
