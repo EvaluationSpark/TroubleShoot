@@ -279,14 +279,50 @@ export default function HomeScreen() {
           itemType={initialAnalysis.item_type || 'device'}
           initialAnalysis={initialAnalysis}
           onDiagnosisComplete={(refinedData) => {
-            setRepairData(refinedData.refined_diagnosis || initialAnalysis);
+            const finalData = refinedData.refined_diagnosis || initialAnalysis;
+            setRepairData(finalData);
             setShowDiagnosticModal(false);
-            setShowModal(true);
+            
+            // Check if safety gating is needed
+            const riskLevel = finalData.risk_level || 'low';
+            const shouldGate = riskLevel === 'high' || riskLevel === 'critical' || finalData.stop_and_call_pro;
+            
+            if (shouldGate) {
+              setShowSafetyGating(true);
+            } else {
+              setShowModal(true);
+            }
           }}
           onClose={() => {
             setShowDiagnosticModal(false);
             setSelectedImage(null);
             setInitialAnalysis(null);
+          }}
+        />
+      )}
+
+      {/* Safety Gating Modal */}
+      {repairData && showSafetyGating && (
+        <SafetyGatingModal
+          visible={showSafetyGating}
+          riskLevel={(repairData.risk_level || 'medium') as RiskLevel}
+          itemType={repairData.item_type || 'item'}
+          confidenceScore={repairData.confidence_score || 85}
+          stopAndCallPro={repairData.stop_and_call_pro || false}
+          assumptions={repairData.assumptions || []}
+          onAcknowledge={() => {
+            setShowSafetyGating(false);
+            setShowModal(true);
+          }}
+          onCallPro={() => {
+            setShowSafetyGating(false);
+            // Open local vendors modal
+            Alert.alert('Find a Professional', 'This will open the local professionals finder.');
+          }}
+          onCancel={() => {
+            setShowSafetyGating(false);
+            setSelectedImage(null);
+            setRepairData(null);
           }}
         />
       )}
