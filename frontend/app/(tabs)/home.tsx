@@ -114,8 +114,8 @@ export default function HomeScreen() {
     >
       <LinearGradient
         colors={[
-          theme.mode === 'dark' ? 'rgba(10, 10, 10, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-          theme.mode === 'dark' ? 'rgba(26, 26, 46, 0.9)' : 'rgba(240, 244, 248, 0.9)',
+          theme.mode === 'dark' ? 'rgba(10, 10, 10, 0.75)' : 'rgba(255, 255, 255, 0.80)',
+          theme.mode === 'dark' ? 'rgba(26, 26, 46, 0.70)' : 'rgba(240, 244, 248, 0.75)',
         ]}
         style={styles.gradientOverlay}
       >
