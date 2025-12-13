@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { loadLanguagePreference } from './i18n';
 import SplashScreen from './components/SplashScreen';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { SkillLevelProvider } from './contexts/SkillLevelContext';
 import { initializeStorage } from './utils/storage';
 
 export default function RootLayout() {
