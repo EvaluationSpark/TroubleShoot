@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
+import DiagnosticQuestionsModal from '../components/DiagnosticQuestionsModal';
 import { useTheme } from '../contexts/ThemeContext';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -27,6 +28,8 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [repairData, setRepairData] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
+  const [initialAnalysis, setInitialAnalysis] = useState<any>(null);
 
   const pickImage = async (useCamera: boolean) => {
     try {
