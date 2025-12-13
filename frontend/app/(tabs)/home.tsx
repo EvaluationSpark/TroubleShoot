@@ -259,6 +259,25 @@ export default function HomeScreen() {
         </SafeAreaView>
       </LinearGradient>
 
+      {/* Diagnostic Questions Modal */}
+      {initialAnalysis && (
+        <DiagnosticQuestionsModal
+          visible={showDiagnosticModal}
+          itemType={initialAnalysis.item_type || 'device'}
+          initialAnalysis={initialAnalysis}
+          onDiagnosisComplete={(refinedData) => {
+            setRepairData(refinedData.refined_diagnosis || initialAnalysis);
+            setShowDiagnosticModal(false);
+            setShowModal(true);
+          }}
+          onClose={() => {
+            setShowDiagnosticModal(false);
+            setSelectedImage(null);
+            setInitialAnalysis(null);
+          }}
+        />
+      )}
+
       {/* Repair Instructions Modal */}
       {repairData && (
         <RepairInstructionsModal
@@ -267,6 +286,7 @@ export default function HomeScreen() {
           onClose={() => {
             setShowModal(false);
             setSelectedImage(null);
+            setRepairData(null);
           }}
         />
       )}
