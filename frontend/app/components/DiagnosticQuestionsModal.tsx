@@ -144,7 +144,7 @@ const DIAGNOSTIC_QUESTIONS: Record<string, any> = {
         id: 1,
         question: 'What is the primary problem?',
         options: [
-          'Device won\\'t turn on',
+          "Device won't turn on",
           'Not working as expected',
           'Making unusual sounds',
           'Physical damage visible',
@@ -155,7 +155,7 @@ const DIAGNOSTIC_QUESTIONS: Record<string, any> = {
       {
         id: 2,
         question: 'When did you first notice this issue?',
-        options: ['Just now', 'Today', 'This week', 'More than a week ago', 'It\\'s been ongoing'],
+        options: ['Just now', 'Today', 'This week', 'More than a week ago', "It's been ongoing"],
       },
       {
         id: 3,
