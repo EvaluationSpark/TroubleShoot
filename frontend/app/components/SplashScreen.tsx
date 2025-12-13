@@ -61,16 +61,16 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
       })
     ).start();
 
-    // Auto-hide after 3 seconds
+    // Auto-hide after 2.5 seconds (shorter, smoother)
     setTimeout(() => {
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 500,
+        duration: 600,
         useNativeDriver: true,
       }).start(() => {
         onFinish();
       });
-    }, 3000);
+    }, 2500);
   }, []);
 
   const rotation = logoRotate.interpolate({
