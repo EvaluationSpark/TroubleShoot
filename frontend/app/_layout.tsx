@@ -3,13 +3,30 @@ import { Stack } from 'expo-router';
 import { loadLanguagePreference } from './i18n';
 import SplashScreen from './components/SplashScreen';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { initializeStorage } from './utils/storage';
 
 export default function RootLayout() {
   const [showSplash, setShowSplash] = useState(true);
+  const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
-    // Load saved language preference on app start
-    loadLanguagePreference();
+    async function initialize() {
+      try {
+        // Initialize storage and run migrations
+        await initializeStorage();
+        
+        // Load saved language preference
+        await loadLanguagePreference();
+        
+        setStorageReady(true);
+      } catch (error) {
+        console.error('Initialization error:', error);
+        // Allow app to continue even if initialization fails
+        setStorageReady(true);
+      }
+    }
+    
+    initialize();
   }, []);
 
   if (showSplash) {
