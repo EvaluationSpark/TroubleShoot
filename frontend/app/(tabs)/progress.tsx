@@ -242,7 +242,13 @@ export default function ProgressScreen() {
 
                 {/* Action Buttons */}
                 <View style={styles.sessionActions}>
-                  <TouchableOpacity style={styles.actionButton}>
+                  <TouchableOpacity 
+                    style={styles.actionButton}
+                    onPress={() => {
+                      setSelectedSession(session);
+                      setShowDetailsModal(true);
+                    }}
+                  >
                     <Ionicons name="eye" size={16} color="#00D9FF" />
                     <Text style={styles.actionButtonText}>View Details</Text>
                   </TouchableOpacity>
