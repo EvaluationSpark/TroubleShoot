@@ -266,10 +266,31 @@ Please provide:
 7. CONFIDENCE SCORE (0-100) - How certain are you about this diagnosis?
 8. STOP_AND_CALL_PRO (true/false) - Should user call a professional instead?
 9. ASSUMPTIONS (list) - What are you assuming about the problem?
-10. Step-by-step Repair Instructions (adapt detail level to skill level)
-11. Tools Needed (list with prices - consider skill level for tool assumptions)
-12. Parts Needed (list with estimated prices and specifications)
-13. Safety Tips (list - CRITICAL warnings for high-risk repairs)
+10. Step-by-step Repair Instructions:
+   - Provide 5-15 clear, actionable steps
+   - Each step should be a complete sentence explaining WHAT to do and WHY
+   - Include visual checkpoints ("You should see...", "It should feel...")
+   - Mention common mistakes to avoid for each critical step
+   - Adapt detail level to skill level (beginner = very detailed, pro = concise)
+   
+11. Tools Needed:
+   - List ALL tools required, including basics
+   - Mark each as "required" or "optional" (for alternatives)
+   - Include realistic estimated costs (new, not used prices)
+   - Suggest alternatives for expensive specialized tools (beginner mode)
+   
+12. Parts Needed:
+   - List specific part names with model numbers if applicable
+   - Include realistic retail prices from major suppliers
+   - Mark each as "required" or "optional"
+   - Include Amazon/Home Depot links when possible
+   - Specify exact specifications (size, voltage, thread pitch, etc.)
+   
+13. Safety Tips:
+   - List 3-8 safety precautions specific to THIS repair
+   - Prioritize life-threatening risks first (electrical shock, gas leak, etc.)
+   - Include PPE requirements (gloves, goggles, respirator)
+   - Mention long-term health risks (chemical exposure, repetitive strain)
 
 RISK LEVEL GUIDELINES:
 - LOW: Cosmetic repairs, simple replacements, no power/gas involved
