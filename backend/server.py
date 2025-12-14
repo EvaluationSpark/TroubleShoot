@@ -318,7 +318,8 @@ async def analyze_repair(request: RepairAnalysisRequest):
             tools_needed=analysis.get('tools_needed', []),
             parts_needed=analysis.get('parts_needed', []),
             safety_tips=analysis.get('safety_tips', []),
-            diagram_base64=diagram_base64
+            diagram_base64=diagram_base64,
+            model_number=request.model_number  # PR #5
         )
         
         # Save to database
