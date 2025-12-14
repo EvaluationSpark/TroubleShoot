@@ -265,8 +265,10 @@ export default function ProgressScreen() {
           <Text style={styles.tipText}>• Take before and after photos to share in Community</Text>
           <Text style={styles.tipText}>• Set reminders for repairs that need ordered parts</Text>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
