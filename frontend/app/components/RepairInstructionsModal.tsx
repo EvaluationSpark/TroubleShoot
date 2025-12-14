@@ -40,6 +40,8 @@ export default function RepairInstructionsModal({
   const [showVendorsModal, setShowVendorsModal] = useState(false); // Local vendors feature
   const [tutorialVideos, setTutorialVideos] = useState<any[]>([]);
   const [loadingVideos, setLoadingVideos] = useState(false);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
 
   // PR #7: Export to PDF
   const handleExportPDF = async () => {
