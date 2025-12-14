@@ -461,10 +461,10 @@ export default function RepairInstructionsModal({
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Repair Steps</Text>
                 <Text style={styles.progressText}>
-                  {checkedSteps.size} / {repairData.repair_steps.length} completed
+                  {checkedSteps.size} / {(repairData.repair_steps || []).length} completed
                 </Text>
               </View>
-              {repairData.repair_steps.map((step: string, index: number) => (
+              {(repairData.repair_steps || []).map((step: string, index: number) => (
                 <View key={index} style={[styles.stepContainer, checkedSteps.has(index) && styles.stepCompleted]}>
                   <TouchableOpacity
                     style={styles.checkbox}
