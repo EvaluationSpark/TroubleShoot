@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocalVendorsModal from './LocalVendorsModal';
 import { CostBreakdown, TimeBreakdown } from './CostTimeBreakdown';
+import { exportRepairAsPDF } from '../utils/pdfExport';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const REPAIRS_STORAGE_KEY = '@pix_fix_repairs';
