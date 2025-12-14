@@ -162,8 +162,17 @@ export default function CommunityScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Community Repairs</Text>
-          <Text style={styles.headerSubtitle}>Share your success stories and inspire others!</Text>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>Community Repairs</Text>
+            <Text style={styles.headerSubtitle}>Share your success stories and inspire others!</Text>
+          </View>
+          {/* PR #6: Guidelines Button */}
+          <TouchableOpacity 
+            style={styles.guidelinesButton} 
+            onPress={() => setShowGuidelines(true)}
+          >
+            <Ionicons name="shield-checkmark-outline" size={20} color="#00D9FF" />
+          </TouchableOpacity>
         </View>
 
         {/* Create Post Button */}
