@@ -208,15 +208,42 @@ Your expertise includes:
         model_context = f"\nMODEL NUMBER PROVIDED: {model_number}\nUse this model number to provide MORE ACCURATE parts specifications, compatibility information, and model-specific repair steps." if model_number else ""
         
         prompt = f"""
-Analyze this image of a broken item and provide a detailed repair analysis in {language}.
+VISUAL ANALYSIS INSTRUCTIONS:
+Carefully examine this image and perform a comprehensive visual inspection:
+
+1. IDENTIFY THE ITEM:
+   - What is the specific type of item? (be as specific as possible)
+   - Brand/manufacturer (if visible in image)
+   - Model/version indicators
+   - Age/condition indicators (wear patterns, discoloration)
+
+2. DAMAGE ASSESSMENT:
+   - Primary damage: What's the main issue visible?
+   - Secondary damage: Any related or consequential damage?
+   - Root cause: What likely caused this damage?
+   - Damage severity: Minor cosmetic vs. functional failure
+   - Hidden damage potential: What might NOT be visible?
+
+3. MATERIAL ANALYSIS:
+   - What materials are involved? (plastic type, metal type, glass, fabric, etc.)
+   - Material condition (brittle, cracked, deformed, corroded)
+   - Material-specific repair approaches
+
+4. VISUAL CLUES:
+   - Wear patterns suggesting usage/failure mode
+   - Stress points, crack patterns, break locations
+   - Missing parts or components
+   - Signs of previous repair attempts
+   - Environmental damage (water, heat, impact, etc.)
 
 USER SKILL LEVEL: {skill_level.upper()}
 {skill_prompt}{model_context}
 
 CRITICAL SAFETY ASSESSMENT:
-- Detect if repair involves: ELECTRICAL work, GAS systems, HVAC, STRUCTURAL repairs, or HIGH-RISK scenarios
-- Assess your CONFIDENCE level (0-100) in the diagnosis
-- If confidence < 70% OR high-risk category detected, set stop_and_call_pro = true
+- Detect if repair involves: ELECTRICAL work (exposed wiring, batteries, circuits), GAS systems, HVAC, STRUCTURAL repairs (load-bearing), or HIGH-RISK scenarios
+- Assess your CONFIDENCE level (0-100) in the diagnosis based on image clarity and visible evidence
+- If confidence < 70% OR high-risk category detected OR unclear damage, set stop_and_call_pro = true
+- Consider image quality: Is the damage clearly visible? Multiple angles needed?
 
 Please provide:
 1. Item Type (e.g., 'Smartphone', 'Chair', 'Laptop', etc.)
