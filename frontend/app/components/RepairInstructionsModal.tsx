@@ -727,4 +727,57 @@ const styles = StyleSheet.create({
     color: '#ccc',
     lineHeight: 22,
   },
+  emptyVideos: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyVideosText: {
+    color: '#666',
+    fontSize: 16,
+    marginTop: 12,
+  },
+  videoCard: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    alignItems: 'center',
+    gap: 12,
+  },
+  videoThumbnail: {
+    width: 80,
+    height: 60,
+    backgroundColor: '#000',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoInfo: {
+    flex: 1,
+  },
+  videoTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  videoDescription: {
+    fontSize: 13,
+    color: '#aaa',
+    marginBottom: 6,
+  },
+  videoMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  videoDuration: {
+    fontSize: 12,
+    color: '#aaa',
+  },
+  videoChannel: {
+    fontSize: 12,
+    color: '#aaa',
+  },
 });
