@@ -94,12 +94,13 @@ export default function HomeScreen() {
             })
         );
 
-      const response = await fetch(`${BACKEND_URL}/api/analyze`, {
+      const response = await fetch(`${BACKEND_URL}/api/analyze-repair`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          image: base64,
+          image_base64: base64,
           skill_level: skillLevel,
+          model_number: modelNumber || undefined,
         }),
       });
 
