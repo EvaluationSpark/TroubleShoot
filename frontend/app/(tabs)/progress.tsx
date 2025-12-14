@@ -277,6 +277,18 @@ export default function ProgressScreen() {
           </ScrollView>
         </SafeAreaView>
       </LinearGradient>
+
+      {/* Full Repair Details Modal */}
+      {selectedSession && (
+        <RepairInstructionsModal
+          visible={showDetailsModal}
+          repairData={selectedSession}
+          onClose={() => {
+            setShowDetailsModal(false);
+            setSelectedSession(null);
+          }}
+        />
+      )}
     </ImageBackground>
   );
 }
