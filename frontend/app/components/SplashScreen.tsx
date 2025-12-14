@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import AppLogo from './AppLogo';
 
 const { width, height } = Dimensions.get('window');
 
