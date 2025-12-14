@@ -42,6 +42,7 @@ export default function RepairInstructionsModal({
   const [selectedStep, setSelectedStep] = useState<{number: number, text: string} | null>(null);
   const [stepDetails, setStepDetails] = useState<string>('');
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [exportingPDF, setExportingPDF] = useState(false); // PR #7
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
