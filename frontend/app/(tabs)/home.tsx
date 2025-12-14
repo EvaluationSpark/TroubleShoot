@@ -106,11 +106,30 @@ export default function HomeScreen() {
 
       if (response.ok) {
         const data = await response.json();
-        setInitialAnalysis(data);
-        // Show diagnostic questions first
-        setShowDiagnosticModal(true);
+        console.log('Analysis response:', data);
+        
+        // Check if there are clarifying questions
+        if (data.clarifyingQuestions && data.clarifyingQuestions.length > 0) {
+          setInitialAnalysis(data);
+          setShowDiagnosticModal(true);
+        } else {
+          // No questions, go directly to results
+          setRepairData(data);
+          
+          // Check if safety gating is needed
+          const riskLevel = data.risk_level || 'low';
+          const shouldGate = riskLevel === 'high' || riskLevel === 'critical' || data.stop_and_call_pro;
+          
+          if (shouldGate) {
+            setShowSafetyGating(true);
+          } else {
+            setShowModal(true);
+          }
+        }
       } else {
-        Alert.alert('Error', 'Failed to analyze image');
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        Alert.alert('Error', 'Failed to analyze image. Please try again.');
       }
     } catch (error) {
       console.error('Error analyzing image:', error);
