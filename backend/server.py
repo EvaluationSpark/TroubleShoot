@@ -245,6 +245,12 @@ CRITICAL SAFETY ASSESSMENT:
 - If confidence < 70% OR high-risk category detected OR unclear damage, set stop_and_call_pro = true
 - Consider image quality: Is the damage clearly visible? Multiple angles needed?
 
+IMPORTANT: ALWAYS provide complete repair instructions, even for critical/dangerous repairs.
+- If stop_and_call_pro = true, STILL provide detailed repair steps
+- Add extra safety warnings and disclaimers for dangerous repairs
+- Clearly state risks at the beginning of repair_steps
+- The user wants to see the process even if they should call a pro
+
 Please provide:
 1. Item Type (e.g., 'Smartphone', 'Chair', 'Laptop', etc.)
 2. Damage Description (what's broken)
