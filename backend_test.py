@@ -81,44 +81,200 @@ def test_root_endpoint():
         log_test("Root Endpoint", "FAIL", f"Exception: {str(e)}")
         return False
 
-def test_analyze_repair():
-    """Test POST /api/analyze-repair - Main feature with image analysis"""
+def test_analyze_repair_pr4():
+    """Test POST /api/analyze-repair - PR #4 Cost/Time Estimation Testing"""
+    print("🔧 Testing /api/analyze-repair endpoint (PR #4: Cost/Time Estimation)")
+    print("=" * 70)
+    
     try:
         payload = {
             "image_base64": SAMPLE_IMAGE_B64,
-            "language": "en"
+            "language": "en",
+            "skill_level": "diy"
         }
         
+        print("📤 Sending request to analyze-repair endpoint...")
         response = requests.post(
             f"{BASE_URL}/analyze-repair", 
             json=payload, 
-            timeout=60  # Longer timeout for AI processing
+            timeout=TIMEOUT
         )
         
-        if response.status_code == 200:
-            data = response.json()
-            required_fields = [
-                "repair_id", "item_type", "damage_description", 
-                "repair_difficulty", "estimated_time", "repair_steps", 
-                "tools_needed", "parts_needed", "safety_tips"
-            ]
-            
-            missing_fields = [field for field in required_fields if field not in data]
-            
-            if not missing_fields:
-                log_test("Analyze Repair", "PASS", 
-                        f"All required fields present. Item: {data.get('item_type', 'N/A')}, "
-                        f"Difficulty: {data.get('repair_difficulty', 'N/A')}")
-                return data["repair_id"]  # Return repair_id for subsequent tests
+        print(f"📊 Response Status: {response.status_code}")
+        
+        if response.status_code != 200:
+            log_test("Analyze Repair (PR #4)", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+            return None
+        
+        data = response.json()
+        print("✅ Response received successfully")
+        
+        # Test existing fields (backward compatibility)
+        required_fields = [
+            "repair_id", "item_type", "damage_description", 
+            "repair_difficulty", "estimated_time", "repair_steps", 
+            "tools_needed", "parts_needed", "safety_tips"
+        ]
+        
+        print("\n🔍 Testing existing fields (backward compatibility):")
+        missing_fields = []
+        for field in required_fields:
+            if field in data:
+                print(f"  ✅ {field}: {type(data[field]).__name__}")
             else:
-                log_test("Analyze Repair", "FAIL", f"Missing fields: {missing_fields}")
-                return None
+                print(f"  ❌ Missing field: {field}")
+                missing_fields.append(field)
+        
+        if missing_fields:
+            log_test("Analyze Repair (PR #4)", "FAIL", f"Missing required fields: {missing_fields}")
+            return None
+        
+        # NEW: Test cost_estimate field (PR #4)
+        print("\n💰 Testing NEW cost_estimate field:")
+        if 'cost_estimate' not in data:
+            log_test("Analyze Repair (PR #4)", "FAIL", "CRITICAL: cost_estimate field missing!")
+            return None
+        
+        cost_estimate = data['cost_estimate']
+        print(f"  ✅ cost_estimate field present: {type(cost_estimate).__name__}")
+        
+        # Test cost_estimate structure
+        cost_required_fields = {
+            'low': (int, float),
+            'typical': (int, float),
+            'high': (int, float),
+            'currency': str,
+            'parts_breakdown': list,
+            'tools_cost': (int, float),
+            'labor_hours_range': dict,
+            'assumptions': list
+        }
+        
+        cost_errors = []
+        for field, expected_type in cost_required_fields.items():
+            if field in cost_estimate:
+                if isinstance(expected_type, tuple):
+                    if isinstance(cost_estimate[field], expected_type):
+                        print(f"    ✅ {field}: {cost_estimate[field]} ({type(cost_estimate[field]).__name__})")
+                    else:
+                        print(f"    ❌ {field}: Wrong type. Expected {expected_type}, got {type(cost_estimate[field])}")
+                        cost_errors.append(f"{field} wrong type")
+                else:
+                    if isinstance(cost_estimate[field], expected_type):
+                        print(f"    ✅ {field}: {cost_estimate[field]} ({type(cost_estimate[field]).__name__})")
+                    else:
+                        print(f"    ❌ {field}: Wrong type. Expected {expected_type}, got {type(cost_estimate[field])}")
+                        cost_errors.append(f"{field} wrong type")
+            else:
+                print(f"    ❌ Missing cost_estimate field: {field}")
+                cost_errors.append(f"missing {field}")
+        
+        # Test labor_hours_range structure
+        if 'labor_hours_range' in cost_estimate and isinstance(cost_estimate['labor_hours_range'], dict):
+            if 'min' in cost_estimate['labor_hours_range'] and 'max' in cost_estimate['labor_hours_range']:
+                print(f"    ✅ labor_hours_range.min: {cost_estimate['labor_hours_range']['min']}")
+                print(f"    ✅ labor_hours_range.max: {cost_estimate['labor_hours_range']['max']}")
+            else:
+                print("    ❌ labor_hours_range missing min/max fields")
+                cost_errors.append("labor_hours_range missing min/max")
+        
+        # NEW: Test time_estimate field (PR #4)
+        print("\n⏱️  Testing NEW time_estimate field:")
+        if 'time_estimate' not in data:
+            log_test("Analyze Repair (PR #4)", "FAIL", "CRITICAL: time_estimate field missing!")
+            return None
+        
+        time_estimate = data['time_estimate']
+        print(f"  ✅ time_estimate field present: {type(time_estimate).__name__}")
+        
+        # Test time_estimate structure
+        time_required_fields = {
+            'prep': (int, float),
+            'active': (int, float),
+            'total': (int, float),
+            'unit': str
+        }
+        
+        time_errors = []
+        for field, expected_type in time_required_fields.items():
+            if field in time_estimate:
+                if isinstance(expected_type, tuple):
+                    if isinstance(time_estimate[field], expected_type):
+                        print(f"    ✅ {field}: {time_estimate[field]} ({type(time_estimate[field]).__name__})")
+                    else:
+                        print(f"    ❌ {field}: Wrong type. Expected {expected_type}, got {type(time_estimate[field])}")
+                        time_errors.append(f"{field} wrong type")
+                else:
+                    if isinstance(time_estimate[field], expected_type):
+                        print(f"    ✅ {field}: {time_estimate[field]} ({type(time_estimate[field]).__name__})")
+                    else:
+                        print(f"    ❌ {field}: Wrong type. Expected {expected_type}, got {type(time_estimate[field])}")
+                        time_errors.append(f"{field} wrong type")
+            else:
+                print(f"    ❌ Missing time_estimate field: {field}")
+                time_errors.append(f"missing {field}")
+        
+        # Test optional cure field
+        if 'cure' in time_estimate:
+            if isinstance(time_estimate['cure'], (int, float)):
+                print(f"    ✅ cure (optional): {time_estimate['cure']} ({type(time_estimate['cure']).__name__})")
+            else:
+                print(f"    ❌ cure: Wrong type. Expected int/float, got {type(time_estimate['cure'])}")
+                time_errors.append("cure wrong type")
         else:
-            log_test("Analyze Repair", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+            print(f"    ℹ️  Optional field 'cure' not present (OK)")
+        
+        # Validate specific field values
+        validation_errors = []
+        if 'unit' in time_estimate and time_estimate['unit'] != 'minutes':
+            print(f"    ❌ unit field should be 'minutes', got: {time_estimate['unit']}")
+            validation_errors.append("unit not 'minutes'")
+        else:
+            print(f"    ✅ unit field correct: {time_estimate['unit']}")
+        
+        if 'currency' in cost_estimate and cost_estimate['currency'] != 'USD':
+            print(f"    ❌ currency field should be 'USD', got: {cost_estimate['currency']}")
+            validation_errors.append("currency not 'USD'")
+        else:
+            print(f"    ✅ currency field correct: {cost_estimate['currency']}")
+        
+        # Test data consistency
+        print("\n🔍 Testing data consistency:")
+        
+        # Check cost range logic
+        if ('low' in cost_estimate and 'typical' in cost_estimate and 'high' in cost_estimate):
+            if cost_estimate['low'] <= cost_estimate['typical'] <= cost_estimate['high']:
+                print(f"    ✅ Cost range logical: ${cost_estimate['low']} ≤ ${cost_estimate['typical']} ≤ ${cost_estimate['high']}")
+            else:
+                print(f"    ❌ Cost range illogical: ${cost_estimate['low']} ≤ ${cost_estimate['typical']} ≤ ${cost_estimate['high']}")
+                validation_errors.append("illogical cost range")
+        
+        # Summary
+        all_errors = cost_errors + time_errors + validation_errors
+        
+        if not all_errors:
+            print("\n📋 Sample Response Data:")
+            print(f"  Item Type: {data['item_type']}")
+            print(f"  Damage: {data['damage_description']}")
+            print(f"  Difficulty: {data['repair_difficulty']}")
+            print(f"  Cost Range: ${cost_estimate['low']}-${cost_estimate['high']} (typical: ${cost_estimate['typical']})")
+            print(f"  Time Estimate: {time_estimate['total']} minutes (prep: {time_estimate['prep']}, active: {time_estimate['active']})")
+            if 'parts_breakdown' in cost_estimate:
+                print(f"  Parts Count: {len(cost_estimate['parts_breakdown'])}")
+            if 'tools_cost' in cost_estimate:
+                print(f"  Tools Cost: ${cost_estimate['tools_cost']}")
+            
+            log_test("Analyze Repair (PR #4)", "PASS", "All cost_estimate and time_estimate fields working correctly")
+            return data["repair_id"]
+        else:
+            log_test("Analyze Repair (PR #4)", "FAIL", f"Errors found: {', '.join(all_errors)}")
             return None
             
+    except requests.exceptions.Timeout:
+        log_test("Analyze Repair (PR #4)", "FAIL", "Request timed out (AI analysis taking too long)")
+        return None
     except Exception as e:
-        log_test("Analyze Repair", "FAIL", f"Exception: {str(e)}")
+        log_test("Analyze Repair (PR #4)", "FAIL", f"Exception: {str(e)}")
         return None
 
 def test_save_repair_session(repair_id):
