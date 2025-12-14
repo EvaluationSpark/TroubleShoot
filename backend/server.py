@@ -278,7 +278,7 @@ Format your response as JSON with these exact keys:
         
         msg = UserMessage(
             text=prompt,
-            file_contents=[ImageContent(data=image_base64, mime_type=mime_type)]
+            file_contents=[ImageContent(content=image_base64, mime_type=mime_type)]
         )
         
         response = await chat.send_message(msg)
