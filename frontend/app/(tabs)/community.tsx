@@ -242,6 +242,18 @@ export default function CommunityScreen() {
                   <Ionicons name="heart" size={20} color="#f87171" />
                   <Text style={styles.likeCount}>{post.likes}</Text>
                 </TouchableOpacity>
+                
+                {/* PR #6: Report Button */}
+                <TouchableOpacity 
+                  style={styles.reportButton} 
+                  onPress={() => {
+                    setReportingPostId(post.id);
+                    setShowReportModal(true);
+                  }}
+                >
+                  <Ionicons name="flag-outline" size={20} color="#6b7280" />
+                  <Text style={styles.reportText}>Report</Text>
+                </TouchableOpacity>
               </View>
             </View>
           ))
