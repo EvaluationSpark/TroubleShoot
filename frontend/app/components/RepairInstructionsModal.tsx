@@ -439,6 +439,19 @@ export default function RepairInstructionsModal({
           repairData={repairData}
           onClose={() => setShowVendorsModal(false)}
         />
+
+        {/* Video Player Modal */}
+        {selectedVideo && (
+          <VideoPlayerModal
+            visible={showVideoPlayer}
+            videoUrl={selectedVideo.url}
+            videoTitle={selectedVideo.title}
+            onClose={() => {
+              setShowVideoPlayer(false);
+              setSelectedVideo(null);
+            }}
+          />
+        )}
       </View>
     </Modal>
   );
