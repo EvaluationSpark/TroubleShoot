@@ -613,4 +613,46 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
+  // PR #5: Model Number Input Styles
+  modelInputCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  modelInputHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  modelInputTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modelInputSubtitle: {
+    fontSize: 12,
+    marginBottom: 12,
+  },
+  modelInputRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  modelInput: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  scanButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
