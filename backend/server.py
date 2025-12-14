@@ -1177,6 +1177,85 @@ Format response as JSON array:
         logger.error(f"Error finding vendors: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/get-step-details")
+async def get_step_details(request: Dict[str, Any]):
+    """Get comprehensive step-by-step details with visual diagram"""
+    try:
+        step_number = request.get('step_number', 1)
+        step_text = request.get('step_text', '')
+        item_type = request.get('item_type', 'Unknown')
+        repair_type = request.get('repair_type', '')
+        
+        # Use AI to generate ultra-detailed instructions
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"step_detail_{uuid.uuid4()}",
+            system_message="You are an expert repair instructor who provides extremely detailed, beginner-friendly instructions."
+        )
+        chat.with_model("gemini", "gemini-2.5-flash")
+        
+        prompt = f"""Provide EXTREMELY DETAILED instructions for this repair step:
+
+Item: {item_type}
+Repair: {repair_type}
+Step {step_number}: {step_text}
+
+Provide a comprehensive guide with:
+1. **Before You Begin**: What to prepare, safety precautions
+2. **Detailed Instructions**: Break down into micro-steps (like you're teaching a complete beginner)
+3. **Visual Cues**: What things should look like at each stage
+4. **Common Mistakes**: What to avoid
+5. **Pro Tips**: Expert advice for better results
+6. **Troubleshooting**: What to do if something goes wrong
+7. **Time Estimate**: How long this step should take
+
+Format as clear, easy-to-read text with proper line breaks.
+Do NOT use markdown formatting or HTML tags."""
+        
+        msg = UserMessage(text=prompt)
+        response = await chat.send_message(msg)
+        detailed_instructions = response.strip()
+        
+        # Generate a helpful diagram/illustration
+        try:
+            from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+            import base64
+            
+            image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+            
+            # Create a clear, instructional diagram
+            image_prompt = f"""Create a clear, simple instructional diagram showing: {step_text} for {item_type} repair.
+Style: Technical illustration, clean lines, labeled parts, step-by-step visual guide, educational poster style.
+Include: Clear labels, arrows showing direction/sequence, important details highlighted."""
+            
+            images = await image_gen.generate_images(
+                prompt=image_prompt,
+                model="gpt-image-1",
+                number_of_images=1
+            )
+            
+            image_base64 = None
+            if images and len(images) > 0:
+                image_base64 = base64.b64encode(images[0]).decode('utf-8')
+            
+            return {
+                "detailed_instructions": detailed_instructions,
+                "diagram_image": image_base64,
+                "step_number": step_number
+            }
+        except Exception as img_error:
+            logger.warning(f"Failed to generate diagram: {str(img_error)}")
+            # Return instructions without image if generation fails
+            return {
+                "detailed_instructions": detailed_instructions,
+                "diagram_image": None,
+                "step_number": step_number
+            }
+        
+    except Exception as e:
+        logger.error(f"Error fetching step details: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/get-tutorial-videos")
 async def get_tutorial_videos(request: Dict[str, Any]):
     """Get relevant tutorial videos for a repair"""
