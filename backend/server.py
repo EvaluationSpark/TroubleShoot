@@ -128,7 +128,7 @@ class LocalVendor(BaseModel):
 
 # ============ HELPER FUNCTIONS ============
 
-async def analyze_broken_item(image_base64: str, language: str = "en", skill_level: str = "diy") -> Dict[str, Any]:
+async def analyze_broken_item(image_base64: str, language: str = "en", skill_level: str = "diy", model_number: Optional[str] = None) -> Dict[str, Any]:
     """Analyze a broken item using Gemini Vision API"""
     try:
         # Adapt instructions based on skill level
