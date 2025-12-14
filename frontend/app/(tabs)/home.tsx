@@ -11,6 +11,7 @@ import {
   ImageBackground,
   Animated,
   ScrollView,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -20,6 +21,7 @@ import { BlurView } from 'expo-blur';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
 import DiagnosticQuestionsModal from '../components/DiagnosticQuestionsModal';
 import SafetyGatingModal from '../components/SafetyGatingModal';
+import BarcodeScannerModal from '../components/BarcodeScannerModal';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSkillLevel } from '../contexts/SkillLevelContext';
 import { RiskLevel } from '../types/models';
