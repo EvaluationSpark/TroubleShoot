@@ -132,27 +132,32 @@ export default function RepairInstructionsModal({
     setSelectedStep({ number: stepNumber, text: stepText });
     setShowDetailModal(true);
     setLoadingDetails(true);
+    setStepDetails('');
+    setStepDiagram(null);
 
     try {
       const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-      const response = await fetch(`${BACKEND_URL}/api/troubleshoot`, {
+      const response = await fetch(`${BACKEND_URL}/api/get-step-details`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          repair_id: repairData.repair_id,
-          question: `Can you provide more details about step ${stepNumber}: "${stepText}"?`,
+          step_number: stepNumber,
+          step_text: stepText,
+          item_type: repairData?.item_type || 'Unknown',
+          repair_type: repairData?.damage_description || '',
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setStepDetails(data.answer || 'No additional details available.');
+        setStepDetails(data.detailed_instructions || 'No additional details available.');
+        setStepDiagram(data.diagram_image || null);
       } else {
         setStepDetails('Unable to fetch details. Please try again.');
       }
     } catch (error) {
       console.error('Error fetching step details:', error);
-      setStepDetails('Error loading details.');
+      setStepDetails('Unable to fetch details. Please try again.');
     } finally {
       setLoadingDetails(false);
     }
