@@ -129,6 +129,8 @@ export default function LocalVendorsModal({
   };
 
   const searchVendors = async () => {
+    console.log('[LocalVendors] Search initiated:', { location, coordinates, itemType });
+    
     if (!location.trim() && !coordinates) {
       Alert.alert('Location Required', 'Please enter your city/zip code or use GPS location');
       return;
@@ -139,6 +141,7 @@ export default function LocalVendorsModal({
     } else {
       setLoading(true);
       try {
+        console.log('[LocalVendors] Fetching from:', `${BACKEND_URL}/api/find-local-vendors`);
         const response = await fetch(`${BACKEND_URL}/api/find-local-vendors`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
