@@ -224,8 +224,8 @@ export default function ProgressScreen() {
               )}
             </View>
 
-            {/* Insights Section */}
-            <InsightsSection insights={insights} />
+            {/* Insights Section - Temporarily disabled due to rendering bug */}
+            {/* <InsightsSection insights={insights} /> */}
 
             {/* Saved Repairs Section */}
             <View style={styles.section}>
