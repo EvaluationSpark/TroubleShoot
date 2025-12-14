@@ -38,6 +38,23 @@ class RepairAnalysisRequest(BaseModel):
     language: str = "en"
     skill_level: Optional[str] = "diy"  # beginner, diy, pro
 
+class CostEstimate(BaseModel):
+    low: float
+    typical: float
+    high: float
+    currency: str = "USD"
+    parts_breakdown: List[Dict[str, Any]]
+    tools_cost: float
+    labor_hours_range: Dict[str, float]  # {"min": 1, "max": 2}
+    assumptions: List[str]
+
+class TimeEstimate(BaseModel):
+    prep: float  # minutes
+    active: float  # minutes
+    cure: Optional[float] = None  # minutes (optional)
+    total: float  # minutes
+    unit: str = "minutes"
+
 class RepairAnalysisResponse(BaseModel):
     repair_id: str
     item_type: str
@@ -45,14 +62,17 @@ class RepairAnalysisResponse(BaseModel):
     repair_difficulty: str  # easy, medium, hard
     estimated_time: str
     repair_steps: List[str]
-    tools_needed: List[str]
-    parts_needed: List[Dict[str, str]]  # [{"name": "...", "link": "..."}]
+    tools_needed: List[Any]  # Can be strings or dicts with cost info
+    parts_needed: List[Dict[str, Any]]  # More flexible for different data types
     safety_tips: List[str]
     risk_level: Optional[str] = "low"  # low, medium, high, critical
     confidence_score: Optional[int] = 85  # 0-100
     stop_and_call_pro: Optional[bool] = False
     assumptions: Optional[List[str]] = []
     diagram_base64: Optional[str] = None
+    # NEW PR #4 fields
+    cost_estimate: Optional[CostEstimate] = None
+    time_estimate: Optional[TimeEstimate] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class TroubleshootQuestion(BaseModel):
