@@ -148,11 +148,13 @@ async def analyze_broken_item(image_base64: str, language: str = "en", skill_lev
         
         chat.with_model("gemini", "gemini-2.5-flash")
         
+        model_context = f"\nMODEL NUMBER PROVIDED: {model_number}\nUse this model number to provide MORE ACCURATE parts specifications, compatibility information, and model-specific repair steps." if model_number else ""
+        
         prompt = f"""
 Analyze this image of a broken item and provide a detailed repair analysis in {language}.
 
 USER SKILL LEVEL: {skill_level.upper()}
-{skill_prompt}
+{skill_prompt}{model_context}
 
 CRITICAL SAFETY ASSESSMENT:
 - Detect if repair involves: ELECTRICAL work, GAS systems, HVAC, STRUCTURAL repairs, or HIGH-RISK scenarios
