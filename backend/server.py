@@ -781,6 +781,232 @@ async def get_community_guidelines():
     }
     return guidelines
 
+# Gamification Endpoints
+from gamification import (
+    calculate_level, check_new_badges, calculate_streak,
+    calculate_xp_reward, XP_REWARDS, BADGES
+)
+
+@api_router.get("/gamification/profile")
+async def get_gamification_profile(user_id: str = "default_user"):
+    """Get user's gamification profile"""
+    try:
+        profile = await db.gamification_profiles.find_one({"user_id": user_id})
+        
+        if not profile:
+            # Create new profile
+            profile = {
+                "user_id": user_id,
+                "total_xp": 0,
+                "level": 1,
+                "current_streak": 0,
+                "longest_streak": 0,
+                "last_activity_date": None,
+                "badges_earned": [],
+                "stats": {},
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.gamification_profiles.insert_one(profile)
+        
+        # Calculate level info
+        level_info = calculate_level(profile["total_xp"])
+        
+        # Get all available badges
+        all_badges = [
+            {
+                "id": badge_id,
+                "name": badge["name"],
+                "description": badge["description"],
+                "icon": badge["icon"],
+                "earned": badge_id in profile["badges_earned"]
+            }
+            for badge_id, badge in BADGES.items()
+        ]
+        
+        return {
+            **profile,
+            "_id": str(profile["_id"]),
+            "level_info": level_info,
+            "all_badges": all_badges
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching gamification profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/gamification/complete-step")
+async def complete_step(request: CompleteStepRequest, user_id: str = "default_user"):
+    """Award XP for completing a repair step"""
+    try:
+        profile = await db.gamification_profiles.find_one({"user_id": user_id})
+        
+        if not profile:
+            profile = {
+                "user_id": user_id,
+                "total_xp": 0,
+                "level": 1,
+                "current_streak": 0,
+                "longest_streak": 0,
+                "last_activity_date": None,
+                "badges_earned": [],
+                "stats": {"steps_completed": 0},
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.gamification_profiles.insert_one(profile)
+        
+        # Calculate XP reward
+        xp_reward = calculate_xp_reward("complete_step")
+        new_total_xp = profile["total_xp"] + xp_reward["total_xp"]
+        old_level = calculate_level(profile["total_xp"])["level"]
+        new_level = calculate_level(new_total_xp)["level"]
+        leveled_up = new_level > old_level
+        
+        # Update streak
+        new_streak = calculate_streak(
+            profile.get("last_activity_date"),
+            profile.get("current_streak", 0)
+        )
+        longest_streak = max(new_streak, profile.get("longest_streak", 0))
+        
+        # Update stats
+        stats = profile.get("stats", {})
+        stats["steps_completed"] = stats.get("steps_completed", 0) + 1
+        
+        # Check for new badges
+        new_badges = check_new_badges(stats, profile.get("badges_earned", []))
+        
+        # Update profile
+        await db.gamification_profiles.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "total_xp": new_total_xp,
+                "current_streak": new_streak,
+                "longest_streak": longest_streak,
+                "last_activity_date": datetime.utcnow(),
+                "badges_earned": profile.get("badges_earned", []) + [b["id"] for b in new_badges],
+                "stats": stats,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        
+        level_info = calculate_level(new_total_xp)
+        
+        return {
+            "xp_awarded": xp_reward["total_xp"],
+            "bonus_xp": xp_reward["bonus_xp"],
+            "bonus_reasons": xp_reward["bonus_reasons"],
+            "new_total_xp": new_total_xp,
+            "leveled_up": leveled_up,
+            "new_level": new_level,
+            "level_info": level_info,
+            "new_badges": new_badges,
+            "current_streak": new_streak
+        }
+        
+    except Exception as e:
+        logger.error(f"Error completing step: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/gamification/complete-repair")
+async def complete_repair(request: CompleteRepairRequest, user_id: str = "default_user"):
+    """Award XP for completing an entire repair"""
+    try:
+        profile = await db.gamification_profiles.find_one({"user_id": user_id})
+        
+        if not profile:
+            profile = {
+                "user_id": user_id,
+                "total_xp": 0,
+                "level": 1,
+                "current_streak": 0,
+                "longest_streak": 0,
+                "last_activity_date": None,
+                "badges_earned": [],
+                "stats": {},
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.gamification_profiles.insert_one(profile)
+        
+        # Determine XP based on difficulty
+        action = f"complete_{request.difficulty}_repair"
+        
+        # Check if this is first repair
+        stats = profile.get("stats", {})
+        is_first = stats.get("completed_repairs", 0) == 0
+        
+        # Calculate XP with bonuses
+        details = {
+            "time_taken_minutes": request.time_taken_minutes,
+            "is_first_repair": is_first,
+            "completion_percentage": 100
+        }
+        xp_reward = calculate_xp_reward(action, details)
+        
+        new_total_xp = profile["total_xp"] + xp_reward["total_xp"]
+        old_level = calculate_level(profile["total_xp"])["level"]
+        new_level = calculate_level(new_total_xp)["level"]
+        leveled_up = new_level > old_level
+        
+        # Update streak
+        new_streak = calculate_streak(
+            profile.get("last_activity_date"),
+            profile.get("current_streak", 0)
+        )
+        longest_streak = max(new_streak, profile.get("longest_streak", 0))
+        
+        # Update stats
+        stats["completed_repairs"] = stats.get("completed_repairs", 0) + 1
+        stats["total_repairs"] = stats.get("total_repairs", 0) + 1
+        stats[f"{request.difficulty}_repairs_completed"] = stats.get(f"{request.difficulty}_repairs_completed", 0) + 1
+        stats["fastest_repair_minutes"] = min(request.time_taken_minutes, stats.get("fastest_repair_minutes", 999))
+        
+        # Track time of day
+        current_hour = datetime.utcnow().hour
+        if current_hour >= 22 or current_hour < 6:
+            stats["late_night_repairs"] = stats.get("late_night_repairs", 0) + 1
+        if current_hour < 8:
+            stats["early_morning_repairs"] = stats.get("early_morning_repairs", 0) + 1
+        
+        # Check for new badges
+        new_badges = check_new_badges(stats, profile.get("badges_earned", []))
+        
+        # Update profile
+        await db.gamification_profiles.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "total_xp": new_total_xp,
+                "current_streak": new_streak,
+                "longest_streak": longest_streak,
+                "last_activity_date": datetime.utcnow(),
+                "badges_earned": profile.get("badges_earned", []) + [b["id"] for b in new_badges],
+                "stats": stats,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        
+        level_info = calculate_level(new_total_xp)
+        
+        return {
+            "xp_awarded": xp_reward["total_xp"],
+            "base_xp": xp_reward["base_xp"],
+            "bonus_xp": xp_reward["bonus_xp"],
+            "bonus_reasons": xp_reward["bonus_reasons"],
+            "new_total_xp": new_total_xp,
+            "leveled_up": leveled_up,
+            "new_level": new_level,
+            "level_info": level_info,
+            "new_badges": new_badges,
+            "current_streak": new_streak,
+            "message": f"Amazing! You earned {xp_reward['total_xp']} XP!"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error completing repair: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/feedback")
 async def submit_feedback(feedback: FeedbackRequest):
     """Submit feedback on repair instructions"""
