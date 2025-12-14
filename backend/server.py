@@ -74,6 +74,8 @@ class RepairAnalysisResponse(BaseModel):
     # NEW PR #4 fields
     cost_estimate: Optional[CostEstimate] = None
     time_estimate: Optional[TimeEstimate] = None
+    # PR #5 field
+    model_number: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class TroubleshootQuestion(BaseModel):
