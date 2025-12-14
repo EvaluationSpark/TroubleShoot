@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 class RepairAnalysisRequest(BaseModel):
     image_base64: str
+    image_mime_type: Optional[str] = "image/jpeg"  # MIME type for Gemini API
     language: str = "en"
     skill_level: Optional[str] = "diy"  # beginner, diy, pro
     model_number: Optional[str] = None  # PR #5: Model number for better accuracy
