@@ -58,10 +58,15 @@ export default function LocalVendorsModal({
       return;
     }
 
+    console.log('[LocalVendors] Getting location...');
+
     setGettingLocation(true);
     try {
       // Request location permission
+      console.log('[LocalVendors] Requesting location permission...');
       const { status } = await Location.requestForegroundPermissionsAsync();
+      console.log('[LocalVendors] Permission status:', status);
+      
       if (status !== 'granted') {
         Alert.alert('Permission Denied', 'Location permission is required to find nearby repair shops.');
         setGettingLocation(false);
@@ -69,32 +74,44 @@ export default function LocalVendorsModal({
       }
 
       // Get current position
+      console.log('[LocalVendors] Getting current position...');
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
+      console.log('[LocalVendors] Position obtained:', position.coords);
 
       const { latitude, longitude } = position.coords;
       setCoordinates({ latitude, longitude });
 
       // Reverse geocode to get city name
+      console.log('[LocalVendors] Reverse geocoding...');
       const addresses = await Location.reverseGeocodeAsync({
         latitude,
         longitude,
       });
+      console.log('[LocalVendors] Addresses found:', addresses.length);
 
       if (addresses.length > 0) {
         const address = addresses[0];
-        const locationText = `${address.city || address.subregion || address.region}, ${address.country}`;
+        const locationText = `${address.city || address.subregion || address.region}, ${address.country || 'Unknown'}`;
+        console.log('[LocalVendors] Location text:', locationText);
         setLocation(locationText);
+      } else {
+        setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
       }
 
       setGettingLocation(false);
       
       // Automatically search with GPS location
+      console.log('[LocalVendors] Searching vendors with coordinates:', latitude, longitude);
       searchVendorsWithCoords(latitude, longitude);
-    } catch (error) {
-      console.error('Error getting location:', error);
-      Alert.alert('Error', 'Failed to get your current location. Please enter it manually.');
+    } catch (error: any) {
+      console.error('[LocalVendors] Error getting location:', error);
+      console.error('[LocalVendors] Error details:', error.message, error.code);
+      Alert.alert(
+        'Location Error', 
+        `Failed to get your current location: ${error.message || 'Unknown error'}. Please enter it manually.`
+      );
       setGettingLocation(false);
     }
   };
