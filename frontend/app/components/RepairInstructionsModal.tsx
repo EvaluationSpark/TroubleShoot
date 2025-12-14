@@ -296,8 +296,8 @@ export default function RepairInstructionsModal({
                   </TouchableOpacity>
                   <View style={styles.stepContent}>
                     <Text style={styles.stepNumber}>Step {index + 1}</Text>
-                    <Text style={styles.stepText}>{typeof step === 'string' ? step : step.title || step.step || 'No description'}</Text>
-                    {step.description && <Text style={styles.stepDescription}>{step.description}</Text>}
+                    <Text style={styles.stepText}>{cleanMarkup(typeof step === 'string' ? step : step.title || step.step || 'No description')}</Text>
+                    {step.description && <Text style={styles.stepDescription}>{cleanMarkup(step.description)}</Text>}
                     <TouchableOpacity
                       style={styles.moreDetailsButton}
                       onPress={() => getStepDetails(index + 1, typeof step === 'string' ? step : step.title || step.step)}
