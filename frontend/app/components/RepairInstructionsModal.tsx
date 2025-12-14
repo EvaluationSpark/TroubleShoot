@@ -703,6 +703,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  exportButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 217, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   content: {
     flex: 1,
   },
