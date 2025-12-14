@@ -232,7 +232,7 @@ export default function HomeScreen() {
                   </Text>
                 </View>
                 <Text style={[styles.modelInputSubtitle, { color: theme.colors.textSecondary }]}>
-                  {modelNumber ? 'Edit or scan again if needed' : 'Manually enter or scan barcode'}
+                  {modelNumber ? 'Edit if needed' : 'Manually enter model number'}
                 </Text>
                 <TextInput
                   style={[styles.modelInput, { 
