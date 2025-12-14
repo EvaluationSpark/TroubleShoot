@@ -366,31 +366,49 @@ Format your response as JSON with these exact keys:
         raise HTTPException(status_code=500, detail=f"Failed to analyze image: {str(e)}")
 
 async def generate_repair_diagram(item_type: str, repair_steps: List[str]) -> Optional[str]:
-    """Generate a diagram using Gemini image generation"""
+    """Generate an infographic using OpenAI gpt-image-1"""
     try:
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"diagram_{uuid.uuid4()}",
-            system_message="You are a technical illustrator."
+        from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+        import base64
+        
+        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        
+        # Create a detailed prompt for an informative repair infographic
+        steps_text = '\n'.join(f'{i+1}. {step}' for i, step in enumerate(repair_steps[:6]))
+        
+        prompt = f"""Create a professional repair infographic for {item_type}. 
+Style: Clean, modern technical illustration with a white/light background.
+Include:
+- Title: "{item_type} Repair Guide" at the top
+- Visual diagram showing the main components
+- Key repair steps illustrated with icons and labels
+- Color-coded sections (tools, parts, steps)
+- Clear, easy-to-follow visual flow
+- Professional layout suitable for printing
+
+Main steps to illustrate:
+{steps_text}
+
+The infographic should be informative, visually appealing, and easy to understand at a glance."""
+        
+        logger.info(f"Generating repair infographic for {item_type}")
+        
+        images = await image_gen.generate_images(
+            prompt=prompt,
+            model="gpt-image-1",
+            number_of_images=1
         )
         
-        chat.with_model("gemini", "gemini-2.5-flash-image-preview").with_params(modalities=["image", "text"])
-        
-        prompt = f"""Create a clear, simple technical diagram showing how to repair a {item_type}. 
-The diagram should illustrate these repair steps:
-{', '.join(repair_steps[:3])}
-
-Style: Clean, professional technical illustration with labels and arrows."""
-        
-        msg = UserMessage(text=prompt)
-        text, images = await chat.send_message_multimodal_response(msg)
-        
         if images and len(images) > 0:
-            return images[0]['data']  # Return base64 image data
+            # Convert bytes to base64 string
+            image_base64 = base64.b64encode(images[0]).decode('utf-8')
+            logger.info(f"Successfully generated infographic for {item_type}")
+            return image_base64
+        
         return None
         
     except Exception as e:
-        logger.warning(f"Failed to generate diagram: {str(e)}")
+        logger.error(f"Error generating infographic: {str(e)}")
         return None
 
 # ============ ENDPOINTS ============
