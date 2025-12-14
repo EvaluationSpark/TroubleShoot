@@ -399,7 +399,9 @@ export default function CommunityScreen() {
         visible={showGuidelines}
         onClose={() => setShowGuidelines(false)}
       />
-    </SafeAreaView>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
