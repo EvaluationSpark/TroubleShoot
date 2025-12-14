@@ -189,10 +189,21 @@ async def analyze_broken_item(image_base64: str, language: str = "en", skill_lev
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"analysis_{uuid.uuid4()}",
-            system_message=f"You are an expert repair technician who can identify broken items and provide detailed repair instructions. {skill_prompt}"
+            system_message=f"""You are an expert repair technician with 20+ years of experience across electronics, appliances, furniture, automotive, and more. You have exceptional visual analysis skills and can identify problems from images with high accuracy.
+
+Your expertise includes:
+- Visual damage assessment and root cause analysis
+- Material science (plastics, metals, fabrics, glass, wood)
+- Electronics diagnosis (circuit boards, connections, components)
+- Mechanical systems (motors, gears, bearings, hinges)
+- Common failure modes and wear patterns
+- Safety risk assessment
+- Cost estimation based on current market prices
+
+{skill_prompt}"""
         )
         
-        chat.with_model("gemini", "gemini-2.5-flash")
+        chat.with_model("gemini", "gemini-2.5-flash-image-preview")
         
         model_context = f"\nMODEL NUMBER PROVIDED: {model_number}\nUse this model number to provide MORE ACCURATE parts specifications, compatibility information, and model-specific repair steps." if model_number else ""
         
