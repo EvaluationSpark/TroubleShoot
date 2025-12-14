@@ -505,7 +505,7 @@ export default function RepairInstructionsModal({
                 <TimeBreakdown timeEstimate={repairData.time_estimate} />
                 
               <Text style={styles.sectionTitle}>Tools Needed</Text>
-              {repairData.tools_needed.map((tool: string, index: number) => (
+              {(repairData.tools_needed || []).map((tool: string, index: number) => (
                 <View key={index} style={styles.listItem}>
                   <Ionicons name="build" size={18} color="#00D9FF" />
                   <Text style={styles.listItemText}>{tool}</Text>
