@@ -1162,82 +1162,109 @@ Format as a clear, easy-to-follow guide."""
 
 @api_router.post("/find-local-vendors")
 async def find_local_vendors(search: LocalVendorSearch):
-    """Find local repair vendors specializing in the item type"""
+    """Find local vendors using real Google Places API"""
     try:
-        # Use AI to generate realistic local vendors based on item type and location
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"vendor_search_{uuid.uuid4()}",
-            system_message="You are a local business directory assistant."
-        )
-        chat.with_model("gemini", "gemini-2.5-flash")
+        import requests
+        import os
         
-        prompt = f"""Generate a list of 5 realistic local repair shops that specialize in fixing {search.item_type} in {search.location}.
-
-For each vendor, provide:
-1. Business name (realistic, professional)
-2. Specialization (what they repair)
-3. Full address
-4. Phone number (format: (XXX) XXX-XXXX)
-5. Email address (professional format: info@businessname.com or contact@businessname.com)
-6. Rating (1-5, realistic decimal)
-7. Number of reviews
-8. Distance from location (in miles)
-9. Estimated repair cost range
-10. Business hours
-11. Website (optional)
-
-Format response as JSON array:
-[
-  {{
-    "name": "...",
-    "specialization": "...",
-    "address": "...",
-    "phone": "...",
-    "email": "info@example.com",
-    "rating": 4.5,
-    "reviews_count": 123,
-    "distance": "2.3 miles",
-    "estimated_cost": "$50-$150",
-    "hours": "Mon-Fri 9AM-6PM, Sat 10AM-4PM",
-    "website": "https://..."
-  }}
-]"""
+        item_type = search.item_type
+        location = search.location
+        latitude = search.latitude
+        longitude = search.longitude
         
-        msg = UserMessage(text=prompt)
-        response = await chat.send_message(msg)
+        # Get Google Maps API key from environment
+        google_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+        if not google_api_key:
+            raise HTTPException(status_code=500, detail="Google Maps API key not configured")
         
-        # Parse JSON response
-        import json
-        response_text = response.strip()
-        if response_text.startswith('```'):
-            response_text = response_text.split('```')[1]
-            if response_text.startswith('json'):
-                response_text = response_text[4:]
-        response_text = response_text.strip()
+        # Build search query based on item type
+        search_query = f"{item_type} repair"
         
-        vendors_data = json.loads(response_text)
+        # Use Google Places Nearby Search API
+        places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
         
-        # Convert to LocalVendor models
+        params = {
+            'location': f"{latitude},{longitude}",
+            'radius': 8000,  # 8km radius
+            'keyword': search_query,
+            'key': google_api_key
+        }
+        
+        logger.info(f"Searching Google Places for: {search_query} near {latitude},{longitude}")
+        
+        response = requests.get(places_url, params=params, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if data.get('status') != 'OK':
+            logger.error(f"Google Places API error: {data.get('status')} - {data.get('error_message')}")
+            # Return empty list instead of failing completely
+            return {"vendors": [], "location": location}
+        
+        places = data.get('results', [])[:5]  # Get top 5 results
+        
         vendors = []
-        for vendor_dict in vendors_data:
-            vendor = LocalVendor(
-                name=vendor_dict.get('name', ''),
-                specialization=vendor_dict.get('specialization', ''),
-                address=vendor_dict.get('address', ''),
-                phone=vendor_dict.get('phone', ''),
-                email=vendor_dict.get('email'),
-                rating=vendor_dict.get('rating', 4.0),
-                reviews_count=vendor_dict.get('reviews_count', 0),
-                distance=vendor_dict.get('distance', 'Unknown'),
-                estimated_cost=vendor_dict.get('estimated_cost', 'Call for quote'),
-                hours=vendor_dict.get('hours', 'Call for hours'),
-                website=vendor_dict.get('website')
-            )
-            vendors.append(vendor)
+        for place in places:
+            place_id = place.get('place_id')
+            
+            # Get detailed place information
+            details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+            details_params = {
+                'place_id': place_id,
+                'fields': 'name,formatted_address,formatted_phone_number,website,rating,user_ratings_total,opening_hours,geometry',
+                'key': google_api_key
+            }
+            
+            details_response = requests.get(details_url, params=details_params, timeout=10)
+            details_data = details_response.json()
+            
+            if details_data.get('status') == 'OK':
+                result = details_data.get('result', {})
+                
+                # Calculate distance from user location
+                place_lat = result.get('geometry', {}).get('location', {}).get('lat')
+                place_lng = result.get('geometry', {}).get('location', {}).get('lng')
+                
+                distance_km = 0
+                if place_lat and place_lng:
+                    from math import radians, cos, sin, asin, sqrt
+                    # Haversine formula
+                    lat1, lon1, lat2, lon2 = map(radians, [latitude, longitude, place_lat, place_lng])
+                    dlon = lon2 - lon1
+                    dlat = lat2 - lat1
+                    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+                    c = 2 * asin(sqrt(a))
+                    distance_km = 6371 * c  # Earth radius in km
+                
+                # Format opening hours
+                hours = "Hours not available"
+                if result.get('opening_hours', {}).get('weekday_text'):
+                    hours = ', '.join(result['opening_hours']['weekday_text'][:2])  # First 2 days
+                
+                vendor = {
+                    "id": place_id,
+                    "name": result.get('name', 'Unknown Business'),
+                    "specialization": f"{item_type} repair and related services",
+                    "address": result.get('formatted_address', ''),
+                    "phone": result.get('formatted_phone_number', 'Not available'),
+                    "email": None,  # Not provided by Google Places API
+                    "rating": result.get('rating', 0),
+                    "reviews_count": result.get('user_ratings_total', 0),
+                    "distance": f"{distance_km:.1f} km" if distance_km > 0 else "Unknown",
+                    "estimated_cost": "$75-$300",  # Generic estimate
+                    "hours": hours,
+                    "website": result.get('website', None)
+                }
+                
+                vendors.append(vendor)
         
-        return {"vendors": [v.dict() for v in vendors], "location": search.location}
+        logger.info(f"Found {len(vendors)} real businesses from Google Places")
+        return {"vendors": vendors, "location": location}
         
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Google Places API request error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to connect to Google Places API")
     except Exception as e:
         logger.error(f"Error finding vendors: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
