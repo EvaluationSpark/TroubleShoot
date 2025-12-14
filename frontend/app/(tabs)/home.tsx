@@ -114,13 +114,17 @@ export default function HomeScreen() {
   };
 
   const analyzeImage = async (imageUri: string) => {
+    console.log('🔍 Starting analysis for image:', imageUri);
     setLoading(true);
     try {
       // Use FileSystem for reliable base64 encoding on mobile
+      console.log('📷 Reading image as base64...');
       const base64 = await FileSystem.readAsStringAsync(imageUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
+      console.log('✅ Base64 encoded, length:', base64.length);
 
+      console.log('🚀 Sending to API:', `${BACKEND_URL}/api/analyze-repair`);
       const response = await fetch(`${BACKEND_URL}/api/analyze-repair`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -131,9 +135,10 @@ export default function HomeScreen() {
         }),
       });
 
+      console.log('📡 Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
-        console.log('Analysis response:', data);
+        console.log('✅ Analysis response received:', data);
         
         // Check if there are clarifying questions
         if (data.clarifyingQuestions && data.clarifyingQuestions.length > 0) {
