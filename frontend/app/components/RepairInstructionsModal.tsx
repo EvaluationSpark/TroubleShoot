@@ -252,6 +252,18 @@ export default function RepairInstructionsModal({
           </View>
         </View>
 
+        {/* Repair Infographic */}
+        {repairData.diagram_base64 && (
+          <View style={styles.infographicContainer}>
+            <Text style={styles.infographicTitle}>📊 Repair Guide Infographic</Text>
+            <Image
+              source={{ uri: `data:image/png;base64,${repairData.diagram_base64}` }}
+              style={styles.infographicImage}
+              resizeMode="contain"
+            />
+          </View>
+        )}
+
         {/* Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
