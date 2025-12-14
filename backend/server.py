@@ -89,6 +89,8 @@ class SaveRepairSession(BaseModel):
     title: str
     notes: Optional[str] = None
     progress_percentage: int = 0
+    status: Optional[str] = "saved"  # saved, in_progress, completed
+    repair_data: Optional[Dict[str, Any]] = None  # Full repair analysis data
 
 class CommunityPost(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
