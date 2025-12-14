@@ -88,7 +88,7 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
       </View>
 
       {/* Most Common Repairs */}
-      {insights.most_common_repairs && insights.most_common_repairs.length > 0 && (
+      {insights.most_common_repairs?.length > 0 ? (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Most Common Repairs</Text>
           {insights.most_common_repairs.map((repair: any, index: number) => (
@@ -103,10 +103,10 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
             </View>
           ))}
         </View>
-      )}
+      ) : null}
 
       {/* Achievements */}
-      {insights.achievements && insights.achievements.length > 0 && (
+      {insights.achievements?.length > 0 ? (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🏆 Achievements</Text>
           <View style={styles.achievementsGrid}>
@@ -119,7 +119,7 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
             ))}
           </View>
         </View>
-      )}
+      ) : null}
 
       {/* Motivational Message */}
       <View style={styles.motivationCard}>
