@@ -150,7 +150,7 @@ export default function RepairInstructionsModal({
 
       if (response.ok) {
         const data = await response.json();
-        setStepDetails(data.detailed_explanation || 'No additional details available.');
+        setStepDetails(data.detailed_instructions || 'No additional details available.');
         setStepDiagram(data.diagram_image || null);
       } else {
         setStepDetails('Unable to fetch details. Please try again.');
