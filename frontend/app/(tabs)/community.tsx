@@ -157,11 +157,21 @@ export default function CommunityScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00D9FF" />}
+    <ImageBackground
+      source={require('../../assets/images/splash-icon.png')}
+      style={styles.container}
+      resizeMode="cover"
+      blurRadius={80}
+    >
+      <LinearGradient
+        colors={['rgba(15, 23, 42, 0.95)', 'rgba(15, 23, 42, 0.98)', 'rgba(0, 0, 0, 0.99)']}
+        style={styles.gradientOverlay}
       >
+        <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00D9FF" />}
+          >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerTextContainer}>
