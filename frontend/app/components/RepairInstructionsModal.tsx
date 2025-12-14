@@ -57,6 +57,19 @@ export default function RepairInstructionsModal({
     }
   };
 
+  // Function to clean markup from text (remove HTML/markdown tags)
+  const cleanMarkup = (text: string): string => {
+    if (!text) return '';
+    return text
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold markdown
+      .replace(/\*(.*?)\*/g, '$1') // Remove italic markdown
+      .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove markdown links
+      .replace(/`(.*?)`/g, '$1') // Remove code markdown
+      .replace(/\n\n+/g, '\n') // Replace multiple newlines with single
+      .trim();
+  };
+
   // Fetch tutorial videos when modal opens
   React.useEffect(() => {
     if (visible && repairData && tutorialVideos.length === 0) {
