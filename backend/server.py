@@ -318,6 +318,12 @@ async def analyze_repair(request: RepairAnalysisRequest):
             tools_needed=analysis.get('tools_needed', []),
             parts_needed=analysis.get('parts_needed', []),
             safety_tips=analysis.get('safety_tips', []),
+            risk_level=analysis.get('risk_level', 'low'),
+            confidence_score=analysis.get('confidence_score', 85),
+            stop_and_call_pro=analysis.get('stop_and_call_pro', False),
+            assumptions=analysis.get('assumptions', []),
+            cost_estimate=analysis.get('cost_estimate'),
+            time_estimate=analysis.get('time_estimate'),
             diagram_base64=diagram_base64,
             model_number=request.model_number  # PR #5
         )
