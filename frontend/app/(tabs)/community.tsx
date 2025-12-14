@@ -11,10 +11,12 @@ import {
   Modal,
   TextInput,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import ReportModal from '../components/ReportModal';
 import CommunityGuidelinesModal from '../components/CommunityGuidelinesModal';
 
