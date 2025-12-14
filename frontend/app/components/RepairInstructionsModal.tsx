@@ -36,6 +36,7 @@ export default function RepairInstructionsModal({
   const [stepDetails, setStepDetails] = useState<string>('');
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [exportingPDF, setExportingPDF] = useState(false); // PR #7
+  const [showVendorsModal, setShowVendorsModal] = useState(false); // Local vendors feature
 
   // PR #7: Export to PDF
   const handleExportPDF = async () => {
