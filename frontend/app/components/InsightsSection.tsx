@@ -122,7 +122,7 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
       ) : null}
 
       {/* Motivational Message */}
-      <View style={styles.motivationCard}>
+      <View style={[styles.motivationCard, styles.container]}>
         <Ionicons name="sparkles" size={20} color="#00D9FF" />
         <Text style={styles.motivationText}>
           {insights.money_saved > 0
@@ -130,7 +130,7 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
             : `Every repair makes you more skilled and saves you money! 🚀`}
         </Text>
       </View>
-    </View>
+    </>
   );
 }
 
