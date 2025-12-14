@@ -37,6 +37,7 @@ class RepairAnalysisRequest(BaseModel):
     image_base64: str
     language: str = "en"
     skill_level: Optional[str] = "diy"  # beginner, diy, pro
+    model_number: Optional[str] = None  # PR #5: Model number for better accuracy
 
 class CostEstimate(BaseModel):
     low: float
