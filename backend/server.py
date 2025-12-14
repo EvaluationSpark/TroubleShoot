@@ -102,6 +102,25 @@ class CommunityPost(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     likes: int = 0
 
+class ReportRequest(BaseModel):
+    post_id: str
+    reason: str  # inappropriate, spam, dangerous, misleading, other
+    details: Optional[str] = None
+    reporter_name: Optional[str] = "Anonymous"
+
+class Report(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    post_id: str
+    reason: str
+    details: Optional[str] = None
+    reporter_name: str = "Anonymous"
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    status: str = "pending"  # pending, reviewed, resolved
+
+class ModeratePostRequest(BaseModel):
+    action: str  # delete, approve, ignore
+    admin_notes: Optional[str] = None
+
 class FeedbackRequest(BaseModel):
     repair_id: str
     rating: int  # 1-5
