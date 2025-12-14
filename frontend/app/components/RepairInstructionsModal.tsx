@@ -304,6 +304,10 @@ export default function RepairInstructionsModal({
             <Ionicons name="bookmark" size={20} color="#fff" />
             <Text style={styles.saveButtonText}>Save for Later</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.vendorButton} onPress={() => setShowVendorsModal(true)}>
+            <Ionicons name="business" size={20} color="#fff" />
+            <Text style={styles.vendorButtonText}>Find Local Pros</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
