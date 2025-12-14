@@ -237,6 +237,18 @@ backend:
           agent: "testing"
           comment: "Gemini AI integration working correctly with EMERGENT_LLM_KEY. Image analysis functional using gemini-2.5-flash model. AI provides meaningful repair analysis including item identification, damage assessment, repair steps, tools needed, and safety tips. Diagram generation using gemini-2.5-flash-image-preview model available but optional."
 
+  - task: "PR #4: Cost/Time Estimation Backend"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Updated AI prompt to generate structured cost_estimate (low/typical/high, parts_breakdown, tools_cost, labor_hours_range, assumptions) and time_estimate (prep, active, cure, total, unit). Fixed field naming to match TypeScript interface."
+
 frontend:
   - task: "Bottom Tab Navigation"
     implemented: true
