@@ -1177,6 +1177,62 @@ Format response as JSON array:
         logger.error(f"Error finding vendors: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/get-tutorial-videos")
+async def get_tutorial_videos(request: Dict[str, Any]):
+    """Get relevant tutorial videos for a repair"""
+    try:
+        item_type = request.get('item_type', 'Unknown')
+        damage_description = request.get('damage_description', '')
+        
+        # Use AI to generate realistic tutorial video suggestions
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"videos_{uuid.uuid4()}",
+            system_message="You are a helpful assistant that suggests relevant repair tutorial videos."
+        )
+        chat.with_model("gemini", "gemini-2.5-flash")
+        
+        prompt = f"""Find 3-5 relevant YouTube tutorial videos for repairing: {item_type}
+Issue: {damage_description}
+
+For each video, provide:
+1. Title (realistic, descriptive)
+2. Description (1-2 sentences about what the video covers)
+3. URL (use realistic YouTube format: https://youtube.com/watch?v=XXXXX)
+4. Duration (e.g., "12:45", "8:20")
+5. Channel name (realistic repair channel names)
+
+Format as JSON array:
+[
+  {{
+    "title": "...",
+    "description": "...",
+    "url": "https://youtube.com/watch?v=...",
+    "duration": "12:45",
+    "channel": "..."
+  }}
+]"""
+        
+        msg = UserMessage(text=prompt)
+        response = await chat.send_message(msg)
+        
+        # Parse JSON response
+        import json
+        response_text = response.strip()
+        if response_text.startswith('```'):
+            response_text = response_text.split('```')[1]
+            if response_text.startswith('json'):
+                response_text = response_text[4:]
+        response_text = response_text.strip()
+        
+        videos = json.loads(response_text)
+        
+        return {"videos": videos}
+        
+    except Exception as e:
+        logger.error(f"Error fetching tutorial videos: {str(e)}")
+        return {"videos": []}  # Return empty array instead of failing
+
 @api_router.get("/")
 async def root():
     return {"message": "FixIt Pro API", "version": "1.0.0"}
