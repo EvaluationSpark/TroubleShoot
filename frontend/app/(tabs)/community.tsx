@@ -540,6 +540,7 @@ const styles = StyleSheet.create({
   },
   postActions: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#2a2a2a',
@@ -553,6 +554,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  // PR #6: Report Button Styles
+  reportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+  },
+  reportText: {
+    color: '#6b7280',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  // PR #6: Guidelines Button Styles
+  headerTextContainer: {
+    flex: 1,
+  },
+  guidelinesButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 217, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalContainer: {
     flex: 1,
