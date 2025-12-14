@@ -332,12 +332,13 @@ Style: Clean, professional technical illustration with labels and arrows."""
 async def analyze_repair(request: RepairAnalysisRequest):
     """Analyze a broken item and provide repair instructions"""
     try:
-        # Analyze the image with skill level and model number (PR #5)
+        # Analyze the image with skill level, model number, and MIME type
         analysis = await analyze_broken_item(
             request.image_base64, 
             request.language,
             request.skill_level,
-            request.model_number
+            request.model_number,
+            request.image_mime_type
         )
         
         # Generate repair ID
