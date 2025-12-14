@@ -32,6 +32,8 @@ export default function HomeScreen() {
   const { theme } = useTheme();
   const { skillLevel } = useSkillLevel();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [modelNumber, setModelNumber] = useState<string>('');
+  const [showScanner, setShowScanner] = useState(false);
   const [loading, setLoading] = useState(false);
   const [repairData, setRepairData] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
