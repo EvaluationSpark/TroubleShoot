@@ -215,36 +215,68 @@ export default function HomeScreen() {
 
             {/* Action Buttons */}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.buttonWrapper}
-                onPress={() => pickImage(true)}
-                disabled={loading}
-              >
-                <LinearGradient
-                  colors={theme.gradients.primary}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.primaryButton}
-                >
-                  <Ionicons name="camera" size={24} color="#fff" />
-                  <Text style={styles.primaryButtonText}>Take Photo</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+              {!selectedImage ? (
+                <>
+                  <TouchableOpacity
+                    style={styles.buttonWrapper}
+                    onPress={() => pickImage(true)}
+                    disabled={loading}
+                  >
+                    <LinearGradient
+                      colors={theme.gradients.primary}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.primaryButton}
+                    >
+                      <Ionicons name="camera" size={24} color="#fff" />
+                      <Text style={styles.primaryButtonText}>Take Photo</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.buttonWrapper}
-                onPress={() => pickImage(false)}
-                disabled={loading}
-              >
-                <BlurView
-                  intensity={theme.colors.glassBlur}
-                  tint={theme.colors.glassTint}
-                  style={[styles.secondaryButton, { borderColor: theme.colors.primary }]}
-                >
-                  <Ionicons name="images" size={24} color={theme.colors.primary} />
-                  <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>Gallery</Text>
-                </BlurView>
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.buttonWrapper}
+                    onPress={() => pickImage(false)}
+                    disabled={loading}
+                  >
+                    <BlurView
+                      intensity={theme.colors.glassBlur}
+                      tint={theme.colors.glassTint}
+                      style={[styles.secondaryButton, { borderColor: theme.colors.primary }]}
+                    >
+                      <Ionicons name="images" size={24} color={theme.colors.primary} />
+                      <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>Gallery</Text>
+                    </BlurView>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={[styles.buttonWrapper, { flex: 1 }]}
+                    onPress={() => analyzeImage(selectedImage)}
+                    disabled={loading}
+                  >
+                    <LinearGradient
+                      colors={theme.gradients.primary}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.primaryButton}
+                    >
+                      <Ionicons name="flash" size={24} color="#fff" />
+                      <Text style={styles.primaryButtonText}>
+                        {loading ? 'Analyzing...' : 'Analyze & Get Repair Guide'}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.retakeButton}
+                    onPress={() => setSelectedImage(null)}
+                    disabled={loading}
+                  >
+                    <Ionicons name="refresh" size={24} color={theme.colors.textSecondary} />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
             {/* Features Grid */}
