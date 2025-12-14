@@ -503,6 +503,87 @@ async def get_repair_sessions():
         logger.error(f"Error fetching sessions: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# PR #8: Repair History & Insights
+@api_router.get("/repair-insights")
+async def get_repair_insights():
+    """Get aggregated insights from repair history"""
+    try:
+        # Get all repair sessions
+        sessions = await db.repair_sessions.find().to_list(1000)
+        
+        if not sessions:
+            return {
+                "total_repairs": 0,
+                "money_saved": 0,
+                "time_invested": 0,
+                "completion_rate": 0,
+                "most_common_repairs": [],
+                "recent_streak": 0,
+                "achievements": []
+            }
+        
+        # Calculate statistics
+        total_repairs = len(sessions)
+        completed_repairs = sum(1 for s in sessions if s.get('status') == 'completed')
+        money_saved = 0
+        time_invested = 0
+        repair_types = {}
+        
+        for session in sessions:
+            # Money saved (use typical cost from cost_estimate)
+            if session.get('cost_estimate') and session.get('cost_estimate', {}).get('typical'):
+                money_saved += session['cost_estimate']['typical']
+            
+            # Time invested (use total from time_estimate)
+            if session.get('time_estimate') and session.get('time_estimate', {}).get('total'):
+                time_invested += session['time_estimate']['total']
+            
+            # Track repair types
+            item_type = session.get('item_type', 'Unknown')
+            repair_types[item_type] = repair_types.get(item_type, 0) + 1
+        
+        # Most common repairs (top 3)
+        most_common = sorted(repair_types.items(), key=lambda x: x[1], reverse=True)[:3]
+        most_common_repairs = [{"type": k, "count": v} for k, v in most_common]
+        
+        # Completion rate
+        completion_rate = (completed_repairs / total_repairs * 100) if total_repairs > 0 else 0
+        
+        # Recent streak (repairs in last 30 days)
+        from datetime import datetime, timedelta
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        recent_streak = sum(1 for s in sessions 
+                          if s.get('updated_at') and s['updated_at'] > thirty_days_ago)
+        
+        # Achievements
+        achievements = []
+        if total_repairs >= 1:
+            achievements.append({"title": "First Fix", "description": "Completed your first repair", "icon": "trophy"})
+        if total_repairs >= 5:
+            achievements.append({"title": "DIY Enthusiast", "description": "Completed 5 repairs", "icon": "star"})
+        if total_repairs >= 10:
+            achievements.append({"title": "Master Fixer", "description": "Completed 10 repairs", "icon": "medal"})
+        if money_saved >= 100:
+            achievements.append({"title": "Penny Saver", "description": "Saved over $100", "icon": "cash"})
+        if money_saved >= 500:
+            achievements.append({"title": "Budget Hero", "description": "Saved over $500", "icon": "trending-up"})
+        
+        return {
+            "total_repairs": total_repairs,
+            "completed_repairs": completed_repairs,
+            "money_saved": round(money_saved, 2),
+            "time_invested": round(time_invested, 0),  # in minutes
+            "completion_rate": round(completion_rate, 1),
+            "most_common_repairs": most_common_repairs,
+            "recent_streak": recent_streak,
+            "achievements": achievements,
+            "currency": "USD"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching insights: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/community/post", response_model=CommunityPost)
 async def create_community_post(post: CommunityPost):
     """Create a community post to share repair success"""
