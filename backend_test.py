@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 
 # Configuration
-BASE_URL = "https://fixmender.preview.emergentagent.com/api"
+BASE_URL = "https://ai-repair-3.preview.emergentagent.com/api"
 TIMEOUT = 30
 
 # Test data
