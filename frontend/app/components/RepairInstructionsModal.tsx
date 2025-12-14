@@ -337,6 +337,43 @@ export default function RepairInstructionsModal({
               ))}
             </View>
           )}
+
+          {activeTab === 'videos' && (
+            <View style={styles.tabContent}>
+              <Text style={styles.sectionTitle}>Tutorial Videos</Text>
+              {loadingVideos ? (
+                <ActivityIndicator size="large" color="#00D9FF" style={{ marginTop: 20 }} />
+              ) : tutorialVideos.length === 0 ? (
+                <View style={styles.emptyVideos}>
+                  <Ionicons name="videocam-outline" size={48} color="#666" />
+                  <Text style={styles.emptyVideosText}>No videos available yet</Text>
+                </View>
+              ) : (
+                tutorialVideos.map((video: any, index: number) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.videoCard}
+                    onPress={() => Linking.openURL(video.url)}
+                  >
+                    <View style={styles.videoThumbnail}>
+                      <Ionicons name="play-circle" size={48} color="#00D9FF" />
+                    </View>
+                    <View style={styles.videoInfo}>
+                      <Text style={styles.videoTitle}>{video.title}</Text>
+                      <Text style={styles.videoDescription}>{video.description}</Text>
+                      <View style={styles.videoMeta}>
+                        <Ionicons name="time-outline" size={14} color="#aaa" />
+                        <Text style={styles.videoDuration}>{video.duration}</Text>
+                        <Ionicons name="person-outline" size={14} color="#aaa" style={{ marginLeft: 12 }} />
+                        <Text style={styles.videoChannel}>{video.channel}</Text>
+                      </View>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#666" />
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+          )}
         </ScrollView>
 
         {/* Action Buttons */}
