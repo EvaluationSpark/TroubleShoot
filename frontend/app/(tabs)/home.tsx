@@ -64,7 +64,7 @@ export default function HomeScreen() {
       if (!result.canceled && result.assets[0]) {
         const imageUri = result.assets[0].uri;
         setSelectedImage(imageUri);
-        await analyzeImage(imageUri);
+        // Don't auto-analyze - let user click the analyze button
       }
     } catch (error) {
       console.error('Error picking image:', error);
