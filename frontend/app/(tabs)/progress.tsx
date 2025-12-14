@@ -36,10 +36,11 @@ export default function ProgressScreen() {
 
   const fetchSessions = async () => {
     try {
-      // Fetch from both sources
-      const [backendSessions, localSessions] = await Promise.all([
+      // Fetch from both sources + insights (PR #8)
+      const [backendSessions, localSessions, insightsData] = await Promise.all([
         fetchBackendSessions(),
         fetchLocalSessions(),
+        fetchInsights(),
       ]);
 
       // Merge and deduplicate sessions (prefer backend data)
@@ -61,6 +62,7 @@ export default function ProgressScreen() {
       });
 
       setSessions(allSessions);
+      setInsights(insightsData);
     } catch (error) {
       console.error('Error fetching sessions:', error);
     } finally {
