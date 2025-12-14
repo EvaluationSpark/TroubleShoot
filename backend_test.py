@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-FixIt Pro Backend API Test Suite
-Tests all backend endpoints for the repair analysis application
+FixIt Pro Backend API Test Suite - PR #4 Cost/Time Estimation Testing
+Focus: Testing the enhanced /api/analyze-repair endpoint with cost_estimate and time_estimate fields
 """
 
 import requests
@@ -12,13 +12,44 @@ from datetime import datetime
 import time
 import os
 from pathlib import Path
+from PIL import Image
+from io import BytesIO
 
 # Configuration
 BASE_URL = "https://ai-repair-3.preview.emergentagent.com/api"
-TIMEOUT = 30
+TIMEOUT = 60  # Increased for AI analysis
+
+def create_test_image():
+    """Create a simple test image of a broken phone screen"""
+    # Create a simple image representing a broken phone
+    img = Image.new('RGB', (300, 600), color='black')
+    
+    # Add some visual elements to simulate a cracked screen
+    from PIL import ImageDraw
+    draw = ImageDraw.Draw(img)
+    
+    # Draw phone outline
+    draw.rectangle([50, 50, 250, 550], outline='white', width=3)
+    
+    # Draw screen area
+    draw.rectangle([70, 100, 230, 450], outline='gray', width=2)
+    
+    # Draw crack lines to simulate damage
+    draw.line([100, 150, 200, 350], fill='red', width=3)
+    draw.line([120, 120, 180, 400], fill='red', width=2)
+    draw.line([90, 200, 210, 300], fill='red', width=2)
+    
+    # Add text
+    draw.text((80, 480), "Cracked Screen", fill='white')
+    
+    # Convert to base64
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_data = buffer.getvalue()
+    return base64.b64encode(img_data).decode('utf-8')
 
 # Test data
-SAMPLE_IMAGE_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+SAMPLE_IMAGE_B64 = create_test_image()
 
 def log_test(test_name, status, details=""):
     """Log test results"""
