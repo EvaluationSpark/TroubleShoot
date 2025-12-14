@@ -33,7 +33,6 @@ export default function HomeScreen() {
   const { skillLevel } = useSkillLevel();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [modelNumber, setModelNumber] = useState<string>('');
-  const [showScanner, setShowScanner] = useState(false);
   const [showModelInput, setShowModelInput] = useState(false); // PR #5: Only show if needed
   const [loading, setLoading] = useState(false);
   const [repairData, setRepairData] = useState<any>(null);
