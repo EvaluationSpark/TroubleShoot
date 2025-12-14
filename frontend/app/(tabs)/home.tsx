@@ -130,6 +130,7 @@ export default function HomeScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           image_base64: base64,
+          image_mime_type: 'image/jpeg',  // Add MIME type for Gemini API
           skill_level: skillLevel,
           model_number: modelNumber || undefined,
         }),
