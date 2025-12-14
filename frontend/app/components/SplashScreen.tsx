@@ -118,37 +118,18 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
                 />
               </Animated.View>
 
-              {/* Logo Container */}
-              <View style={styles.logoContainer}>
-                <Animated.View
-                  style={[
-                    styles.logoCircle,
-                    {
-                      transform: [{ rotate: rotation }],
-                    },
-                  ]}
-                >
-                  <LinearGradient
-                    colors={['#00D9FF', '#0099CC', '#006699']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.logoGradient}
-                  >
-                    <Text style={styles.logoIcon}>🔧</Text>
-                  </LinearGradient>
-                </Animated.View>
-              </View>
-
-              {/* App Name */}
-              <View style={styles.textContainer}>
-                <Text style={styles.appName}>FixIntel AI</Text>
-                <View style={styles.taglineContainer}>
-                  <View style={styles.sparkle}>
-                    <Text style={styles.sparkleText}>✨</Text>
-                  </View>
-                  <Text style={styles.tagline}>Intelligent Repair Assistant</Text>
-                </View>
-              </View>
+              {/* Professional Logo */}
+              <Animated.View
+                style={[
+                  styles.logoContainer,
+                  {
+                    opacity: fadeAnim,
+                    transform: [{ scale: scaleAnim }],
+                  },
+                ]}
+              >
+                <AppLogo size={200} showText={true} variant="full" />
+              </Animated.View>
 
               {/* Loading Indicator */}
               <View style={styles.loadingContainer}>
