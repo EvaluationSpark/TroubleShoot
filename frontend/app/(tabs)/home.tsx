@@ -116,13 +116,33 @@ export default function HomeScreen() {
   const analyzeImage = async (imageUri: string) => {
     console.log('🔍 Starting analysis for image:', imageUri);
     setLoading(true);
+    
     try {
-      // Use FileSystem for reliable base64 encoding on mobile
-      console.log('📷 Reading image as base64...');
-      const base64 = await FileSystem.readAsStringAsync(imageUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      console.log('✅ Base64 encoded, length:', base64.length);
+      let base64 = '';
+      
+      // Try FileSystem first, fallback to fetch
+      try {
+        console.log('📷 Reading image as base64 with FileSystem...');
+        base64 = await FileSystem.readAsStringAsync(imageUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        console.log('✅ Base64 encoded with FileSystem, length:', base64.length);
+      } catch (fsError) {
+        console.log('⚠️ FileSystem failed, trying fetch method...', fsError);
+        // Fallback to fetch method for web
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1]);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        console.log('✅ Base64 encoded with fetch, length:', base64.length);
+      }
 
       console.log('🚀 Sending to API:', `${BACKEND_URL}/api/analyze-repair`);
       const response = await fetch(`${BACKEND_URL}/api/analyze-repair`, {
@@ -130,7 +150,7 @@ export default function HomeScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           image_base64: base64,
-          image_mime_type: 'image/jpeg',  // Add MIME type for Gemini API
+          image_mime_type: 'image/jpeg',
           skill_level: skillLevel,
           model_number: modelNumber || undefined,
         }),
