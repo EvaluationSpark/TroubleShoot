@@ -1,0 +1,57 @@
+{
+  "name": "fixintel-ai",
+  "version": "1.0.0",
+  "description": "AI-powered repair guide app with step-by-step instructions, tutorial videos, and local repair shop recommendations",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && uvicorn server:app --host 0.0.0.0 --port 8001 --reload",
+    "start:frontend": "cd frontend && expo start --tunnel",
+    "build:frontend": "cd frontend && eas build --profile production --platform all",
+    "build:frontend:ios": "cd frontend && eas build --profile production --platform ios",
+    "build:frontend:android": "cd frontend && eas build --profile production --platform android",
+    "build:preview": "cd frontend && eas build --profile preview --platform all",
+    "submit:ios": "cd frontend && eas submit --platform ios",
+    "submit:android": "cd frontend && eas submit --platform android",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "install:frontend": "cd frontend && yarn install",
+    "test:backend": "cd backend && pytest",
+    "lint:backend": "cd backend && pylint server.py",
+    "lint:frontend": "cd frontend && npx eslint .",
+    "clean": "npm run clean:backend && npm run clean:frontend",
+    "clean:backend": "cd backend && find . -type d -name '__pycache__' -exec rm -rf {} + && find . -type f -name '*.pyc' -delete",
+    "clean:frontend": "cd frontend && rm -rf node_modules .expo .metro-cache",
+    "health-check": "npm run health-check:backend && npm run health-check:frontend",
+    "health-check:backend": "curl -f http://localhost:8001/api/ || exit 1",
+    "health-check:frontend": "curl -f http://localhost:3000 || exit 1",
+    "deploy": "echo 'Deployment instructions in DEPLOYMENT_GUIDE.md'",
+    "update:frontend": "cd frontend && eas update --branch production --message 'OTA update'",
+    "logs:backend": "tail -f backend/logs/*.log",
+    "logs:frontend": "cd frontend && npx expo start --no-dev --minify"
+  },
+  "keywords": [
+    "repair",
+    "ai",
+    "image-analysis",
+    "mobile-app",
+    "expo",
+    "react-native",
+    "fastapi",
+    "mongodb"
+  ],
+  "author": "FixIntel AI",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fixintel/fixintel-ai"
+  },
+  "bugs": {
+    "url": "https://github.com/fixintel/fixintel-ai/issues"
+  },
+  "homepage": "https://fixintel.ai"
+}
