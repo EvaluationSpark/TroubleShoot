@@ -434,7 +434,7 @@ export default function RepairInstructionsModal({
                   {stepDiagram && (
                     <View style={styles.diagramContainer}>
                       <Image 
-                        source={{ uri: stepDiagram }} 
+                        source={{ uri: `data:image/png;base64,${stepDiagram}` }} 
                         style={styles.diagramImage}
                         resizeMode="contain"
                       />
