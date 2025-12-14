@@ -45,7 +45,7 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
       </View>
 
       {/* Stats Grid */}
-      <View style={styles.statsGrid}>
+      <View style={[styles.statsGrid, styles.container]}>
         {/* Money Saved */}
         <View style={[styles.statCard, styles.statCardMoney]}>
           <Ionicons name="cash-outline" size={32} color="#10b981" />
