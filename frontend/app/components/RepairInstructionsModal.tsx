@@ -375,9 +375,23 @@ export default function RepairInstructionsModal({
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Repair Guide</Text>
-          <TouchableOpacity onPress={onClose}>
-            <Ionicons name="close" size={28} color="#fff" />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            {/* PR #7: Export PDF Button */}
+            <TouchableOpacity 
+              onPress={handleExportPDF} 
+              disabled={exportingPDF}
+              style={styles.exportButton}
+            >
+              {exportingPDF ? (
+                <ActivityIndicator size="small" color="#00D9FF" />
+              ) : (
+                <Ionicons name="share-outline" size={24} color="#00D9FF" />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="close" size={28} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
