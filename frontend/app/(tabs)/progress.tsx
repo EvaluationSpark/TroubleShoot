@@ -98,16 +98,17 @@ export default function ProgressScreen() {
     }
   };
 
+  // PR #8: Fetch repair insights
   const fetchInsights = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/insights`);
+      const response = await fetch(`${BACKEND_URL}/api/repair-insights`);
       if (response.ok) {
         const data = await response.json();
         return data;
       }
       return null;
     } catch (error) {
-      console.log('Insights fetch failed');
+      console.log('Insights fetch failed:', error);
       return null;
     }
   };
