@@ -453,15 +453,6 @@ export default function HomeScreen() {
         />
       )}
 
-      {/* Barcode Scanner Modal - PR #5 */}
-      <BarcodeScannerModal
-        visible={showScanner}
-        onScanComplete={(scannedModel) => {
-          setModelNumber(scannedModel);
-          setShowScanner(false);
-        }}
-        onClose={() => setShowScanner(false)}
-      />
     </ImageBackground>
   );
 }
