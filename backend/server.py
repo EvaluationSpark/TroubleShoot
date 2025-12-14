@@ -121,6 +121,28 @@ class ModeratePostRequest(BaseModel):
     action: str  # delete, approve, ignore
     admin_notes: Optional[str] = None
 
+# Gamification Models
+class GamificationProfile(BaseModel):
+    user_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    total_xp: int = 0
+    level: int = 1
+    current_streak: int = 0
+    longest_streak: int = 0
+    last_activity_date: Optional[datetime] = None
+    badges_earned: List[str] = []
+    stats: Dict[str, Any] = {}
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CompleteStepRequest(BaseModel):
+    repair_id: str
+    step_number: int
+
+class CompleteRepairRequest(BaseModel):
+    repair_id: str
+    difficulty: str  # easy, medium, hard
+    time_taken_minutes: int
+
 class FeedbackRequest(BaseModel):
     repair_id: str
     rating: int  # 1-5
