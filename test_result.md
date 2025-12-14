@@ -390,14 +390,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Bottom Tab Navigation"
-    - "Home Screen - Photo Selection"
-    - "Home Screen - Image Analysis"
-    - "Repair Instructions Modal"
-    - "Community Screen - View Posts"
-    - "Community Screen - Create Post"
-    - "Progress Screen - Stats and Sessions"
-    - "Settings Screen - Preferences"
+    - "PR #4: Cost/Time Estimation Backend"
+    - "PR #4: Cost/Time Estimation Frontend"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
