@@ -25,6 +25,8 @@ export default function ProgressScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [insights, setInsights] = useState<any>(null); // PR #8
   const [showInsights, setShowInsights] = useState(true); // PR #8
+  const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Fetch sessions when screen comes into focus
   useFocusEffect(
