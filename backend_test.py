@@ -480,67 +480,47 @@ def test_error_handling():
         return False
 
 def main():
-    """Run all backend tests"""
-    print("=" * 60)
-    print("FixIt Pro Backend API Test Suite")
-    print("=" * 60)
-    print(f"Testing against: {BASE_URL}")
+    """Run PR #4 focused backend tests"""
+    print("🚀 FixIt Pro Backend Testing - PR #4: Cost/Time Estimation")
+    print("=" * 70)
+    print(f"Backend URL: {BASE_URL}")
+    print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
     
     # Track test results
     results = {}
     
-    # Test 1: Root endpoint
+    # Test 1: Root endpoint (quick connectivity check)
+    print("🌐 Testing API connectivity...")
     results['root'] = test_root_endpoint()
     
-    # Test 2: Analyze repair (main feature)
-    repair_id = test_analyze_repair()
-    results['analyze'] = repair_id is not None
-    
-    # Test 3: Save repair session
-    session_id = test_save_repair_session(repair_id)
-    results['save_session'] = session_id is not None
-    
-    # Test 4: Get repair sessions
-    results['get_sessions'] = test_get_repair_sessions()
-    
-    # Test 5: Create community post
-    post_id = test_create_community_post()
-    results['create_post'] = post_id is not None
-    
-    # Test 6: Get community posts
-    results['get_posts'] = test_get_community_posts()
-    
-    # Test 7: Like post
-    results['like_post'] = test_like_post(post_id)
-    
-    # Test 8: Submit feedback
-    results['feedback'] = test_submit_feedback(repair_id)
-    
-    # Test 9: Error handling
-    results['error_handling'] = test_error_handling()
+    # Test 2: Main focus - Analyze repair with PR #4 cost/time estimation
+    print("\n🎯 MAIN TEST: PR #4 Cost/Time Estimation")
+    repair_id = test_analyze_repair_pr4()
+    results['pr4_cost_time'] = repair_id is not None
     
     # Summary
-    print("=" * 60)
-    print("TEST SUMMARY")
-    print("=" * 60)
+    print("\n📊 TEST SUMMARY")
+    print("=" * 70)
     
     passed = sum(1 for result in results.values() if result)
     total = len(results)
     
     for test_name, result in results.items():
         status = "✅ PASS" if result else "❌ FAIL"
-        print(f"{test_name.replace('_', ' ').title()}: {status}")
+        display_name = test_name.replace('_', ' ').title()
+        if test_name == 'pr4_cost_time':
+            display_name = "PR #4: Cost/Time Estimation"
+        print(f"  {display_name}: {status}")
     
-    print()
-    print(f"Overall: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
+    print(f"\nOverall: {passed}/{total} tests passed")
     
     if passed == total:
-        print("🎉 All tests passed! Backend API is working correctly.")
+        print("🎉 ALL TESTS PASSED - PR #4 Cost/Time Estimation working correctly!")
+        return True
     else:
-        print("⚠️  Some tests failed. Check the details above.")
-    
-    return results
+        print("⚠️  SOME TESTS FAILED - Issues found with PR #4 implementation")
+        return False
 
 if __name__ == "__main__":
     main()
