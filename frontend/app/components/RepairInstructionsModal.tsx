@@ -15,6 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocalVendorsModal from './LocalVendorsModal';
+import VideoPlayerModal from './VideoPlayerModal';
 import { CostBreakdown, TimeBreakdown } from './CostTimeBreakdown';
 import { exportRepairAsPDF } from '../utils/pdfExport';
 
