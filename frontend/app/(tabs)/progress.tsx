@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import InsightsSection from '../components/InsightsSection'; // PR #8
+import RepairInstructionsModal from '../components/RepairInstructionsModal';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const REPAIRS_STORAGE_KEY = '@pix_fix_repairs';
