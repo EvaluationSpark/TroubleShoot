@@ -349,7 +349,15 @@ export default function HomeScreen() {
                 <>
                   <TouchableOpacity
                     style={[styles.buttonWrapper, { flex: 1 }]}
-                    onPress={() => analyzeImage(selectedImage)}
+                    onPress={() => {
+                      console.log('🎯 Analyze button clicked!');
+                      Alert.alert('Debug', `Image: ${selectedImage ? 'Selected' : 'None'}`);
+                      if (selectedImage) {
+                        analyzeImage(selectedImage);
+                      } else {
+                        Alert.alert('Error', 'No image selected');
+                      }
+                    }}
                     disabled={loading}
                   >
                     <LinearGradient
