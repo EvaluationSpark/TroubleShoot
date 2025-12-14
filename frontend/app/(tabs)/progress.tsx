@@ -137,7 +137,7 @@ export default function ProgressScreen() {
 
   return (
     <ImageBackground
-      source={require('../../assets/images/splash-icon.png')}
+      source={require('../../assets/images/icon.png')}
       style={styles.container}
       resizeMode="cover"
       blurRadius={80}
