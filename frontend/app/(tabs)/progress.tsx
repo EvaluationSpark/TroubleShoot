@@ -124,6 +124,27 @@ export default function ProgressScreen() {
     fetchSessions();
   };
 
+  const clearAllSessions = async () => {
+    try {
+      // Clear local storage
+      await AsyncStorage.removeItem('repair_sessions');
+      
+      // Clear backend (if endpoint exists)
+      try {
+        await fetch(`${BACKEND_URL}/api/repair-sessions`, {
+          method: 'DELETE',
+        });
+      } catch (e) {
+        console.log('Backend clear failed (may not exist):', e);
+      }
+      
+      // Refresh the list
+      fetchSessions();
+    } catch (error) {
+      console.error('Error clearing sessions:', error);
+    }
+  };
+
   const getProgressColor = (progress: number) => {
     if (progress < 33) return '#f87171';
     if (progress < 66) return '#fbbf24';
