@@ -14,24 +14,34 @@
         "projectId": "fixintel-ai-repair-guide"
       }
     },
+    "description": "AI-powered repair guide app that helps you fix broken items with step-by-step instructions, tutorial videos, and local repair shop recommendations.",
     "notification": {
       "icon": "./assets/images/icon.png",
       "color": "#00D9FF",
       "androidMode": "default",
       "androidCollapsedTitle": "#{unread_notifications} new repairs"
     },
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.fixintel.ai",
+      "buildNumber": "1.0.0",
       "infoPlist": {
-        "NSCameraUsageDescription": "Pix-Fix needs camera access to analyze broken items.",
-        "NSPhotoLibraryUsageDescription": "Pix-Fix needs photo library access to select images for repair analysis.",
-        "NSLocationWhenInUseUsageDescription": "Pix-Fix needs your location to find local repair shops near you."
+        "NSCameraUsageDescription": "FixIntel AI needs camera access to analyze broken items for repair diagnostics.",
+        "NSPhotoLibraryUsageDescription": "FixIntel AI needs photo library access to select images for repair analysis.",
+        "NSLocationWhenInUseUsageDescription": "FixIntel AI needs your location to find local repair professionals near you."
       }
     },
     "android": {
+      "package": "com.fixintel.ai",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000"
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
