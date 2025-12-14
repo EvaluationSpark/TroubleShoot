@@ -54,6 +54,39 @@ export default function RepairInstructionsModal({
     }
   };
 
+  // Fetch tutorial videos when modal opens
+  React.useEffect(() => {
+    if (visible && repairData && tutorialVideos.length === 0) {
+      fetchTutorialVideos();
+    }
+  }, [visible, repairData]);
+
+  const fetchTutorialVideos = async () => {
+    if (!repairData?.item_type) return;
+    
+    setLoadingVideos(true);
+    try {
+      const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${BACKEND_URL}/api/get-tutorial-videos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_type: repairData.item_type,
+          damage_description: repairData.damage_description,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTutorialVideos(data.videos || []);
+      }
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+    } finally {
+      setLoadingVideos(false);
+    }
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     if (!difficulty) return '#fbbf24'; // Default to medium if undefined
     switch (difficulty.toLowerCase()) {
