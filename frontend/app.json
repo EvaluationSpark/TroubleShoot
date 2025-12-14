@@ -1,13 +1,19 @@
 {
   "expo": {
-    "name": "Pix-Fix",
-    "slug": "pix-fix",
+    "name": "FixIntel AI",
+    "slug": "fixintel-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "pixfix",
+    "scheme": "fixintel",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "owner": "fixintel",
+    "extra": {
+      "eas": {
+        "projectId": "fixintel-ai-repair-guide"
+      }
+    },
     "notification": {
       "icon": "./assets/images/icon.png",
       "color": "#00D9FF",
