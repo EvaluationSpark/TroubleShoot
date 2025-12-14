@@ -250,6 +250,12 @@ export default function RepairInstructionsModal({
           >
             <Text style={[styles.tabText, activeTab === 'safety' && styles.activeTabText]}>Safety</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'videos' && styles.activeTab]}
+            onPress={() => setActiveTab('videos')}
+          >
+            <Text style={[styles.tabText, activeTab === 'videos' && styles.activeTabText]}>Videos</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Tab Content */}
