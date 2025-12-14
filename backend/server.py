@@ -62,9 +62,9 @@ class RepairAnalysisResponse(BaseModel):
     damage_description: str
     repair_difficulty: str  # easy, medium, hard
     estimated_time: str
-    repair_steps: List[str]
+    repair_steps: List[Any]  # Can be strings or objects with step details
     tools_needed: List[Any]  # Can be strings or dicts with cost info
-    parts_needed: List[Dict[str, Any]]  # More flexible for different data types
+    parts_needed: List[Any]  # More flexible for different data types
     safety_tips: List[str]
     risk_level: Optional[str] = "low"  # low, medium, high, critical
     confidence_score: Optional[int] = 85  # 0-100
