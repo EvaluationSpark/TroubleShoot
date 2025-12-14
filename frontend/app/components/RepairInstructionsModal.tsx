@@ -786,6 +786,26 @@ const styles = StyleSheet.create({
     color: '#ccc',
     lineHeight: 22,
   },
+  infographicContainer: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  infographicTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#00D9FF',
+    marginBottom: 12,
+  },
+  infographicImage: {
+    width: '100%',
+    height: 300,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
   diagramContainer: {
     marginBottom: 16,
     alignItems: 'center',
