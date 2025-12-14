@@ -367,6 +367,26 @@ export default function CommunityScreen() {
           </ScrollView>
         </View>
       </Modal>
+
+      {/* PR #6: Report Modal */}
+      <ReportModal
+        visible={showReportModal}
+        postId={reportingPostId}
+        onClose={() => {
+          setShowReportModal(false);
+          setReportingPostId('');
+        }}
+        onReportSubmitted={() => {
+          // Optionally refresh posts or show a success indicator
+          fetchPosts();
+        }}
+      />
+
+      {/* PR #6: Community Guidelines Modal */}
+      <CommunityGuidelinesModal
+        visible={showGuidelines}
+        onClose={() => setShowGuidelines(false)}
+      />
     </SafeAreaView>
   );
 }
