@@ -469,6 +469,10 @@ export default function RepairInstructionsModal({
 
           {activeTab === 'tools' && (
             <View style={styles.tabContent}>
+                {/* Cost & Time Breakdowns */}
+                <CostBreakdown costEstimate={repairData.cost_estimate} />
+                <TimeBreakdown timeEstimate={repairData.time_estimate} />
+                
               <Text style={styles.sectionTitle}>Tools Needed</Text>
               {repairData.tools_needed.map((tool: string, index: number) => (
                 <View key={index} style={styles.listItem}>
