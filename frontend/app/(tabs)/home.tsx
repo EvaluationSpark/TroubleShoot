@@ -68,42 +68,8 @@ export default function HomeScreen() {
       if (!result.canceled && result.assets[0]) {
         const imageUri = result.assets[0].uri;
         setSelectedImage(imageUri);
-        
-        // PR #5 Enhancement: Auto-scan for barcodes in the captured image
-        if (useCamera) {
-          let barcodeDetected = false;
-          try {
-            const { BarCodeScanner } = await import('expo-barcode-scanner');
-            const barcodes = await BarCodeScanner.scanFromURLAsync(imageUri);
-            
-            if (barcodes && barcodes.length > 0) {
-              const detectedModel = barcodes[0].data;
-              setModelNumber(detectedModel);
-              barcodeDetected = true;
-              setShowModelInput(true); // Show field with detected value for editing
-              Alert.alert(
-                '✅ Model Number Detected!',
-                `Found: ${detectedModel}\n\nYou can edit it below if needed.`,
-                [{ text: 'OK' }]
-              );
-            }
-          } catch (error) {
-            console.log('Barcode scan attempt:', error);
-          }
-          
-          // Show manual input field if no barcode detected
-          if (!barcodeDetected) {
-            setShowModelInput(true);
-            Alert.alert(
-              'No Barcode Detected',
-              'You can manually enter the model number below or use the scan button.',
-              [{ text: 'OK' }]
-            );
-          }
-        } else {
-          // For gallery images, always show the input field
-          setShowModelInput(true);
-        }
+        // Show optional model input for manual entry
+        setShowModelInput(true);
       }
     } catch (error) {
       console.error('Error picking image:', error);
