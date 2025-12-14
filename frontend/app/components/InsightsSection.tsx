@@ -19,7 +19,7 @@ interface InsightsSectionProps {
 export default function InsightsSection({ insights }: InsightsSectionProps) {
   if (!insights || insights.total_repairs === 0) {
     return (
-      <View style={styles.emptyState}>
+      <View style={[styles.emptyState, { marginBottom: 24 }]}>
         <Ionicons name="bar-chart-outline" size={64} color="#6b7280" />
         <Text style={styles.emptyTitle}>No Insights Yet</Text>
         <Text style={styles.emptyText}>
