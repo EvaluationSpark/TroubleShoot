@@ -527,6 +527,32 @@ async def get_repair_sessions():
         logger.error(f"Error fetching sessions: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.delete("/repair-sessions/{session_id}")
+async def delete_repair_session(session_id: str):
+    """Delete a specific repair session"""
+    try:
+        result = await db.repair_sessions.delete_one({"repair_id": session_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Session not found")
+        return {"message": "Session deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting session: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/repair-sessions")
+async def delete_all_repair_sessions():
+    """Delete all repair sessions (admin/testing)"""
+    try:
+        result = await db.repair_sessions.delete_many({})
+        return {"message": f"Deleted {result.deleted_count} session(s)"}
+        
+    except Exception as e:
+        logger.error(f"Error deleting sessions: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # PR #8: Repair History & Insights
 @api_router.get("/repair-insights")
 async def get_repair_insights():
