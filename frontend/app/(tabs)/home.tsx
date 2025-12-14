@@ -234,27 +234,19 @@ export default function HomeScreen() {
                 <Text style={[styles.modelInputSubtitle, { color: theme.colors.textSecondary }]}>
                   {modelNumber ? 'Edit or scan again if needed' : 'Manually enter or scan barcode'}
                 </Text>
-                <View style={styles.modelInputRow}>
-                  <TextInput
-                    style={[styles.modelInput, { 
-                      color: theme.colors.text,
-                      borderColor: modelNumber ? theme.colors.success : theme.colors.glassBorder,
-                      backgroundColor: theme.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                    }]}
-                    placeholder="e.g., XR-2000, ABC123"
-                    placeholderTextColor={theme.colors.textTertiary}
-                    value={modelNumber}
-                    onChangeText={setModelNumber}
-                    autoCapitalize="characters"
-                    returnKeyType="done"
-                  />
-                  <TouchableOpacity
-                    style={[styles.scanButton, { backgroundColor: `${theme.colors.primary}20` }]}
-                    onPress={() => setShowScanner(true)}
-                  >
-                    <Ionicons name="barcode-outline" size={24} color={theme.colors.primary} />
-                  </TouchableOpacity>
-                </View>
+                <TextInput
+                  style={[styles.modelInput, { 
+                    color: theme.colors.text,
+                    borderColor: modelNumber ? theme.colors.success : theme.colors.glassBorder,
+                    backgroundColor: theme.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                  }]}
+                  placeholder="e.g., XR-2000, ABC123"
+                  placeholderTextColor={theme.colors.textTertiary}
+                  value={modelNumber}
+                  onChangeText={setModelNumber}
+                  autoCapitalize="characters"
+                  returnKeyType="done"
+                />
               </BlurView>
             )}
 
