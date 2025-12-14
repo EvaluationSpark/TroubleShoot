@@ -96,6 +96,20 @@ export default function ProgressScreen() {
     }
   };
 
+  const fetchInsights = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/insights`);
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.log('Insights fetch failed');
+      return null;
+    }
+  };
+
   const onRefresh = () => {
     setRefreshing(true);
     fetchSessions();
