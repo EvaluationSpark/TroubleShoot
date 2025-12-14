@@ -25,6 +25,11 @@ export default function CommunityScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  
+  // PR #6: Community Moderation
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportingPostId, setReportingPostId] = useState<string>('');
+  const [showGuidelines, setShowGuidelines] = useState(false);
 
   // Create post state
   const [title, setTitle] = useState('');
