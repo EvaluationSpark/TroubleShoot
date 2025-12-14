@@ -44,6 +44,20 @@ export default function RepairInstructionsModal({
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [exportingPDF, setExportingPDF] = useState(false); // PR #7
 
+  // PR #7: Export to PDF
+  const handleExportPDF = async () => {
+    setExportingPDF(true);
+    try {
+      await exportRepairAsPDF(repairData);
+      Alert.alert('Success', 'Repair guide exported successfully!');
+    } catch (error) {
+      console.error('Export error:', error);
+      Alert.alert('Export Failed', 'Could not export the repair guide. Please try again.');
+    } finally {
+      setExportingPDF(false);
+    }
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'easy':
