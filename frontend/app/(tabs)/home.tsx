@@ -116,20 +116,10 @@ export default function HomeScreen() {
   const analyzeImage = async (imageUri: string) => {
     setLoading(true);
     try {
-      const base64 = await fetch(imageUri)
-        .then((res) => res.blob())
-        .then(
-          (blob) =>
-            new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                const base64String = reader.result as string;
-                resolve(base64String.split(',')[1]);
-              };
-              reader.onerror = reject;
-              reader.readAsDataURL(blob);
-            })
-        );
+      // Use FileSystem for reliable base64 encoding on mobile
+      const base64 = await FileSystem.readAsStringAsync(imageUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
       const response = await fetch(`${BACKEND_URL}/api/analyze-repair`, {
         method: 'POST',
