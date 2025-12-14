@@ -544,6 +544,140 @@ async def like_post(post_id: str):
         logger.error(f"Error liking post: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# PR #6: Community Moderation Endpoints
+@api_router.post("/community/report", response_model=Report)
+async def report_post(report: ReportRequest):
+    """Report a community post"""
+    try:
+        # Check if post exists
+        post = await db.community_posts.find_one({"id": report.post_id})
+        if not post:
+            raise HTTPException(status_code=404, detail="Post not found")
+        
+        # Create report
+        report_obj = Report(
+            post_id=report.post_id,
+            reason=report.reason,
+            details=report.details,
+            reporter_name=report.reporter_name or "Anonymous"
+        )
+        
+        await db.reports.insert_one(report_obj.dict())
+        logger.info(f"Post {report.post_id} reported for: {report.reason}")
+        
+        return report_obj
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error reporting post: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/community/reports")
+async def get_reports(status: Optional[str] = "pending"):
+    """Get all reports (admin endpoint)"""
+    try:
+        query = {"status": status} if status else {}
+        reports = await db.reports.find(query).sort("timestamp", -1).to_list(length=100)
+        return {"reports": reports}
+        
+    except Exception as e:
+        logger.error(f"Error fetching reports: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/community/moderate/{post_id}")
+async def moderate_post(post_id: str, moderation: ModeratePostRequest):
+    """Moderate a reported post (admin endpoint)"""
+    try:
+        if moderation.action == "delete":
+            # Delete the post
+            result = await db.community_posts.delete_one({"id": post_id})
+            if result.deleted_count == 0:
+                raise HTTPException(status_code=404, detail="Post not found")
+            
+            # Update all reports for this post
+            await db.reports.update_many(
+                {"post_id": post_id},
+                {"$set": {"status": "resolved"}}
+            )
+            
+            return {"message": "Post deleted successfully"}
+            
+        elif moderation.action == "approve":
+            # Mark reports as reviewed but keep post
+            await db.reports.update_many(
+                {"post_id": post_id},
+                {"$set": {"status": "reviewed"}}
+            )
+            return {"message": "Post approved, reports marked as reviewed"}
+            
+        elif moderation.action == "ignore":
+            # Just mark as reviewed, no action on post
+            await db.reports.update_many(
+                {"post_id": post_id},
+                {"$set": {"status": "reviewed"}}
+            )
+            return {"message": "Reports ignored"}
+            
+        else:
+            raise HTTPException(status_code=400, detail="Invalid action. Use: delete, approve, or ignore")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error moderating post: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/community/guidelines")
+async def get_community_guidelines():
+    """Get community guidelines"""
+    guidelines = {
+        "title": "Community Guidelines",
+        "introduction": "FixIntel AI is a community of repair enthusiasts helping each other. Please follow these guidelines to keep our community safe, helpful, and respectful.",
+        "rules": [
+            {
+                "title": "Be Respectful",
+                "description": "Treat all community members with respect. No harassment, hate speech, or personal attacks."
+            },
+            {
+                "title": "Share Real Repairs",
+                "description": "Only post genuine repair experiences with actual before/after photos. No fake or misleading content."
+            },
+            {
+                "title": "Safety First",
+                "description": "Never post dangerous repair methods. If a repair involves electrical, gas, or structural work, recommend professional help."
+            },
+            {
+                "title": "No Spam",
+                "description": "Don't post advertisements, promotional content, or repetitive posts. Share to help, not to sell."
+            },
+            {
+                "title": "Appropriate Content",
+                "description": "Keep all content family-friendly. No inappropriate, offensive, or NSFW material."
+            },
+            {
+                "title": "Give Credit",
+                "description": "If you used someone else's repair guide or technique, give them credit."
+            }
+        ],
+        "reporting": {
+            "title": "Report Violations",
+            "description": "If you see content that violates these guidelines, please report it. We review all reports and take appropriate action.",
+            "reasons": [
+                "Inappropriate content",
+                "Spam or advertisements",
+                "Dangerous repair advice",
+                "Misleading information",
+                "Other violations"
+            ]
+        },
+        "consequences": {
+            "title": "Consequences",
+            "description": "Violations may result in content removal. Repeated violations may lead to account restrictions."
+        }
+    }
+    return guidelines
+
 @api_router.post("/feedback")
 async def submit_feedback(feedback: FeedbackRequest):
     """Submit feedback on repair instructions"""
