@@ -59,6 +59,7 @@ export default function RepairInstructionsModal({
   };
 
   const getDifficultyColor = (difficulty: string) => {
+    if (!difficulty) return '#fbbf24'; // Default to medium if undefined
     switch (difficulty.toLowerCase()) {
       case 'easy':
         return '#4ade80';
