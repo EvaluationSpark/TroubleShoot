@@ -343,6 +343,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 24,
   },
   headerTitle: {
@@ -354,6 +356,14 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     color: '#aaa',
+  },
+  clearButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   statsContainer: {
     flexDirection: 'row',
