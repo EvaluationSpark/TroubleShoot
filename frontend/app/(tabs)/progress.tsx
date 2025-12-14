@@ -105,6 +105,13 @@ export default function ProgressScreen() {
         return dateB.getTime() - dateA.getTime();
       });
 
+      console.log('[Progress] Fetched sessions:', {
+        backendCount: backendSessions.length,
+        localCount: localSessions.length,
+        totalCount: allSessions.length,
+        sessions: allSessions
+      });
+      
       setSessions(allSessions);
       setInsights(insightsData);
     } catch (error) {
