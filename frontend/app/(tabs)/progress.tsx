@@ -142,8 +142,11 @@ export default function ProgressScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>My Repairs</Text>
-          <Text style={styles.headerSubtitle}>Track your ongoing repair projects</Text>
+          <Text style={styles.headerSubtitle}>Track your ongoing repair projects & insights</Text>
         </View>
+
+        {/* PR #8: Insights Section */}
+        {showInsights && <InsightsSection insights={insights} />}
 
         {/* Stats */}
         <View style={styles.statsContainer}>
