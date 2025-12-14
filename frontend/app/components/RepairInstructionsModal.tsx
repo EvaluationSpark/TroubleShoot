@@ -431,6 +431,15 @@ export default function RepairInstructionsModal({
                 <ActivityIndicator size="large" color="#00D9FF" style={{ marginTop: 20 }} />
               ) : (
                 <ScrollView style={styles.detailScroll}>
+                  {stepDiagram && (
+                    <View style={styles.diagramContainer}>
+                      <Image 
+                        source={{ uri: stepDiagram }} 
+                        style={styles.diagramImage}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  )}
                   <Text style={styles.detailDescription}>{stepDetails}</Text>
                 </ScrollView>
               )}
