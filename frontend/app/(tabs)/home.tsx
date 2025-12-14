@@ -664,24 +664,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 12,
   },
-  modelInputRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
   modelInput: {
-    flex: 1,
     height: 48,
     borderRadius: 12,
     borderWidth: 1,
     paddingHorizontal: 16,
     fontSize: 16,
     fontWeight: '500',
-  },
-  scanButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
