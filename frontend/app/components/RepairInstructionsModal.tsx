@@ -585,6 +585,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  vendorButton: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#4ade80',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  vendorButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   closeButton: {
     flex: 1,
     backgroundColor: '#333',
