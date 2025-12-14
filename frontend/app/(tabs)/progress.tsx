@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import InsightsSection from '../components/InsightsSection'; // PR #8
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const REPAIRS_STORAGE_KEY = '@pix_fix_repairs';
