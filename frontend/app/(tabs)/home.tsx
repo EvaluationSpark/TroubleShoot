@@ -68,7 +68,27 @@ export default function HomeScreen() {
       if (!result.canceled && result.assets[0]) {
         const imageUri = result.assets[0].uri;
         setSelectedImage(imageUri);
-        // Don't auto-analyze - let user click the analyze button
+        
+        // PR #5 Enhancement: Auto-scan for barcodes in the captured image
+        if (useCamera) {
+          try {
+            const { BarCodeScanner } = await import('expo-barcode-scanner');
+            const barcodes = await BarCodeScanner.scanFromURLAsync(imageUri);
+            
+            if (barcodes && barcodes.length > 0) {
+              const detectedModel = barcodes[0].data;
+              setModelNumber(detectedModel);
+              Alert.alert(
+                'Model Number Detected!',
+                `Found: ${detectedModel}\n\nYou can edit it if needed.`,
+                [{ text: 'OK' }]
+              );
+            }
+          } catch (error) {
+            // Silently fail if barcode scanning doesn't work
+            console.log('Barcode scan failed:', error);
+          }
+        }
       }
     } catch (error) {
       console.error('Error picking image:', error);
