@@ -89,7 +89,7 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
 
       {/* Most Common Repairs */}
       {insights.most_common_repairs?.length > 0 ? (
-        <View style={styles.section}>
+        <View style={[styles.section, styles.container]}>
           <Text style={styles.sectionTitle}>Most Common Repairs</Text>
           {insights.most_common_repairs.map((repair: any, index: number) => (
             <View key={index} style={styles.repairItem}>
@@ -107,7 +107,7 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
 
       {/* Achievements */}
       {insights.achievements?.length > 0 ? (
-        <View style={styles.section}>
+        <View style={[styles.section, styles.container]}>
           <Text style={styles.sectionTitle}>🏆 Achievements</Text>
           <View style={styles.achievementsGrid}>
             {insights.achievements.map((achievement: any, index: number) => (
