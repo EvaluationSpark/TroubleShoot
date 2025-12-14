@@ -229,7 +229,7 @@ export default function ProgressScreen() {
 
             {/* Saved Repairs Section */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Saved Repairs</Text>
+              <Text style={styles.sectionTitle}>Saved Repairs ({sessions.length})</Text>
               
               {sessions.length === 0 ? (
                 <View style={styles.emptyState}>
