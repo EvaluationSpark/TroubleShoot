@@ -37,9 +37,9 @@ export default function InsightsSection({ insights }: InsightsSectionProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, styles.container]}>
         <Ionicons name="stats-chart" size={24} color="#00D9FF" />
         <Text style={styles.headerTitle}>Your Repair Insights</Text>
       </View>
