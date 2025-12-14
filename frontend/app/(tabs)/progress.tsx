@@ -177,8 +177,18 @@ export default function ProgressScreen() {
           >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Repairs</Text>
-          <Text style={styles.headerSubtitle}>Track your ongoing repair projects & insights</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.headerTitle}>My Repairs</Text>
+            <Text style={styles.headerSubtitle}>Track your ongoing repair projects & insights</Text>
+          </View>
+          {sessions.length > 0 && (
+            <TouchableOpacity 
+              onPress={clearAllSessions}
+              style={styles.clearButton}
+            >
+              <Ionicons name="trash-outline" size={20} color="#ef4444" />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* PR #8: Insights Section */}
