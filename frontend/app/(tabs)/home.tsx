@@ -234,7 +234,7 @@ export default function HomeScreen() {
                 </Text>
               </View>
               <Text style={[styles.modelInputSubtitle, { color: theme.colors.textSecondary }]}>
-                For better accuracy, enter or scan your device model
+                📸 Camera auto-detects barcodes, or manually enter/scan
               </Text>
               <View style={styles.modelInputRow}>
                 <TextInput
