@@ -8,24 +8,23 @@ import {
   RefreshControl,
   ActivityIndicator,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import InsightsSection from '../components/InsightsSection'; // PR #8
+import InsightsSection from '../components/InsightsSection';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-const REPAIRS_STORAGE_KEY = '@pix_fix_repairs';
 
 export default function ProgressScreen() {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [insights, setInsights] = useState<any>(null); // PR #8
-  const [showInsights, setShowInsights] = useState(true); // PR #8
+  const [insights, setInsights] = useState<any>(null);
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
@@ -40,27 +39,66 @@ export default function ProgressScreen() {
     fetchSessions();
   }, []);
 
+  const fetchBackendSessions = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/repair-sessions`);
+      if (response.ok) {
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching backend sessions:', error);
+      return [];
+    }
+  };
+
+  const fetchLocalSessions = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('repair_sessions');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching local sessions:', error);
+      return [];
+    }
+  };
+
+  const fetchInsights = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/repair-insights`);
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Insights fetch failed:', error);
+      return null;
+    }
+  };
+
   const fetchSessions = async () => {
     try {
-      // Fetch from both sources + insights (PR #8)
       const [backendSessions, localSessions, insightsData] = await Promise.all([
         fetchBackendSessions(),
         fetchLocalSessions(),
         fetchInsights(),
       ]);
 
-      // Merge and deduplicate sessions (prefer backend data)
+      // Merge sessions (backend + local, deduplicate by repair_id)
       const allSessions = [...backendSessions];
       const backendIds = new Set(backendSessions.map((s: any) => s.repair_id));
       
-      // Add local sessions that aren't in backend
       localSessions.forEach((localSession: any) => {
         if (!backendIds.has(localSession.repair_id)) {
           allSessions.push(localSession);
         }
       });
 
-      // Sort by updated_at or timestamp
+      // Sort by date (newest first)
       allSessions.sort((a: any, b: any) => {
         const dateA = new Date(a.updated_at || a.timestamp || 0);
         const dateB = new Date(b.updated_at || b.timestamp || 0);
@@ -77,85 +115,74 @@ export default function ProgressScreen() {
     }
   };
 
-  const fetchBackendSessions = async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/repair-sessions`);
-      if (response.ok) {
-        const data = await response.json();
-        return data;
-      }
-      return [];
-    } catch (error) {
-      console.log('Backend fetch failed, using local data only');
-      return [];
-    }
-  };
-
-  const fetchLocalSessions = async () => {
-    try {
-      const stored = await AsyncStorage.getItem(REPAIRS_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-      return [];
-    } catch (error) {
-      console.error('Error fetching local sessions:', error);
-      return [];
-    }
-  };
-
-  // PR #8: Fetch repair insights
-  const fetchInsights = async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/repair-insights`);
-      if (response.ok) {
-        const data = await response.json();
-        return data;
-      }
-      return null;
-    } catch (error) {
-      console.log('Insights fetch failed:', error);
-      return null;
-    }
-  };
-
   const onRefresh = () => {
     setRefreshing(true);
     fetchSessions();
   };
 
   const clearAllSessions = async () => {
-    try {
-      // Clear local storage
-      await AsyncStorage.removeItem('repair_sessions');
-      
-      // Clear backend (if endpoint exists)
-      try {
-        await fetch(`${BACKEND_URL}/api/repair-sessions`, {
-          method: 'DELETE',
-        });
-      } catch (e) {
-        console.log('Backend clear failed (may not exist):', e);
-      }
-      
-      // Refresh the list
-      fetchSessions();
-    } catch (error) {
-      console.error('Error clearing sessions:', error);
-    }
+    Alert.alert(
+      'Clear All Repairs',
+      'Are you sure you want to delete all saved repairs? This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Clear local storage
+              await AsyncStorage.removeItem('repair_sessions');
+              
+              // Clear backend
+              try {
+                await fetch(`${BACKEND_URL}/api/repair-sessions`, {
+                  method: 'DELETE',
+                });
+              } catch (e) {
+                console.log('Backend clear failed:', e);
+              }
+              
+              // Refresh
+              fetchSessions();
+              Alert.alert('Success', 'All repairs have been deleted');
+            } catch (error) {
+              console.error('Error clearing sessions:', error);
+              Alert.alert('Error', 'Failed to clear repairs');
+            }
+          },
+        },
+      ]
+    );
   };
 
-  const getProgressColor = (progress: number) => {
-    if (progress < 33) return '#f87171';
-    if (progress < 66) return '#fbbf24';
-    return '#4ade80';
+  const handleViewDetails = (session: any) => {
+    // Ensure we have the repair data in the correct structure
+    const repairData = session.repair_data || session;
+    setSelectedSession(repairData);
+    setShowDetailsModal(true);
   };
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#00D9FF" />
-      </View>
+      <ImageBackground
+        source={require('../../assets/images/icon.png')}
+        style={styles.container}
+        resizeMode="cover"
+        blurRadius={80}
+      >
+        <LinearGradient
+          colors={['rgba(15, 23, 42, 0.95)', 'rgba(15, 23, 42, 0.98)', 'rgba(0, 0, 0, 0.99)']}
+          style={styles.gradientOverlay}
+        >
+          <SafeAreaView style={styles.safeArea}>
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#00D9FF" />
+              <Text style={styles.loadingText}>Loading repairs...</Text>
+            </View>
+          </SafeAreaView>
+        </LinearGradient>
+      </ImageBackground>
     );
   }
 
@@ -170,156 +197,113 @@ export default function ProgressScreen() {
         colors={['rgba(15, 23, 42, 0.95)', 'rgba(15, 23, 42, 0.98)', 'rgba(0, 0, 0, 0.99)']}
         style={styles.gradientOverlay}
       >
-        <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+        <SafeAreaView style={styles.safeArea}>
           <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00D9FF" />}
+            style={styles.scrollContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00D9FF" />
+            }
           >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.headerTitle}>My Repairs</Text>
-            <Text style={styles.headerSubtitle}>Track your ongoing repair projects & insights</Text>
-          </View>
-          {sessions.length > 0 && (
-            <TouchableOpacity 
-              onPress={clearAllSessions}
-              style={styles.clearButton}
-            >
-              <Ionicons name="trash-outline" size={20} color="#ef4444" />
-            </TouchableOpacity>
-          )}
-        </View>
+            {/* Header */}
+            <View style={styles.header}>
+              <View style={styles.headerTextContainer}>
+                <Text style={styles.headerTitle}>My Repairs</Text>
+                <Text style={styles.headerSubtitle}>Track your projects & insights</Text>
+              </View>
+              {sessions.length > 0 && (
+                <TouchableOpacity onPress={clearAllSessions} style={styles.clearButton}>
+                  <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                </TouchableOpacity>
+              )}
+            </View>
 
-        {/* PR #8: Insights Section */}
-        {showInsights && <InsightsSection insights={insights} />}
+            {/* Insights Section */}
+            <InsightsSection insights={insights} />
 
-        {/* Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Ionicons name="construct" size={28} color="#00D9FF" />
-            <Text style={styles.statNumber}>{sessions.length}</Text>
-            <Text style={styles.statLabel}>Total Repairs</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Ionicons name="checkmark-circle" size={28} color="#4ade80" />
-            <Text style={styles.statNumber}>
-              {sessions.filter(s => s.progress_percentage === 100).length}
-            </Text>
-            <Text style={styles.statLabel}>Completed</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Ionicons name="time" size={28} color="#fbbf24" />
-            <Text style={styles.statNumber}>
-              {sessions.filter(s => s.progress_percentage > 0 && s.progress_percentage < 100).length}
-            </Text>
-            <Text style={styles.statLabel}>In Progress</Text>
-          </View>
-        </View>
-
-        {/* Sessions List */}
-        {sessions.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="list-outline" size={64} color="#555" />
-            <Text style={styles.emptyText}>No saved repairs yet</Text>
-            <Text style={styles.emptySubtext}>Start a repair from the Home tab and save it to track your progress</Text>
-          </View>
-        ) : (
-          <View style={styles.sessionsContainer}>
-            <Text style={styles.sectionTitle}>Saved Repairs</Text>
-            {sessions.map((session) => (
-              <TouchableOpacity key={session.id} style={styles.sessionCard}>
-                <View style={styles.sessionHeader}>
-                  <View style={styles.sessionIconContainer}>
-                    <Ionicons
-                      name={session.progress_percentage === 100 ? 'checkmark-circle' : 'construct'}
-                      size={24}
-                      color={session.progress_percentage === 100 ? '#4ade80' : '#00D9FF'}
-                    />
-                  </View>
-                  <View style={styles.sessionInfo}>
-                    <Text style={styles.sessionTitle}>{session.title}</Text>
-                    {session.notes && (
-                      <Text style={styles.sessionNotes} numberOfLines={2}>
-                        {session.notes}
-                      </Text>
-                    )}
-                    <Text style={styles.sessionDate}>
-                      Saved on {new Date(session.updated_at || session.timestamp).toLocaleDateString()}
-                    </Text>
-                  </View>
+            {/* Saved Repairs Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Saved Repairs</Text>
+              
+              {sessions.length === 0 ? (
+                <View style={styles.emptyState}>
+                  <Ionicons name="construct-outline" size={64} color="#666" />
+                  <Text style={styles.emptyTitle}>No Saved Repairs</Text>
+                  <Text style={styles.emptyText}>
+                    When you save repair instructions, they'll appear here for easy access.
+                  </Text>
                 </View>
+              ) : (
+                sessions.map((session, index) => {
+                  const title = session.title || session.item_type || 'Unknown Repair';
+                  const status = session.status || 'saved';
+                  const progress = session.progress_percentage || 0;
+                  const date = session.updated_at || session.timestamp;
+                  const formattedDate = date ? new Date(date).toLocaleDateString() : 'Unknown date';
 
-                {/* Progress Bar */}
-                <View style={styles.progressSection}>
-                  <View style={styles.progressHeader}>
-                    <Text style={styles.progressLabel}>Progress</Text>
-                    <Text style={[styles.progressPercentage, { color: getProgressColor(session.progress_percentage) }]}>
-                      {session.progress_percentage}%
-                    </Text>
-                  </View>
-                  <View style={styles.progressBarContainer}>
-                    <View
-                      style={[
-                        styles.progressBar,
-                        {
-                          width: `${session.progress_percentage}%`,
-                          backgroundColor: getProgressColor(session.progress_percentage),
-                        },
-                      ]}
-                    />
-                  </View>
-                </View>
+                  return (
+                    <View key={session.repair_id || index} style={styles.sessionCard}>
+                      <View style={styles.sessionHeader}>
+                        <View style={styles.sessionTitleContainer}>
+                          <Text style={styles.sessionTitle}>{title}</Text>
+                          <Text style={styles.sessionDate}>{formattedDate}</Text>
+                        </View>
+                        <View style={[styles.statusBadge, status === 'completed' && styles.statusCompleted]}>
+                          <Text style={styles.statusText}>
+                            {status === 'completed' ? '✓ Done' : '⏳ Saved'}
+                          </Text>
+                        </View>
+                      </View>
 
-                {/* Action Buttons */}
-                <View style={styles.sessionActions}>
-                  <TouchableOpacity 
-                    style={styles.actionButton}
-                    onPress={() => {
-                      setSelectedSession(session);
-                      setShowDetailsModal(true);
-                    }}
-                  >
-                    <Ionicons name="eye" size={16} color="#00D9FF" />
-                    <Text style={styles.actionButtonText}>View Details</Text>
-                  </TouchableOpacity>
-                  {session.progress_percentage < 100 && (
-                    <TouchableOpacity style={styles.actionButton}>
-                      <Ionicons name="arrow-forward" size={16} color="#4ade80" />
-                      <Text style={[styles.actionButtonText, { color: '#4ade80' }]}>Continue</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+                      {session.damage_description && (
+                        <Text style={styles.sessionDescription} numberOfLines={2}>
+                          {session.damage_description}
+                        </Text>
+                      )}
 
-        {/* Tips Section */}
-        <View style={styles.tipsContainer}>
-          <View style={styles.tipsHeader}>
-            <Ionicons name="bulb" size={24} color="#fbbf24" />
-            <Text style={styles.tipsTitle}>Pro Tips</Text>
-          </View>
-          <Text style={styles.tipText}>• Save repairs to track your progress over time</Text>
-          <Text style={styles.tipText}>• Take before and after photos to share in Community</Text>
-          <Text style={styles.tipText}>• Set reminders for repairs that need ordered parts</Text>
-        </View>
+                      {progress > 0 && (
+                        <View style={styles.progressBar}>
+                          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+                          <Text style={styles.progressText}>{progress}% Complete</Text>
+                        </View>
+                      )}
+
+                      <View style={styles.sessionActions}>
+                        <TouchableOpacity
+                          style={styles.viewButton}
+                          onPress={() => handleViewDetails(session)}
+                        >
+                          <Ionicons name="eye" size={16} color="#00D9FF" />
+                          <Text style={styles.viewButtonText}>View Details</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={styles.continueButton}
+                          onPress={() => handleViewDetails(session)}
+                        >
+                          <Ionicons name="play-circle" size={16} color="#4ade80" />
+                          <Text style={styles.continueButtonText}>Continue</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                })
+              )}
+            </View>
           </ScrollView>
         </SafeAreaView>
-      </LinearGradient>
 
-      {/* Full Repair Details Modal */}
-      {selectedSession && (
-        <RepairInstructionsModal
-          visible={showDetailsModal}
-          repairData={selectedSession}
-          onClose={() => {
-            setShowDetailsModal(false);
-            setSelectedSession(null);
-          }}
-        />
-      )}
+        {/* Repair Details Modal */}
+        {selectedSession && (
+          <RepairInstructionsModal
+            visible={showDetailsModal}
+            repairData={selectedSession}
+            onClose={() => {
+              setShowDetailsModal(false);
+              setSelectedSession(null);
+            }}
+          />
+        )}
+      </LinearGradient>
     </ImageBackground>
   );
 }
@@ -339,13 +323,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    color: '#fff',
+    marginTop: 16,
+    fontSize: 16,
+  },
   scrollContent: {
+    flex: 1,
     padding: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: 28,
@@ -365,48 +358,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  statsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 8,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#aaa',
-    marginTop: 4,
-  },
-  emptyState: {
-    alignItems: 'center',
-    padding: 40,
-  },
-  emptyText: {
-    color: '#aaa',
-    fontSize: 18,
-    marginTop: 16,
-    fontWeight: '600',
-  },
-  emptySubtext: {
-    color: '#666',
-    fontSize: 14,
-    marginTop: 8,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  sessionsContainer: {
-    marginBottom: 32,
+  section: {
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 20,
@@ -414,109 +367,124 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 16,
   },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    marginTop: 16,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    textAlign: 'center',
+    marginTop: 8,
+  },
   sessionCard: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 16,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   sessionHeader: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
-  sessionIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#2a2a2a',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sessionInfo: {
+  sessionTitleContainer: {
     flex: 1,
+    marginRight: 12,
   },
   sessionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#fff',
     marginBottom: 4,
   },
-  sessionNotes: {
-    fontSize: 13,
-    color: '#aaa',
-    marginBottom: 4,
-    lineHeight: 18,
-  },
   sessionDate: {
     fontSize: 12,
-    color: '#666',
+    color: '#9ca3af',
   },
-  progressSection: {
-    marginBottom: 16,
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(251, 191, 36, 0.2)',
   },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+  statusCompleted: {
+    backgroundColor: 'rgba(74, 222, 128, 0.2)',
   },
-  progressLabel: {
-    color: '#aaa',
-    fontSize: 13,
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#fbbf24',
   },
-  progressPercentage: {
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
-  progressBarContainer: {
-    height: 8,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 4,
-    overflow: 'hidden',
+  sessionDescription: {
+    fontSize: 14,
+    color: '#d1d5db',
+    marginBottom: 12,
+    lineHeight: 20,
   },
   progressBar: {
-    height: '100%',
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 4,
+    marginBottom: 12,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#4ade80',
+    borderRadius: 4,
+  },
+  progressText: {
+    position: 'absolute',
+    right: 8,
+    top: -16,
+    fontSize: 10,
+    color: '#4ade80',
+    fontWeight: '600',
   },
   sessionActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
-  actionButton: {
+  viewButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
     padding: 12,
-    backgroundColor: '#2a2a2a',
     borderRadius: 8,
+    backgroundColor: 'rgba(0, 217, 255, 0.1)',
+    gap: 6,
   },
-  actionButtonText: {
+  viewButtonText: {
     color: '#00D9FF',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
   },
-  tipsContainer: {
-    backgroundColor: '#2a2a00',
-    padding: 20,
-    borderRadius: 16,
-  },
-  tipsHeader: {
+  continueButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(74, 222, 128, 0.1)',
+    gap: 6,
   },
-  tipsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fbbf24',
-  },
-  tipText: {
-    color: '#fbbf24',
+  continueButtonText: {
+    color: '#4ade80',
     fontSize: 14,
-    lineHeight: 22,
-    marginBottom: 8,
+    fontWeight: '600',
   },
 });
