@@ -369,7 +369,10 @@ export default function RepairInstructionsModal({
                   <TouchableOpacity
                     key={index}
                     style={styles.videoCard}
-                    onPress={() => Linking.openURL(video.url)}
+                    onPress={() => {
+                      setSelectedVideo(video);
+                      setShowVideoPlayer(true);
+                    }}
                   >
                     <View style={styles.videoThumbnail}>
                       <Ionicons name="play-circle" size={48} color="#00D9FF" />
