@@ -774,6 +774,16 @@ const styles = StyleSheet.create({
     color: '#ccc',
     lineHeight: 22,
   },
+  diagramContainer: {
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  diagramImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    backgroundColor: '#333',
+  },
   emptyVideos: {
     alignItems: 'center',
     padding: 40,
