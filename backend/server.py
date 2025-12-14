@@ -190,10 +190,11 @@ Format your response as JSON with these exact keys:
     "assumptions": ["Using typical retail prices", "Assuming basic tools already owned"]
   }},
   "time_estimate": {{
-    "prep_minutes": 10,
-    "active_minutes": 30,
-    "cure_minutes": 0,
-    "total_minutes": 40
+    "prep": 10,
+    "active": 30,
+    "cure": 0,
+    "total": 40,
+    "unit": "minutes"
   }},
   "risk_level": "low|medium|high|critical",
   "confidence_score": 85,
