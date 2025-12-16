@@ -480,7 +480,7 @@ export default function RepairInstructionsModal({
             }}
           />
         )}
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 }
