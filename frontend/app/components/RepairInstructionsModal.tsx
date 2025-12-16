@@ -207,7 +207,7 @@ export default function RepairInstructionsModal({
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Repair Guide</Text>
