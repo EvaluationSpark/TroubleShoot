@@ -22,6 +22,7 @@ import { BlurView } from 'expo-blur';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
 import DiagnosticQuestionsModal from '../components/DiagnosticQuestionsModal';
 import SafetyGatingModal from '../components/SafetyGatingModal';
+import GamificationCard from '../components/GamificationCard';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSkillLevel } from '../contexts/SkillLevelContext';
 import { RiskLevel } from '../types/models';
