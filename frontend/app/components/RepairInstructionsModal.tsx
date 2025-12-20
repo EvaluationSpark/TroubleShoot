@@ -163,14 +163,106 @@ export default function RepairInstructionsModal({
     }
   };
 
-  const toggleStep = (index: number) => {
+  const toggleStep = async (index: number) => {
     const newChecked = new Set(checkedSteps);
-    if (newChecked.has(index)) {
+    const wasChecked = newChecked.has(index);
+    
+    if (wasChecked) {
       newChecked.delete(index);
     } else {
       newChecked.add(index);
+      
+      // Award XP for completing a step
+      try {
+        const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+        const response = await fetch(`${BACKEND_URL}/api/gamification/complete-step`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: 'default_user',
+            repair_id: repairData?.repair_id || 'unknown',
+            step_number: index,
+          }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.xp_earned > 0) {
+            // Show a small XP notification
+            Alert.alert('🎮 +' + data.xp_earned + ' XP!', 'Step completed!', [
+              { text: 'OK', style: 'default' }
+            ]);
+          }
+          if (data.ranked_up && data.new_rank) {
+            Alert.alert(
+              '🎉 Rank Up!',
+              `Congratulations! You are now a ${data.new_rank.badge} ${data.new_rank.name}!`,
+              [{ text: 'Awesome!', style: 'default' }]
+            );
+          }
+        }
+      } catch (error) {
+        console.log('Failed to award XP:', error);
+      }
     }
     setCheckedSteps(newChecked);
+  };
+
+  // Complete entire repair project
+  const completeRepairProject = async () => {
+    const totalSteps = (repairData?.repair_steps || []).length;
+    const completedSteps = checkedSteps.size;
+    
+    if (completedSteps < totalSteps) {
+      Alert.alert(
+        'Incomplete Repair',
+        `You've completed ${completedSteps} of ${totalSteps} steps. Complete all steps to earn full XP!`,
+        [
+          { text: 'Continue Repair', style: 'cancel' },
+          { text: 'Mark Complete Anyway', onPress: () => submitRepairCompletion() }
+        ]
+      );
+    } else {
+      submitRepairCompletion();
+    }
+  };
+
+  const submitRepairCompletion = async () => {
+    try {
+      const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${BACKEND_URL}/api/gamification/complete-repair`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: 'default_user',
+          repair_id: repairData?.repair_id || 'unknown',
+          item_type: repairData?.item_type || 'unknown',
+          total_steps: (repairData?.repair_steps || []).length,
+          time_taken_minutes: 0, // Could track actual time if needed
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        let message = `You earned ${data.xp_earned} XP!`;
+        
+        if (data.new_achievements && data.new_achievements.length > 0) {
+          const achievementNames = data.new_achievements.map((a: any) => `${a.badge} ${a.name}`).join('\n');
+          message += `\n\n🏆 New Achievements:\n${achievementNames}`;
+        }
+        
+        if (data.ranked_up && data.new_rank) {
+          message += `\n\n🎉 RANK UP!\nYou are now a ${data.new_rank.badge} ${data.new_rank.name}!`;
+        }
+        
+        Alert.alert('🎮 Repair Complete!', message, [
+          { text: 'Awesome!', style: 'default' }
+        ]);
+      }
+    } catch (error) {
+      console.error('Failed to submit repair completion:', error);
+    }
   };
 
   const getStepDetails = async (stepNumber: number, stepText: string) => {
