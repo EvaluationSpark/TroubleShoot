@@ -44,6 +44,49 @@ export default function RepairInstructionsModal({
   const [loadingVideos, setLoadingVideos] = useState(false);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [searchingParts, setSearchingParts] = useState(false);
+  const [enhancedParts, setEnhancedParts] = useState<any[]>([]);
+  const [showPartsModal, setShowPartsModal] = useState(false);
+  const [selectedPart, setSelectedPart] = useState<any>(null);
+
+  // Search for real parts with purchase links
+  const searchForParts = async () => {
+    if (!repairData?.parts_needed || repairData.parts_needed.length === 0) {
+      Alert.alert('No Parts', 'No parts are needed for this repair.');
+      return;
+    }
+
+    setSearchingParts(true);
+    try {
+      const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${BACKEND_URL}/api/search-parts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_type: repairData.item_type,
+          parts_needed: repairData.parts_needed,
+          model_number: repairData.model_number || '',
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEnhancedParts(data.parts || []);
+        if (data.parts && data.parts.length > 0) {
+          setShowPartsModal(true);
+        } else {
+          Alert.alert('No Results', 'Could not find purchase links for these parts.');
+        }
+      } else {
+        Alert.alert('Error', 'Failed to search for parts.');
+      }
+    } catch (error) {
+      console.error('Error searching parts:', error);
+      Alert.alert('Error', 'Failed to search for parts.');
+    } finally {
+      setSearchingParts(false);
+    }
+  };
 
   // PR #7: Export to PDF
   const handleExportPDF = async () => {
