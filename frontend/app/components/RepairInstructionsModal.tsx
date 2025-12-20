@@ -48,6 +48,7 @@ export default function RepairInstructionsModal({
   const [enhancedParts, setEnhancedParts] = useState<any[]>([]);
   const [showPartsModal, setShowPartsModal] = useState(false);
   const [selectedPart, setSelectedPart] = useState<any>(null);
+  const [stepVideos, setStepVideos] = useState<any[]>([]);
 
   // Search for real parts with purchase links
   const searchForParts = async () => {
