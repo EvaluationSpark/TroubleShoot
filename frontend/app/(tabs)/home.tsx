@@ -160,12 +160,13 @@ export default function HomeScreen() {
     <ImageBackground
       source={require('../../assets/images/app-background.jpg')}
       style={[styles.container, { backgroundColor: theme.colors.background }]}
+      imageStyle={styles.backgroundImage}
       resizeMode="cover"
     >
       <LinearGradient
         colors={[
-          theme.mode === 'dark' ? 'rgba(10, 10, 10, 0.75)' : 'rgba(255, 255, 255, 0.80)',
-          theme.mode === 'dark' ? 'rgba(26, 26, 46, 0.70)' : 'rgba(240, 244, 248, 0.75)',
+          theme.mode === 'dark' ? 'rgba(10, 10, 10, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+          theme.mode === 'dark' ? 'rgba(26, 26, 46, 0.80)' : 'rgba(240, 244, 248, 0.80)',
         ]}
         style={styles.gradientOverlay}
       >
