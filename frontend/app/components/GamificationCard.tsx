@@ -160,23 +160,23 @@ export default function GamificationCard({ onClose }: GamificationCardProps) {
             <ScrollView style={styles.modalScroll}>
               {/* Rank Display */}
               <View style={styles.rankDisplay}>
-                <Text style={[styles.bigBadge, { color: profile.rank.color }]}>
-                  {profile.rank.badge}
+                <Text style={[styles.bigBadge, { color: currentRank.color }]}>
+                  {currentRank.badge}
                 </Text>
-                <Text style={[styles.bigRankName, { color: profile.rank.color }]}>
-                  {profile.rank.name}
+                <Text style={[styles.bigRankName, { color: currentRank.color }]}>
+                  {currentRank.name}
                 </Text>
-                <Text style={styles.bigXP}>{profile.xp} XP</Text>
+                <Text style={styles.bigXP}>{profile.xp || 0} XP</Text>
                 
-                {profile.next_rank && (
+                {profile.next_rank && profile.next_rank.rank && (
                   <View style={styles.nextRankInfo}>
                     <View style={styles.bigProgressBar}>
                       <View 
                         style={[
                           styles.bigProgressFill, 
                           { 
-                            width: `${((profile.xp - profile.rank.min_xp) / (profile.next_rank.rank.min_xp - profile.rank.min_xp)) * 100}%`,
-                            backgroundColor: profile.rank.color 
+                            width: `${((profile.xp - currentRank.min_xp) / (profile.next_rank.rank.min_xp - currentRank.min_xp)) * 100}%`,
+                            backgroundColor: currentRank.color 
                           }
                         ]} 
                       />
@@ -192,12 +192,12 @@ export default function GamificationCard({ onClose }: GamificationCardProps) {
               <View style={styles.statsGrid}>
                 <View style={styles.statBox}>
                   <Ionicons name="construct" size={24} color="#4ade80" />
-                  <Text style={styles.statBoxValue}>{profile.total_repairs_completed}</Text>
+                  <Text style={styles.statBoxValue}>{profile.total_repairs_completed || 0}</Text>
                   <Text style={styles.statBoxLabel}>Repairs</Text>
                 </View>
                 <View style={styles.statBox}>
                   <Ionicons name="list" size={24} color="#60a5fa" />
-                  <Text style={styles.statBoxValue}>{profile.total_steps_completed}</Text>
+                  <Text style={styles.statBoxValue}>{profile.total_steps_completed || 0}</Text>
                   <Text style={styles.statBoxLabel}>Steps</Text>
                 </View>
                 <View style={styles.statBox}>
