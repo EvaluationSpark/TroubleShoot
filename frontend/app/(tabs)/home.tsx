@@ -477,15 +477,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  logoGradient: {
+  logoImage: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoIcon: {
-    fontSize: 24,
+    borderRadius: 12,
   },
   appName: {
     fontSize: 20,
