@@ -179,6 +179,7 @@ export default function RepairInstructionsModal({
     setLoadingDetails(true);
     setStepDetails('');
     setStepDiagram(null);
+    setStepVideos([]);
 
     try {
       const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -197,6 +198,7 @@ export default function RepairInstructionsModal({
         const data = await response.json();
         setStepDetails(data.detailed_instructions || 'No additional details available.');
         setStepDiagram(data.diagram_image || null);
+        setStepVideos(data.tutorial_videos || []);
       } else {
         setStepDetails('Unable to fetch details. Please try again.');
       }
