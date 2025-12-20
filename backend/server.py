@@ -1261,23 +1261,50 @@ async def get_step_details(request: Dict[str, Any]):
         )
         chat.with_model("gemini", "gemini-2.5-flash")
         
-        prompt = f"""Provide EXTREMELY DETAILED instructions for this repair step:
+        prompt = f"""Break down this repair step into SIMPLIFIED SUB-STEPS for a complete beginner:
 
 Item: {item_type}
 Repair: {repair_type}
 Step {step_number}: {step_text}
 
-Provide a comprehensive guide with:
-1. **Before You Begin**: What to prepare, safety precautions
-2. **Detailed Instructions**: Break down into micro-steps (like you're teaching a complete beginner)
-3. **Visual Cues**: What things should look like at each stage
-4. **Common Mistakes**: What to avoid
-5. **Pro Tips**: Expert advice for better results
-6. **Troubleshooting**: What to do if something goes wrong
-7. **Time Estimate**: How long this step should take
+IMPORTANT: Break this single step into 5-10 smaller, simpler micro-steps that anyone can follow.
 
-Format as clear, easy-to-read text with proper line breaks.
-Do NOT use markdown formatting or HTML tags."""
+Format your response EXACTLY like this:
+
+📋 SUB-STEPS (Simplified Breakdown):
+1. [First micro-action - very specific]
+2. [Second micro-action - very specific]
+3. [Third micro-action - very specific]
+... continue until complete
+
+⚠️ SAFETY FIRST:
+- [Safety precaution 1]
+- [Safety precaution 2]
+
+🔧 WHAT YOU'LL NEED FOR THIS STEP:
+- [Specific tool/material 1]
+- [Specific tool/material 2]
+
+👀 VISUAL CHECKPOINTS:
+- After sub-step 2, you should see: [description]
+- After sub-step 4, it should look like: [description]
+- When complete, verify: [description]
+
+❌ COMMON MISTAKES TO AVOID:
+- [Mistake 1 and why it's bad]
+- [Mistake 2 and why it's bad]
+
+💡 PRO TIPS:
+- [Helpful tip 1]
+- [Helpful tip 2]
+
+⏱️ ESTIMATED TIME: [X-Y minutes]
+
+🆘 IF SOMETHING GOES WRONG:
+- Problem: [issue] → Solution: [fix]
+- Problem: [issue] → Solution: [fix]
+
+Make every instruction crystal clear - assume the person has never done any repair work before."""
         
         msg = UserMessage(text=prompt)
         response = await chat.send_message(msg)
