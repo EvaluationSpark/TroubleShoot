@@ -465,6 +465,26 @@ export default function RepairInstructionsModal({
                   </View>
                 </View>
               ))}
+              
+              {/* Complete Repair Button */}
+              <TouchableOpacity
+                style={[
+                  styles.completeRepairButton,
+                  checkedSteps.size === (repairData.repair_steps || []).length && styles.completeRepairButtonReady
+                ]}
+                onPress={completeRepairProject}
+              >
+                <Ionicons 
+                  name={checkedSteps.size === (repairData.repair_steps || []).length ? "trophy" : "flag"} 
+                  size={24} 
+                  color="#fff" 
+                />
+                <Text style={styles.completeRepairButtonText}>
+                  {checkedSteps.size === (repairData.repair_steps || []).length 
+                    ? '🎮 Complete Repair & Earn XP!' 
+                    : `Mark Repair Complete (${checkedSteps.size}/${(repairData.repair_steps || []).length})`}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
 
