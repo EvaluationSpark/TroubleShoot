@@ -36,6 +36,10 @@
         "NSLocationWhenInUseUsageDescription": "FixIntel AI needs your location to find local repair professionals near you."
       }
     },
+    "androidStatusBar": {
+      "backgroundColor": "#000000",
+      "barStyle": "light-content"
+    },
     "android": {
       "package": "com.fixintel.ai",
       "versionCode": 1,
