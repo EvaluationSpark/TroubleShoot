@@ -1662,6 +1662,344 @@ IMPORTANT:
         logger.error(f"Error searching for parts: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============ GAMIFICATION SYSTEM ============
+
+# Rank definitions
+RANKS = [
+    {"name": "Novice Fixer", "min_xp": 0, "badge": "🔰", "color": "#9CA3AF"},
+    {"name": "Apprentice", "min_xp": 100, "badge": "🔧", "color": "#60A5FA"},
+    {"name": "Handyman", "min_xp": 300, "badge": "🛠️", "color": "#34D399"},
+    {"name": "Skilled Repairer", "min_xp": 600, "badge": "⚙️", "color": "#FBBF24"},
+    {"name": "Expert Technician", "min_xp": 1000, "badge": "🏆", "color": "#F97316"},
+    {"name": "Master Craftsman", "min_xp": 2000, "badge": "👑", "color": "#A855F7"},
+    {"name": "Repair Legend", "min_xp": 5000, "badge": "⭐", "color": "#EF4444"},
+]
+
+# Achievement definitions
+ACHIEVEMENTS = [
+    {"id": "first_repair", "name": "First Fix", "description": "Complete your first repair", "xp": 50, "badge": "🎉"},
+    {"id": "five_repairs", "name": "Getting Handy", "description": "Complete 5 repairs", "xp": 100, "badge": "✋"},
+    {"id": "ten_repairs", "name": "Repair Enthusiast", "description": "Complete 10 repairs", "xp": 200, "badge": "🔥"},
+    {"id": "twenty_five_repairs", "name": "Fix-It Pro", "description": "Complete 25 repairs", "xp": 500, "badge": "💪"},
+    {"id": "fifty_repairs", "name": "Repair Master", "description": "Complete 50 repairs", "xp": 1000, "badge": "🏅"},
+    {"id": "first_electronics", "name": "Tech Savvy", "description": "Repair an electronic device", "xp": 75, "badge": "📱"},
+    {"id": "first_appliance", "name": "Appliance Whisperer", "description": "Repair a home appliance", "xp": 75, "badge": "🏠"},
+    {"id": "first_auto", "name": "Grease Monkey", "description": "Complete an automotive repair", "xp": 75, "badge": "🚗"},
+    {"id": "streak_3", "name": "On a Roll", "description": "Complete repairs 3 days in a row", "xp": 100, "badge": "📅"},
+    {"id": "streak_7", "name": "Week Warrior", "description": "Complete repairs 7 days in a row", "xp": 250, "badge": "🗓️"},
+    {"id": "speed_demon", "name": "Speed Demon", "description": "Complete a repair in under 30 minutes", "xp": 75, "badge": "⚡"},
+    {"id": "perfectionist", "name": "Perfectionist", "description": "Complete all steps in a repair", "xp": 50, "badge": "✨"},
+]
+
+def get_rank_for_xp(xp: int) -> dict:
+    """Get the rank for a given XP amount"""
+    current_rank = RANKS[0]
+    for rank in RANKS:
+        if xp >= rank["min_xp"]:
+            current_rank = rank
+    return current_rank
+
+def get_next_rank(xp: int) -> dict:
+    """Get the next rank and XP needed"""
+    for i, rank in enumerate(RANKS):
+        if xp < rank["min_xp"]:
+            return {"rank": rank, "xp_needed": rank["min_xp"] - xp}
+    return None  # Max rank reached
+
+@api_router.get("/gamification/profile")
+async def get_gamification_profile(user_id: str = "default_user"):
+    """Get user's gamification profile"""
+    try:
+        profile = await db.gamification_profiles.find_one({"user_id": user_id})
+        
+        if not profile:
+            # Create default profile
+            profile = {
+                "user_id": user_id,
+                "xp": 0,
+                "total_repairs_completed": 0,
+                "total_steps_completed": 0,
+                "achievements": [],
+                "current_streak": 0,
+                "longest_streak": 0,
+                "last_repair_date": None,
+                "repairs_by_category": {},
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+            await db.gamification_profiles.insert_one(profile)
+        
+        # Calculate rank info
+        current_rank = get_rank_for_xp(profile.get("xp", 0))
+        next_rank_info = get_next_rank(profile.get("xp", 0))
+        
+        return {
+            "user_id": user_id,
+            "xp": profile.get("xp", 0),
+            "rank": current_rank,
+            "next_rank": next_rank_info,
+            "total_repairs_completed": profile.get("total_repairs_completed", 0),
+            "total_steps_completed": profile.get("total_steps_completed", 0),
+            "achievements": profile.get("achievements", []),
+            "current_streak": profile.get("current_streak", 0),
+            "longest_streak": profile.get("longest_streak", 0),
+            "repairs_by_category": profile.get("repairs_by_category", {}),
+            "all_ranks": RANKS,
+            "all_achievements": ACHIEVEMENTS
+        }
+    except Exception as e:
+        logger.error(f"Error getting gamification profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/gamification/complete-step")
+async def complete_step(request: Dict[str, Any]):
+    """Award XP for completing a repair step"""
+    try:
+        user_id = request.get("user_id", "default_user")
+        repair_id = request.get("repair_id")
+        step_number = request.get("step_number")
+        
+        # Base XP for completing a step
+        xp_earned = 10
+        
+        # Get or create profile
+        profile = await db.gamification_profiles.find_one({"user_id": user_id})
+        if not profile:
+            profile = {
+                "user_id": user_id,
+                "xp": 0,
+                "total_repairs_completed": 0,
+                "total_steps_completed": 0,
+                "achievements": [],
+                "current_streak": 0,
+                "longest_streak": 0,
+                "repairs_by_category": {},
+                "completed_steps": []
+            }
+        
+        # Check if step already completed
+        completed_steps = profile.get("completed_steps", [])
+        step_key = f"{repair_id}_{step_number}"
+        if step_key in completed_steps:
+            return {"message": "Step already completed", "xp_earned": 0}
+        
+        # Update profile
+        completed_steps.append(step_key)
+        new_xp = profile.get("xp", 0) + xp_earned
+        new_steps = profile.get("total_steps_completed", 0) + 1
+        
+        await db.gamification_profiles.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "xp": new_xp,
+                    "total_steps_completed": new_steps,
+                    "completed_steps": completed_steps,
+                    "updated_at": datetime.utcnow().isoformat()
+                }
+            },
+            upsert=True
+        )
+        
+        # Check for rank up
+        old_rank = get_rank_for_xp(profile.get("xp", 0))
+        new_rank = get_rank_for_xp(new_xp)
+        ranked_up = old_rank["name"] != new_rank["name"]
+        
+        return {
+            "xp_earned": xp_earned,
+            "total_xp": new_xp,
+            "total_steps_completed": new_steps,
+            "ranked_up": ranked_up,
+            "new_rank": new_rank if ranked_up else None
+        }
+    except Exception as e:
+        logger.error(f"Error completing step: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/gamification/complete-repair")
+async def complete_repair(request: Dict[str, Any]):
+    """Award XP and check achievements for completing a repair"""
+    try:
+        user_id = request.get("user_id", "default_user")
+        repair_id = request.get("repair_id")
+        item_type = request.get("item_type", "").lower()
+        total_steps = request.get("total_steps", 0)
+        time_taken_minutes = request.get("time_taken_minutes", 0)
+        
+        # Base XP for completing a repair
+        xp_earned = 50
+        
+        # Bonus XP based on complexity (steps)
+        if total_steps >= 10:
+            xp_earned += 50  # Complex repair bonus
+        elif total_steps >= 5:
+            xp_earned += 25  # Medium repair bonus
+        
+        # Speed bonus
+        if time_taken_minutes > 0 and time_taken_minutes < 30:
+            xp_earned += 25  # Speed bonus
+        
+        # Get profile
+        profile = await db.gamification_profiles.find_one({"user_id": user_id})
+        if not profile:
+            profile = {
+                "user_id": user_id,
+                "xp": 0,
+                "total_repairs_completed": 0,
+                "total_steps_completed": 0,
+                "achievements": [],
+                "current_streak": 0,
+                "longest_streak": 0,
+                "repairs_by_category": {},
+                "last_repair_date": None
+            }
+        
+        # Update repair count
+        new_repair_count = profile.get("total_repairs_completed", 0) + 1
+        
+        # Update category counts
+        repairs_by_category = profile.get("repairs_by_category", {})
+        category = "other"
+        if any(word in item_type for word in ["phone", "tablet", "computer", "laptop", "tv", "electronic"]):
+            category = "electronics"
+        elif any(word in item_type for word in ["car", "truck", "auto", "vehicle", "motorcycle"]):
+            category = "automotive"
+        elif any(word in item_type for word in ["washer", "dryer", "refrigerator", "dishwasher", "oven", "appliance"]):
+            category = "appliance"
+        elif any(word in item_type for word in ["furniture", "chair", "table", "desk"]):
+            category = "furniture"
+        
+        repairs_by_category[category] = repairs_by_category.get(category, 0) + 1
+        
+        # Check streak
+        current_streak = profile.get("current_streak", 0)
+        longest_streak = profile.get("longest_streak", 0)
+        last_repair_date = profile.get("last_repair_date")
+        today = datetime.utcnow().date().isoformat()
+        
+        if last_repair_date:
+            last_date = datetime.fromisoformat(last_repair_date).date()
+            days_diff = (datetime.utcnow().date() - last_date).days
+            if days_diff == 1:
+                current_streak += 1
+            elif days_diff > 1:
+                current_streak = 1
+            # Same day doesn't increase streak
+        else:
+            current_streak = 1
+        
+        longest_streak = max(longest_streak, current_streak)
+        
+        # Check achievements
+        new_achievements = []
+        existing_achievements = [a["id"] for a in profile.get("achievements", [])]
+        
+        # First repair
+        if new_repair_count == 1 and "first_repair" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "first_repair"))
+            xp_earned += 50
+        
+        # Repair count achievements
+        if new_repair_count >= 5 and "five_repairs" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "five_repairs"))
+            xp_earned += 100
+        if new_repair_count >= 10 and "ten_repairs" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "ten_repairs"))
+            xp_earned += 200
+        if new_repair_count >= 25 and "twenty_five_repairs" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "twenty_five_repairs"))
+            xp_earned += 500
+        if new_repair_count >= 50 and "fifty_repairs" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "fifty_repairs"))
+            xp_earned += 1000
+        
+        # Category achievements
+        if category == "electronics" and repairs_by_category.get("electronics", 0) == 1 and "first_electronics" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "first_electronics"))
+            xp_earned += 75
+        if category == "appliance" and repairs_by_category.get("appliance", 0) == 1 and "first_appliance" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "first_appliance"))
+            xp_earned += 75
+        if category == "automotive" and repairs_by_category.get("automotive", 0) == 1 and "first_auto" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "first_auto"))
+            xp_earned += 75
+        
+        # Streak achievements
+        if current_streak >= 3 and "streak_3" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "streak_3"))
+            xp_earned += 100
+        if current_streak >= 7 and "streak_7" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "streak_7"))
+            xp_earned += 250
+        
+        # Speed achievement
+        if time_taken_minutes > 0 and time_taken_minutes < 30 and "speed_demon" not in existing_achievements:
+            new_achievements.append(next(a for a in ACHIEVEMENTS if a["id"] == "speed_demon"))
+            xp_earned += 75
+        
+        # Calculate new XP
+        new_xp = profile.get("xp", 0) + xp_earned
+        
+        # Update profile
+        all_achievements = profile.get("achievements", []) + new_achievements
+        
+        await db.gamification_profiles.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "xp": new_xp,
+                    "total_repairs_completed": new_repair_count,
+                    "achievements": all_achievements,
+                    "current_streak": current_streak,
+                    "longest_streak": longest_streak,
+                    "last_repair_date": today,
+                    "repairs_by_category": repairs_by_category,
+                    "updated_at": datetime.utcnow().isoformat()
+                }
+            },
+            upsert=True
+        )
+        
+        # Check for rank up
+        old_rank = get_rank_for_xp(profile.get("xp", 0))
+        new_rank = get_rank_for_xp(new_xp)
+        ranked_up = old_rank["name"] != new_rank["name"]
+        
+        return {
+            "xp_earned": xp_earned,
+            "total_xp": new_xp,
+            "total_repairs_completed": new_repair_count,
+            "current_streak": current_streak,
+            "new_achievements": new_achievements,
+            "ranked_up": ranked_up,
+            "new_rank": new_rank if ranked_up else None,
+            "current_rank": get_rank_for_xp(new_xp)
+        }
+    except Exception as e:
+        logger.error(f"Error completing repair: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/gamification/leaderboard")
+async def get_leaderboard(limit: int = 10):
+    """Get top users by XP"""
+    try:
+        cursor = db.gamification_profiles.find().sort("xp", -1).limit(limit)
+        leaders = []
+        async for profile in cursor:
+            rank = get_rank_for_xp(profile.get("xp", 0))
+            leaders.append({
+                "user_id": profile.get("user_id"),
+                "xp": profile.get("xp", 0),
+                "rank": rank,
+                "total_repairs": profile.get("total_repairs_completed", 0),
+                "achievements_count": len(profile.get("achievements", []))
+            })
+        return {"leaderboard": leaders}
+    except Exception as e:
+        logger.error(f"Error getting leaderboard: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/")
 async def root():
     return {"message": "FixIt Pro API", "version": "1.0.0"}
