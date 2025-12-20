@@ -53,13 +53,36 @@ export default function LocalVendorsModal({
   const [coordinates, setCoordinates] = useState<{latitude: number, longitude: number} | null>(null);
 
   const getCurrentLocation = async () => {
+    console.log('[LocalVendors] getCurrentLocation called, Platform:', Platform.OS);
+    
+    // For web, use browser's geolocation API
     if (Platform.OS === 'web') {
-      Alert.alert('Not Available', 'GPS location is not available on web. Please enter your location manually.');
+      if (!navigator.geolocation) {
+        Alert.alert('Not Supported', 'Geolocation is not supported by your browser. Please enter your location manually.');
+        return;
+      }
+      
+      setGettingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('[LocalVendors] Web geolocation success:', latitude, longitude);
+          setCoordinates({ latitude, longitude });
+          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          setGettingLocation(false);
+          searchVendorsWithCoords(latitude, longitude);
+        },
+        (error) => {
+          console.error('[LocalVendors] Web geolocation error:', error);
+          Alert.alert('Location Error', `Failed to get location: ${error.message}. Please enter your location manually.`);
+          setGettingLocation(false);
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+      );
       return;
     }
 
-    console.log('[LocalVendors] Getting location...');
-
+    // For native platforms
     setGettingLocation(true);
     try {
       // Request location permission
@@ -73,7 +96,7 @@ export default function LocalVendorsModal({
         return;
       }
 
-      // Get current position
+      // Get current position with timeout
       console.log('[LocalVendors] Getting current position...');
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
@@ -85,18 +108,23 @@ export default function LocalVendorsModal({
 
       // Reverse geocode to get city name
       console.log('[LocalVendors] Reverse geocoding...');
-      const addresses = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude,
-      });
-      console.log('[LocalVendors] Addresses found:', addresses.length);
+      try {
+        const addresses = await Location.reverseGeocodeAsync({
+          latitude,
+          longitude,
+        });
+        console.log('[LocalVendors] Addresses found:', addresses.length);
 
-      if (addresses.length > 0) {
-        const address = addresses[0];
-        const locationText = `${address.city || address.subregion || address.region}, ${address.country || 'Unknown'}`;
-        console.log('[LocalVendors] Location text:', locationText);
-        setLocation(locationText);
-      } else {
+        if (addresses.length > 0) {
+          const address = addresses[0];
+          const locationText = `${address.city || address.subregion || address.region || 'Unknown'}, ${address.country || ''}`.trim();
+          console.log('[LocalVendors] Location text:', locationText);
+          setLocation(locationText);
+        } else {
+          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+        }
+      } catch (geocodeError) {
+        console.warn('[LocalVendors] Geocoding failed, using coordinates:', geocodeError);
         setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
       }
 
