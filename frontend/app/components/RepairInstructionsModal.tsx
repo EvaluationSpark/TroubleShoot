@@ -452,20 +452,35 @@ export default function RepairInstructionsModal({
                       setShowVideoPlayer(true);
                     }}
                   >
-                    <View style={styles.videoThumbnail}>
-                      <Ionicons name="play-circle" size={48} color="#00D9FF" />
-                    </View>
-                    <View style={styles.videoInfo}>
-                      <Text style={styles.videoTitle}>{video.title}</Text>
-                      <Text style={styles.videoDescription}>{video.description}</Text>
-                      <View style={styles.videoMeta}>
-                        <Ionicons name="time-outline" size={14} color="#aaa" />
-                        <Text style={styles.videoDuration}>{video.duration}</Text>
-                        <Ionicons name="person-outline" size={14} color="#aaa" style={{ marginLeft: 12 }} />
-                        <Text style={styles.videoChannel}>{video.channel}</Text>
+                    <View style={styles.videoThumbnailContainer}>
+                      {video.thumbnail ? (
+                        <Image 
+                          source={{ uri: video.thumbnail }} 
+                          style={styles.videoThumbnailImage}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={styles.videoThumbnailPlaceholder}>
+                          <Ionicons name="logo-youtube" size={32} color="#ff0000" />
+                        </View>
+                      )}
+                      <View style={styles.playOverlay}>
+                        <Ionicons name="play-circle" size={40} color="#fff" />
                       </View>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#666" />
+                    <View style={styles.videoInfo}>
+                      <Text style={styles.videoTitle} numberOfLines={2}>{video.title}</Text>
+                      <Text style={styles.videoDescription} numberOfLines={2}>{video.description}</Text>
+                      <View style={styles.videoMeta}>
+                        <Ionicons name="logo-youtube" size={14} color="#ff0000" />
+                        <Text style={styles.videoChannel}>{video.channel}</Text>
+                        {video.duration && (
+                          <>
+                            <Text style={styles.videoDuration}> • {video.duration}</Text>
+                          </>
+                        )}
+                      </View>
+                    </View>
                   </TouchableOpacity>
                 ))
               )}
