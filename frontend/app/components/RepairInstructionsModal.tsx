@@ -539,6 +539,57 @@ export default function RepairInstructionsModal({
             }}
           />
         )}
+
+        {/* Parts Purchase Modal */}
+        <Modal visible={showPartsModal} animationType="slide" onRequestClose={() => setShowPartsModal(false)}>
+          <SafeAreaView style={styles.partsModalContainer}>
+            <View style={styles.partsModalHeader}>
+              <Text style={styles.partsModalTitle}>Where to Buy Parts</Text>
+              <TouchableOpacity onPress={() => setShowPartsModal(false)}>
+                <Ionicons name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.partsModalContent}>
+              {enhancedParts.map((part, index) => (
+                <View key={index} style={styles.enhancedPartCard}>
+                  <Text style={styles.enhancedPartName}>{part.part_name}</Text>
+                  <Text style={styles.enhancedPartPrice}>{part.estimated_price_range}</Text>
+                  
+                  {part.tips && (
+                    <View style={styles.partTipContainer}>
+                      <Ionicons name="bulb" size={16} color="#fbbf24" />
+                      <Text style={styles.partTipText}>{part.tips}</Text>
+                    </View>
+                  )}
+
+                  {part.alternative_names && part.alternative_names.length > 0 && (
+                    <Text style={styles.alternativeNames}>
+                      Also known as: {part.alternative_names.join(', ')}
+                    </Text>
+                  )}
+
+                  <Text style={styles.whereToBuyTitle}>Where to Buy:</Text>
+                  {(part.where_to_buy || []).map((store: any, storeIndex: number) => (
+                    <TouchableOpacity
+                      key={storeIndex}
+                      style={styles.storeButton}
+                      onPress={() => Linking.openURL(store.search_url)}
+                    >
+                      <View style={styles.storeInfo}>
+                        <Ionicons name="storefront" size={20} color="#00D9FF" />
+                        <Text style={styles.storeName}>{store.store}</Text>
+                      </View>
+                      <View style={styles.storeAction}>
+                        <Text style={styles.storeNotes}>{store.notes}</Text>
+                        <Ionicons name="open-outline" size={20} color="#4ade80" />
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ))}
+            </ScrollView>
+          </SafeAreaView>
+        </Modal>
       </SafeAreaView>
     </Modal>
   );
