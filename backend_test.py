@@ -16,7 +16,7 @@ from PIL import Image
 from io import BytesIO
 
 # Configuration
-BASE_URL = "https://smartfix-3.preview.emergentagent.com/api"
+BASE_URL = "https://fixitguru-2.preview.emergentagent.com/api"
 TIMEOUT = 60  # Increased for AI analysis
 
 def create_test_image():

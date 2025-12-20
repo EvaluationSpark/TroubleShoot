@@ -68,7 +68,7 @@ eas build --profile production --platform android
 
 The following environment variables are automatically included in builds:
 
-- `EXPO_PUBLIC_BACKEND_URL`: https://smartfix-3.preview.emergentagent.com
+- `EXPO_PUBLIC_BACKEND_URL`: https://fixitguru-2.preview.emergentagent.com
 - `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY`: (from .env)
 - `EXPO_PUBLIC_GOOGLE_PLACES_API_KEY`: (from .env)
 
