@@ -518,7 +518,10 @@ export default function RepairInstructionsModal({
               </View>
               <Text style={styles.detailStepText}>{selectedStep?.text}</Text>
               {loadingDetails ? (
-                <ActivityIndicator size="large" color="#00D9FF" style={{ marginTop: 20 }} />
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color="#00D9FF" />
+                  <Text style={styles.loadingText}>Generating detailed breakdown and finding tutorial videos...</Text>
+                </View>
               ) : (
                 <ScrollView style={styles.detailScroll}>
                   {stepDiagram && (
@@ -531,6 +534,52 @@ export default function RepairInstructionsModal({
                     </View>
                   )}
                   <Text style={styles.detailDescription}>{stepDetails}</Text>
+                  
+                  {/* Tutorial Videos for this Step */}
+                  {stepVideos.length > 0 && (
+                    <View style={styles.stepVideosSection}>
+                      <View style={styles.stepVideoHeader}>
+                        <Ionicons name="logo-youtube" size={24} color="#ff0000" />
+                        <Text style={styles.stepVideosTitle}>Video Tutorials for This Step</Text>
+                      </View>
+                      {stepVideos.map((video: any, index: number) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.stepVideoCard}
+                          onPress={() => {
+                            setSelectedVideo(video);
+                            setShowVideoPlayer(true);
+                          }}
+                        >
+                          <View style={styles.stepVideoThumbnail}>
+                            {video.thumbnail ? (
+                              <Image 
+                                source={{ uri: video.thumbnail }} 
+                                style={styles.stepVideoThumbnailImage}
+                                resizeMode="cover"
+                              />
+                            ) : (
+                              <View style={styles.stepVideoPlaceholder}>
+                                <Ionicons name="play-circle" size={32} color="#ff0000" />
+                              </View>
+                            )}
+                            <View style={styles.stepVideoPlayOverlay}>
+                              <Ionicons name="play" size={24} color="#fff" />
+                            </View>
+                          </View>
+                          <View style={styles.stepVideoInfo}>
+                            <Text style={styles.stepVideoTitle} numberOfLines={2}>{video.title}</Text>
+                            <Text style={styles.stepVideoChannel}>{video.channel}</Text>
+                            {video.relevance && (
+                              <Text style={styles.stepVideoRelevance} numberOfLines={2}>
+                                <Ionicons name="checkmark-circle" size={12} color="#4ade80" /> {video.relevance}
+                              </Text>
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
                 </ScrollView>
               )}
             </View>
