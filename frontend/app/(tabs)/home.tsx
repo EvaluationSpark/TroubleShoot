@@ -354,6 +354,9 @@ export default function HomeScreen() {
               </BlurView>
             )}
 
+            {/* Gamification Progress Card */}
+            <GamificationCard />
+
             {/* Features Grid */}
             <View style={styles.featuresGrid}>
               {[
