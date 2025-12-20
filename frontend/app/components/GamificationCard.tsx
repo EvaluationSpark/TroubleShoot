@@ -101,31 +101,34 @@ export default function GamificationCard({ onClose }: GamificationCardProps) {
     outputRange: ['0%', '100%'],
   });
 
+  // Default rank if not available
+  const currentRank = profile.rank || { name: 'Novice Fixer', badge: '🔰', color: '#9CA3AF', min_xp: 0 };
+
   return (
     <>
       <TouchableOpacity onPress={() => setShowFullProfile(true)}>
         <BlurView intensity={40} tint="dark" style={styles.card}>
           <View style={styles.rankSection}>
-            <Text style={[styles.rankBadge, { color: profile.rank.color }]}>
-              {profile.rank.badge}
+            <Text style={[styles.rankBadge, { color: currentRank.color }]}>
+              {currentRank.badge}
             </Text>
             <View style={styles.rankInfo}>
-              <Text style={styles.rankName}>{profile.rank.name}</Text>
-              <Text style={styles.xpText}>{profile.xp} XP</Text>
+              <Text style={styles.rankName}>{currentRank.name}</Text>
+              <Text style={styles.xpText}>{profile.xp || 0} XP</Text>
             </View>
             <View style={styles.statsQuick}>
               <View style={styles.statItem}>
                 <Ionicons name="checkmark-circle" size={16} color="#4ade80" />
-                <Text style={styles.statValue}>{profile.total_repairs_completed}</Text>
+                <Text style={styles.statValue}>{profile.total_repairs_completed || 0}</Text>
               </View>
               <View style={styles.statItem}>
                 <Ionicons name="flame" size={16} color="#f97316" />
-                <Text style={styles.statValue}>{profile.current_streak}</Text>
+                <Text style={styles.statValue}>{profile.current_streak || 0}</Text>
               </View>
             </View>
           </View>
           
-          {profile.next_rank && (
+          {profile.next_rank && profile.next_rank.rank && (
             <View style={styles.progressSection}>
               <View style={styles.progressBar}>
                 <Animated.View 
