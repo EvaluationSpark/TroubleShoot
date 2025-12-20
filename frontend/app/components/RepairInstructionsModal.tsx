@@ -956,10 +956,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
-    padding: 16,
+    padding: 12,
     marginBottom: 12,
-    alignItems: 'center',
     gap: 12,
+  },
+  videoThumbnailContainer: {
+    width: 120,
+    height: 68,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    position: 'relative',
+  },
+  videoThumbnailImage: {
+    width: '100%',
+    height: '100%',
+  },
+  videoThumbnailPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+  },
+  playOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   videoThumbnail: {
     width: 80,
@@ -973,20 +1001,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   videoTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: '#fff',
     marginBottom: 4,
+    lineHeight: 18,
   },
   videoDescription: {
-    fontSize: 13,
-    color: '#aaa',
+    fontSize: 12,
+    color: '#888',
     marginBottom: 6,
+    lineHeight: 16,
   },
   videoMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   videoDuration: {
     fontSize: 12,
@@ -995,6 +1025,7 @@ const styles = StyleSheet.create({
   videoChannel: {
     fontSize: 12,
     color: '#aaa',
+    flex: 1,
   },
   // Parts Modal Styles
   findPartsButton: {
