@@ -8,12 +8,7 @@
     "scheme": "fixintel",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "owner": "fixintel",
-    "extra": {
-      "eas": {
-        "projectId": "fixintel-ai-repair-guide"
-      }
-    },
+    "owner": "rentmouse",
     "description": "AI-powered repair guide app that helps you fix broken items with step-by-step instructions, tutorial videos, and local repair shop recommendations.",
     "notification": {
       "icon": "./assets/images/icon.png",
