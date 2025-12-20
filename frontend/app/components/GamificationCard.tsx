@@ -242,9 +242,9 @@ export default function GamificationCard({ onClose }: GamificationCardProps) {
               {/* All Ranks */}
               <Text style={styles.sectionTitle}>Ranks</Text>
               <View style={styles.ranksContainer}>
-                {profile.all_ranks.map((rank, index) => {
-                  const isCurrentRank = rank.name === profile.rank.name;
-                  const isUnlocked = profile.xp >= rank.min_xp;
+                {(profile.all_ranks || []).map((rank, index) => {
+                  const isCurrentRank = rank.name === currentRank.name;
+                  const isUnlocked = (profile.xp || 0) >= rank.min_xp;
                   return (
                     <View 
                       key={rank.name} 
