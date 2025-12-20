@@ -179,14 +179,10 @@ export default function HomeScreen() {
           >
             <View style={styles.headerContent}>
               <View style={styles.logoSection}>
-                <LinearGradient
-                  colors={theme.gradients.primary}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.logoGradient}
-                >
-                  <Text style={styles.logoIcon}>🔧</Text>
-                </LinearGradient>
+                <Image 
+                  source={require('../../assets/images/icon.png')} 
+                  style={styles.logoImage}
+                />
                 <View>
                   <Text style={[styles.appName, { color: theme.colors.text }]}>FixIntel AI</Text>
                   <Text style={[styles.appTagline, { color: theme.colors.primary }]}>Intelligent Repair</Text>
