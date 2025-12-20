@@ -1207,6 +1207,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  completeRepairButton: {
+    backgroundColor: '#4b5563',
+    padding: 18,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginTop: 24,
+    marginBottom: 20,
+  },
+  completeRepairButtonReady: {
+    backgroundColor: '#4ade80',
+  },
+  completeRepairButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   partPrice: {
     fontSize: 12,
     color: '#4ade80',
