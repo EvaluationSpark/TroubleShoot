@@ -1135,49 +1135,6 @@ async def submit_feedback(feedback: FeedbackRequest):
         logger.error(f"Error submitting feedback: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.post("/get-step-details")
-async def get_step_details(request: dict):
-    """Get detailed explanation for a specific repair step"""
-    try:
-        item_type = request.get('item_type')
-        step_text = request.get('step_text')
-        step_number = request.get('step_number')
-        
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"step_detail_{uuid.uuid4()}",
-            system_message="You are a helpful repair technician providing detailed step-by-step guidance."
-        )
-        chat.with_model("gemini", "gemini-2.5-flash")
-        
-        prompt = f"""Provide a very detailed explanation for this repair step on a {item_type}:
-
-Step {step_number}: {step_text}
-
-Please provide:
-1. **What to do**: Detailed instructions with specific actions
-2. **Why it's important**: Explanation of why this step matters
-3. **Common mistakes**: What to avoid
-4. **Tips & tricks**: Pro tips to make it easier
-5. **Tools/materials for this step**: What you specifically need
-6. **Estimated time**: How long this step should take
-7. **Warning signs**: What indicates you're doing it wrong
-
-Format as a clear, easy-to-follow guide."""
-        
-        msg = UserMessage(text=prompt)
-        response = await chat.send_message(msg)
-        
-        return {
-            "step_number": step_number,
-            "step_text": step_text,
-            "detailed_explanation": response
-        }
-        
-    except Exception as e:
-        logger.error(f"Error getting step details: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @api_router.post("/find-local-vendors")
 async def find_local_vendors(search: LocalVendorSearch):
     """Find local vendors using real Google Places API"""
