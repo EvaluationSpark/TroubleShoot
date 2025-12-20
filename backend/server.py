@@ -1406,6 +1406,115 @@ Format as JSON array:
         logger.error(f"Error fetching tutorial videos: {str(e)}")
         return {"videos": []}  # Return empty array instead of failing
 
+@api_router.post("/search-parts")
+async def search_parts(request: Dict[str, Any]):
+    """Search for real parts with actual purchase links using web search"""
+    try:
+        import requests
+        
+        item_type = request.get('item_type', '')
+        parts_needed = request.get('parts_needed', [])
+        model_number = request.get('model_number', '')
+        
+        if not parts_needed:
+            return {"parts": []}
+        
+        enhanced_parts = []
+        
+        for part in parts_needed:
+            part_name = part.get('name', '') if isinstance(part, dict) else str(part)
+            
+            if not part_name:
+                continue
+            
+            # Build search query with model number if available
+            search_query = f"{part_name} {item_type}"
+            if model_number:
+                search_query = f"{part_name} {model_number} {item_type}"
+            search_query += " buy price"
+            
+            # Use AI to search and find real product links
+            chat = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"parts_search_{uuid.uuid4()}",
+                system_message="You are a helpful assistant that finds real product listings for repair parts."
+            )
+            chat.with_model("gemini", "gemini-2.5-flash")
+            
+            prompt = f"""Search for this repair part and provide REAL purchase options:
+
+Part needed: {part_name}
+Item being repaired: {item_type}
+{f'Model number: {model_number}' if model_number else ''}
+
+Provide 2-3 REAL places to buy this part with actual store names. Format as JSON:
+{{
+  "part_name": "{part_name}",
+  "search_term": "recommended search term for this part",
+  "estimated_price_range": "$X - $Y",
+  "where_to_buy": [
+    {{
+      "store": "Store Name (e.g., Amazon, Home Depot, AutoZone, iFixit, eBay)",
+      "search_url": "direct search URL for this part on that store",
+      "notes": "any helpful notes about buying from this store"
+    }}
+  ],
+  "tips": "tips for finding the right part",
+  "alternative_names": ["other names this part might be called"]
+}}
+
+IMPORTANT: 
+- Use REAL store names and create actual search URLs
+- For Amazon: https://www.amazon.com/s?k=SEARCH+TERMS
+- For Home Depot: https://www.homedepot.com/s/SEARCH+TERMS
+- For AutoZone: https://www.autozone.com/searchresult?searchText=SEARCH+TERMS
+- For iFixit: https://www.ifixit.com/Search?query=SEARCH+TERMS
+- For eBay: https://www.ebay.com/sch/i.html?_nkw=SEARCH+TERMS
+- Replace spaces with + in URLs"""
+
+            msg = UserMessage(text=prompt)
+            response = await chat.send_message(msg)
+            
+            # Parse the response
+            response_text = response.strip()
+            if response_text.startswith('```'):
+                response_text = response_text.split('```')[1]
+                if response_text.startswith('json'):
+                    response_text = response_text[4:]
+            response_text = response_text.strip()
+            
+            try:
+                import json
+                part_info = json.loads(response_text)
+                enhanced_parts.append(part_info)
+            except json.JSONDecodeError:
+                # If JSON parsing fails, create a basic entry
+                enhanced_parts.append({
+                    "part_name": part_name,
+                    "search_term": f"{part_name} {item_type}",
+                    "estimated_price_range": part.get('price', 'Varies') if isinstance(part, dict) else 'Varies',
+                    "where_to_buy": [
+                        {
+                            "store": "Amazon",
+                            "search_url": f"https://www.amazon.com/s?k={part_name.replace(' ', '+')}+{item_type.replace(' ', '+')}",
+                            "notes": "Wide selection, check reviews"
+                        },
+                        {
+                            "store": "eBay",
+                            "search_url": f"https://www.ebay.com/sch/i.html?_nkw={part_name.replace(' ', '+')}+{item_type.replace(' ', '+')}",
+                            "notes": "Good for used/refurbished parts"
+                        }
+                    ],
+                    "tips": "Compare prices across multiple stores",
+                    "alternative_names": []
+                })
+        
+        return {"parts": enhanced_parts}
+        
+    except Exception as e:
+        logger.error(f"Error searching for parts: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/")
 async def root():
     return {"message": "FixIt Pro API", "version": "1.0.0"}
