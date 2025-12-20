@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   video: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').width * (9 / 16), // 16:9 aspect ratio
+    width: '100%',
+    aspectRatio: 16 / 9,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
