@@ -207,7 +207,7 @@ export default function GamificationCard({ onClose }: GamificationCardProps) {
                 </View>
                 <View style={styles.statBox}>
                   <Ionicons name="trophy" size={24} color="#fbbf24" />
-                  <Text style={styles.statBoxValue}>{profile.achievements.length}</Text>
+                  <Text style={styles.statBoxValue}>{(profile.achievements || []).length}</Text>
                   <Text style={styles.statBoxLabel}>Badges</Text>
                 </View>
               </View>
@@ -215,8 +215,8 @@ export default function GamificationCard({ onClose }: GamificationCardProps) {
               {/* Achievements */}
               <Text style={styles.sectionTitle}>Achievements</Text>
               <View style={styles.achievementsGrid}>
-                {profile.all_achievements.map((achievement) => {
-                  const earned = profile.achievements.some(a => a.id === achievement.id);
+                {(profile.all_achievements || []).map((achievement) => {
+                  const earned = (profile.achievements || []).some(a => a.id === achievement.id);
                   return (
                     <View 
                       key={achievement.id} 
