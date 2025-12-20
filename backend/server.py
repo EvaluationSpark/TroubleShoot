@@ -1246,7 +1246,7 @@ async def find_local_vendors(search: LocalVendorSearch):
 
 @api_router.post("/get-step-details")
 async def get_step_details(request: Dict[str, Any]):
-    """Get comprehensive step-by-step details with visual diagram"""
+    """Get comprehensive step-by-step details with visual diagram and tutorial videos"""
     try:
         step_number = request.get('step_number', 1)
         step_text = request.get('step_text', '')
@@ -1310,6 +1310,69 @@ Make every instruction crystal clear - assume the person has never done any repa
         response = await chat.send_message(msg)
         detailed_instructions = response.strip()
         
+        # Search for relevant tutorial videos for this specific step
+        step_videos = []
+        try:
+            video_chat = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=f"step_videos_{uuid.uuid4()}",
+                system_message="You are an expert at finding specific YouTube repair tutorials."
+            )
+            video_chat.with_model("gemini", "gemini-2.5-flash")
+            
+            video_prompt = f"""Find 2-3 REAL YouTube videos that specifically show how to: {step_text}
+For item: {item_type}
+
+Look for videos from popular repair channels like:
+- ChrisFix, Scotty Kilmer (car repairs)
+- iFixit, JerryRigEverything (electronics)
+- This Old House, Home RenoVision DIY (home repairs)
+- Project Farm (tools)
+
+Return ONLY videos that actually exist with real video IDs.
+
+Format as JSON array:
+[
+  {{
+    "title": "Exact video title",
+    "video_id": "11-character YouTube video ID",
+    "channel": "Channel name",
+    "relevance": "Why this video helps with this specific step"
+  }}
+]
+
+IMPORTANT: Only include videos you are confident exist on YouTube."""
+
+            video_msg = UserMessage(text=video_prompt)
+            video_response = await video_chat.send_message(video_msg)
+            
+            # Parse video response
+            video_text = video_response.strip()
+            if video_text.startswith('```'):
+                video_text = video_text.split('```')[1]
+                if video_text.startswith('json'):
+                    video_text = video_text[4:]
+            video_text = video_text.strip()
+            
+            import json
+            ai_videos = json.loads(video_text)
+            
+            for v in ai_videos:
+                video_id = v.get('video_id', '')
+                if video_id and len(video_id) == 11:
+                    step_videos.append({
+                        'title': v.get('title', 'Tutorial Video'),
+                        'video_id': video_id,
+                        'url': f"https://www.youtube.com/watch?v={video_id}",
+                        'embed_url': f"https://www.youtube.com/embed/{video_id}",
+                        'thumbnail': f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
+                        'channel': v.get('channel', 'YouTube'),
+                        'relevance': v.get('relevance', '')
+                    })
+                    
+        except Exception as video_error:
+            logger.warning(f"Failed to fetch step videos: {str(video_error)}")
+        
         # Generate a helpful diagram/illustration
         try:
             from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
@@ -1335,7 +1398,8 @@ Include: Clear labels, arrows showing direction/sequence, important details high
             return {
                 "detailed_instructions": detailed_instructions,
                 "diagram_image": image_base64,
-                "step_number": step_number
+                "step_number": step_number,
+                "tutorial_videos": step_videos
             }
         except Exception as img_error:
             logger.warning(f"Failed to generate diagram: {str(img_error)}")
@@ -1343,7 +1407,8 @@ Include: Clear labels, arrows showing direction/sequence, important details high
             return {
                 "detailed_instructions": detailed_instructions,
                 "diagram_image": None,
-                "step_number": step_number
+                "step_number": step_number,
+                "tutorial_videos": step_videos
             }
         
     except Exception as e:
