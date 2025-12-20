@@ -546,8 +546,9 @@ export default function RepairInstructionsModal({
         {selectedVideo && (
           <VideoPlayerModal
             visible={showVideoPlayer}
-            videoUrl={selectedVideo.url}
+            videoUrl={selectedVideo.url || selectedVideo.embed_url || ''}
             videoTitle={selectedVideo.title}
+            videoId={selectedVideo.video_id}
             onClose={() => {
               setShowVideoPlayer(false);
               setSelectedVideo(null);
