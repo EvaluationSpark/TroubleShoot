@@ -327,7 +327,7 @@ export default function HomeScreen() {
                     style={[styles.buttonWrapper, { flex: 1 }]}
                     onPress={() => {
                       console.log('🎯 Analyze button clicked!');
-                      Alert.alert('Debug', `Image: ${selectedImage ? 'Selected' : 'None'}`);
+                      Alert.alert('Repair Image Selected', `Ready to analyze your image`);
                       if (selectedImage) {
                         analyzeImage(selectedImage);
                       } else {
