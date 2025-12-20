@@ -158,11 +158,7 @@ export default function HomeScreen() {
 
   return (
     <ImageBackground
-      source={{
-        uri: theme.mode === 'dark'
-          ? 'https://images.unsplash.com/photo-1655393001768-d946c97d6fd1?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080'
-          : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080',
-      }}
+      source={require('../../assets/images/app-background.jpg')}
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       resizeMode="cover"
     >
