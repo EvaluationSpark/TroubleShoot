@@ -2,7 +2,7 @@
   "expo": {
     "name": "FixIntel AI",
     "slug": "fixintel-ai",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "fixintel",
@@ -29,7 +29,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.fixintel.ai",
-      "buildNumber": "1.0.4",
+      "buildNumber": "1.0.5",
       "infoPlist": {
         "NSCameraUsageDescription": "FixIntel AI needs camera access to analyze broken items for repair diagnostics.",
         "NSPhotoLibraryUsageDescription": "FixIntel AI needs photo library access to select images for repair analysis.",
@@ -42,7 +42,7 @@
     },
     "android": {
       "package": "com.fixintel.ai",
-      "versionCode": 4,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
