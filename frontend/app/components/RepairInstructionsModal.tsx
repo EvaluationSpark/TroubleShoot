@@ -393,14 +393,30 @@ export default function RepairInstructionsModal({
                   <Ionicons name="cube" size={20} color="#fbbf24" />
                   <View style={styles.partInfo}>
                     <Text style={styles.listItemText}>{typeof part === 'string' ? part : part.name || part.part || 'Unknown part'}</Text>
-                    {part.link && (
-                      <TouchableOpacity onPress={() => Linking.openURL(part.link)}>
-                        <Text style={styles.linkText}>Buy on Amazon</Text>
-                      </TouchableOpacity>
+                    {part.price && (
+                      <Text style={styles.partPrice}>Est. ${typeof part.price === 'number' ? part.price : part.price}</Text>
                     )}
                   </View>
                 </View>
               ))}
+              
+              {/* Find Where to Buy Button */}
+              {(repairData.parts_needed || []).length > 0 && (
+                <TouchableOpacity
+                  style={styles.findPartsButton}
+                  onPress={searchForParts}
+                  disabled={searchingParts}
+                >
+                  {searchingParts ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <>
+                      <Ionicons name="search" size={20} color="#fff" />
+                      <Text style={styles.findPartsButtonText}>Find Where to Buy</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              )}
             </View>
           )}
 
