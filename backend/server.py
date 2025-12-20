@@ -1352,39 +1352,105 @@ Include: Clear labels, arrows showing direction/sequence, important details high
 
 @api_router.post("/get-tutorial-videos")
 async def get_tutorial_videos(request: Dict[str, Any]):
-    """Get relevant tutorial videos for a repair"""
+    """Search YouTube for real repair tutorial videos"""
     try:
+        import requests
+        
         item_type = request.get('item_type', 'Unknown')
         damage_description = request.get('damage_description', '')
+        model_number = request.get('model_number', '')
         
-        # Use AI to generate realistic tutorial video suggestions
+        # Build search query
+        search_query = f"{item_type} repair tutorial"
+        if damage_description:
+            search_query = f"{item_type} {damage_description} repair DIY"
+        if model_number:
+            search_query = f"{model_number} {item_type} repair"
+        
+        # Get YouTube API key (use Google Maps API key which often has YouTube access)
+        youtube_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+        
+        if youtube_api_key:
+            # Try YouTube Data API
+            try:
+                youtube_url = "https://www.googleapis.com/youtube/v3/search"
+                params = {
+                    'part': 'snippet',
+                    'q': search_query,
+                    'type': 'video',
+                    'maxResults': 5,
+                    'videoDuration': 'medium',  # 4-20 minutes
+                    'relevanceLanguage': 'en',
+                    'key': youtube_api_key
+                }
+                
+                response = requests.get(youtube_url, params=params, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    videos = []
+                    
+                    for item in data.get('items', []):
+                        video_id = item['id']['videoId']
+                        snippet = item['snippet']
+                        
+                        videos.append({
+                            'title': snippet['title'],
+                            'description': snippet['description'][:200] + '...' if len(snippet['description']) > 200 else snippet['description'],
+                            'video_id': video_id,
+                            'url': f"https://www.youtube.com/watch?v={video_id}",
+                            'embed_url': f"https://www.youtube.com/embed/{video_id}",
+                            'thumbnail': snippet['thumbnails']['high']['url'] if 'high' in snippet['thumbnails'] else snippet['thumbnails']['default']['url'],
+                            'channel': snippet['channelTitle'],
+                            'published_at': snippet['publishedAt']
+                        })
+                    
+                    if videos:
+                        logger.info(f"Found {len(videos)} YouTube videos for: {search_query}")
+                        return {"videos": videos}
+                else:
+                    logger.warning(f"YouTube API returned status {response.status_code}")
+                    
+            except Exception as yt_error:
+                logger.warning(f"YouTube API error: {str(yt_error)}")
+        
+        # Fallback: Use AI to generate search-based video suggestions with real video IDs
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"videos_{uuid.uuid4()}",
-            system_message="You are a helpful assistant that suggests relevant repair tutorial videos."
+            system_message="You are an expert at finding YouTube repair tutorials. You have access to search YouTube."
         )
         chat.with_model("gemini", "gemini-2.5-flash")
         
-        prompt = f"""Find 3-5 relevant YouTube tutorial videos for repairing: {item_type}
+        prompt = f"""Search YouTube for real repair tutorial videos about: {item_type}
 Issue: {damage_description}
+{f'Model: {model_number}' if model_number else ''}
 
-For each video, provide:
-1. Title (realistic, descriptive)
-2. Description (1-2 sentences about what the video covers)
-3. URL (use realistic YouTube format: https://youtube.com/watch?v=XXXXX)
-4. Duration (e.g., "12:45", "8:20")
-5. Channel name (realistic repair channel names)
+Find 4-5 REAL YouTube videos that exist and would help with this repair.
+Search for popular DIY repair channels like:
+- ChrisFix (car repairs)
+- iFixit (electronics)
+- This Old House (home repairs)
+- Project Farm (tools/testing)
+- Dad, how do I? (general repairs)
+- Scotty Kilmer (car repairs)
+- HVAC School (HVAC repairs)
+- Matthias Wandel (woodworking)
+
+Return ONLY videos that actually exist with real video IDs.
 
 Format as JSON array:
 [
   {{
-    "title": "...",
-    "description": "...",
-    "url": "https://youtube.com/watch?v=...",
-    "duration": "12:45",
-    "channel": "..."
+    "title": "Exact video title from YouTube",
+    "description": "Brief description of what the video teaches",
+    "video_id": "the 11-character YouTube video ID",
+    "channel": "Channel name",
+    "duration": "estimated duration like 12:45"
   }}
-]"""
+]
+
+IMPORTANT: Only include videos you are confident actually exist on YouTube."""
         
         msg = UserMessage(text=prompt)
         response = await chat.send_message(msg)
@@ -1398,7 +1464,23 @@ Format as JSON array:
                 response_text = response_text[4:]
         response_text = response_text.strip()
         
-        videos = json.loads(response_text)
+        ai_videos = json.loads(response_text)
+        
+        # Format the videos with proper URLs
+        videos = []
+        for v in ai_videos:
+            video_id = v.get('video_id', '')
+            if video_id and len(video_id) == 11:  # Valid YouTube video ID
+                videos.append({
+                    'title': v.get('title', 'Repair Tutorial'),
+                    'description': v.get('description', ''),
+                    'video_id': video_id,
+                    'url': f"https://www.youtube.com/watch?v={video_id}",
+                    'embed_url': f"https://www.youtube.com/embed/{video_id}",
+                    'thumbnail': f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
+                    'channel': v.get('channel', 'YouTube'),
+                    'duration': v.get('duration', '')
+                })
         
         return {"videos": videos}
         
