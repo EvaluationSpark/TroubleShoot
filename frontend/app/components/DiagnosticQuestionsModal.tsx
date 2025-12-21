@@ -570,4 +570,43 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
+  // New styles for AI questions
+  aiTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  aiTagText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  freeTextContainer: {
+    gap: 16,
+    marginBottom: 24,
+  },
+  textInputCard: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  textInput: {
+    fontSize: 16,
+    minHeight: 120,
+    lineHeight: 24,
+  },
+  submitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: 16,
+    borderRadius: 16,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });
