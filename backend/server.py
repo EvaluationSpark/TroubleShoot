@@ -323,8 +323,14 @@ Format your response as JSON with these exact keys:
 {{
   "item_type": "...",
   "damage_description": "...",
+  "detected_issues": ["issue 1", "issue 2"],
   "no_visible_damage": false,
-  "diagnostic_questions": [],
+  "clarifying_questions": [
+    "I can see what appears to be [detected issue]. Can you confirm this is what you need help with?",
+    "Is the [item] currently working at all, or completely non-functional?",
+    "Have you noticed any other issues besides [main issue]?",
+    "When did you first notice this problem?"
+  ],
   "repair_difficulty": "...",
   "estimated_time": "...",
   "cost_estimate": {{
@@ -356,6 +362,14 @@ Format your response as JSON with these exact keys:
   "parts_needed": [{{"name": "...", "price": 20, "required": true, "link": "https://example.com"}}],
   "safety_tips": [...]
 }}
+
+**IMPORTANT - ALWAYS INCLUDE CLARIFYING QUESTIONS:**
+Whether or not you detect visible damage, ALWAYS include 3-5 clarifying questions to confirm the diagnosis with the user. These questions should:
+1. Confirm the detected issue (if damage visible): "I see [specific damage]. Is this the main problem you're trying to fix?"
+2. Check for additional issues: "Are there any other problems with this [item] besides what I can see?"
+3. Understand the context: "When did this problem start?" or "What were you doing when this happened?"
+4. Verify functionality: "Does the [item] still work partially, or is it completely non-functional?"
+5. Check for related symptoms: "Have you noticed any unusual sounds, smells, or behaviors?"
 
 **IF NO VISIBLE DAMAGE**, respond with:
 {{
