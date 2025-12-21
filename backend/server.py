@@ -80,6 +80,8 @@ class RepairAnalysisResponse(BaseModel):
     # No Visible Damage Detection fields
     no_visible_damage: Optional[bool] = False
     diagnostic_questions: Optional[List[str]] = []
+    clarifying_questions: Optional[List[str]] = []
+    detected_issues: Optional[List[str]] = []
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class TroubleshootQuestion(BaseModel):
