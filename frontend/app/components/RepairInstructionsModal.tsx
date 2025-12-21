@@ -308,12 +308,13 @@ export default function RepairInstructionsModal({
     try {
       const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
       
-      // Save to backend
+      // Save to backend with user_id
       await fetch(`${BACKEND_URL}/api/save-repair-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           repair_id: repairData.repair_id,
+          user_id: userId, // Include user ID for filtering
           title: `${repairData.item_type} Repair`,
           repair_data: repairData, // Save complete repair data
           status: 'saved',
@@ -322,12 +323,13 @@ export default function RepairInstructionsModal({
         }),
       });
 
-      // Also save locally
+      // Also save locally with user_id
       const existingSessions = await AsyncStorage.getItem('repair_sessions');
       const sessions = existingSessions ? JSON.parse(existingSessions) : [];
       
       const sessionData = {
         repair_id: repairData.repair_id,
+        user_id: userId, // Include user ID
         title: `${repairData.item_type} Repair`,
         ...repairData, // Include all repair data
         status: 'saved',
