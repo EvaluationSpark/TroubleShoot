@@ -18,7 +18,7 @@
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_BACKEND_URL": "https://fixitguru-2.preview.emergentagent.com"
+        "EXPO_PUBLIC_BACKEND_URL": "https://fixgenius-4.preview.emergentagent.com"
       }
     }
   },
