@@ -4,6 +4,7 @@ import { loadLanguagePreference } from './i18n';
 import SplashScreen from './components/SplashScreen';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SkillLevelProvider } from './contexts/SkillLevelContext';
+import { UserProvider } from './contexts/UserContext';
 import { initializeStorage } from './utils/storage';
 
 export default function RootLayout() {
@@ -37,34 +38,36 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <SkillLevelProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" />
-        <Stack.Screen 
-          name="screens/HelpSupportScreen" 
-          options={{ 
-            headerShown: true,
-            presentation: 'modal',
-            title: 'Help & Support'
-          }} 
-        />
-        <Stack.Screen 
-          name="screens/TermsOfServiceScreen" 
-          options={{ 
-            headerShown: true,
-            presentation: 'modal',
-            title: 'Terms of Service'
-          }} 
-        />
-        <Stack.Screen 
-          name="screens/PrivacyPolicyScreen" 
-          options={{ 
-            headerShown: true,
-            presentation: 'modal',
-            title: 'Privacy Policy'
-          }} 
-        />
-      </Stack>
+        <UserProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(tabs)" />
+          <Stack.Screen 
+            name="screens/HelpSupportScreen" 
+            options={{ 
+              headerShown: true,
+              presentation: 'modal',
+              title: 'Help & Support'
+            }} 
+          />
+          <Stack.Screen 
+            name="screens/TermsOfServiceScreen" 
+            options={{ 
+              headerShown: true,
+              presentation: 'modal',
+              title: 'Terms of Service'
+            }} 
+          />
+          <Stack.Screen 
+            name="screens/PrivacyPolicyScreen" 
+            options={{ 
+              headerShown: true,
+              presentation: 'modal',
+              title: 'Privacy Policy'
+            }} 
+          />
+        </Stack>
+        </UserProvider>
       </SkillLevelProvider>
     </ThemeProvider>
   );
