@@ -18,7 +18,7 @@ const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 interface DiagnosticQuestionsModalProps {
   visible: boolean;
   itemType: string;
-  initialAnalysis: string;
+  initialAnalysis: any; // Can be object with diagnostic_questions or string
   onDiagnosisComplete: (fullDiagnosis: any) => void;
   onClose: () => void;
 }
