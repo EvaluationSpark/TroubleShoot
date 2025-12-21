@@ -91,6 +91,7 @@ class TroubleshootQuestion(BaseModel):
 
 class SaveRepairSession(BaseModel):
     repair_id: str
+    user_id: str = "default_user"  # User identifier
     title: str
     notes: Optional[str] = None
     progress_percentage: int = 0
