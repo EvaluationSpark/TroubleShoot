@@ -29,7 +29,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.fixintel.ai",
-      "buildNumber": "1.0.5",
+      "buildNumber": "1.0.6",
       "requireFullScreen": false,
       "infoPlist": {
         "NSCameraUsageDescription": "FixIntel AI needs camera access to analyze broken items for repair diagnostics.",
