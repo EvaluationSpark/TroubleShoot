@@ -637,12 +637,174 @@ def test_refine_diagnosis():
         log_test("Refine Diagnosis", "FAIL", f"Unexpected error: {str(e)}")
         return False, None
 
+def test_clarifying_questions_feature():
+    """Test the Clarifying Questions feature - ALWAYS returns clarifying_questions"""
+    print("\n🎯 TESTING CLARIFYING QUESTIONS FEATURE")
+    print("=" * 70)
+    print("Testing that clarifying_questions are ALWAYS returned for both damaged and undamaged items")
+    
+    results = {
+        'damaged_item': False,
+        'undamaged_item': False
+    }
+    
+    # Test 1: Damaged item (should have clarifying_questions + detected_issues)
+    print("\n🔧 Test 1: DAMAGED ITEM - Should return clarifying_questions")
+    print("-" * 50)
+    
+    damaged_image = create_test_image()  # Creates cracked phone image
+    
+    test_data_damaged = {
+        "image_base64": damaged_image,
+        "image_mime_type": "image/png",
+        "language": "en",
+        "skill_level": "diy"
+    }
+    
+    try:
+        response = requests.post(
+            f"{BASE_URL}/analyze-repair",
+            json=test_data_damaged,
+            timeout=TIMEOUT
+        )
+        
+        print(f"📊 Response Status: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Check required fields for clarifying questions feature
+            clarifying_questions = data.get('clarifying_questions', [])
+            detected_issues = data.get('detected_issues', [])
+            item_type = data.get('item_type', 'Unknown')
+            damage_description = data.get('damage_description', '')
+            
+            print(f"🔧 Item Type: {item_type}")
+            print(f"💥 Damage Description: {damage_description}")
+            print(f"🔍 Detected Issues ({len(detected_issues)}): {detected_issues}")
+            print(f"❓ Clarifying Questions ({len(clarifying_questions)}):")
+            
+            for i, question in enumerate(clarifying_questions, 1):
+                print(f"   {i}. {question}")
+            
+            # Validate clarifying_questions
+            if clarifying_questions and len(clarifying_questions) >= 3:
+                print("✅ PASS: clarifying_questions populated for damaged item")
+                results['damaged_item'] = True
+            else:
+                print("❌ FAIL: clarifying_questions missing or insufficient for damaged item")
+                results['damaged_item'] = False
+            
+            # Validate detected_issues
+            if detected_issues and len(detected_issues) > 0:
+                print("✅ PASS: detected_issues populated for damaged item")
+            else:
+                print("⚠️  WARNING: detected_issues empty for damaged item")
+                
+        else:
+            print(f"❌ FAIL: API error {response.status_code}: {response.text}")
+            results['damaged_item'] = False
+            
+    except Exception as e:
+        print(f"❌ FAIL: Exception testing damaged item: {str(e)}")
+        results['damaged_item'] = False
+    
+    # Test 2: Undamaged item (should still have clarifying_questions)
+    print("\n📱 Test 2: UNDAMAGED ITEM - Should STILL return clarifying_questions")
+    print("-" * 50)
+    
+    undamaged_image = create_undamaged_test_image()  # Creates clean phone image
+    
+    test_data_undamaged = {
+        "image_base64": undamaged_image,
+        "image_mime_type": "image/jpeg",
+        "language": "en",
+        "skill_level": "beginner"
+    }
+    
+    try:
+        response = requests.post(
+            f"{BASE_URL}/analyze-repair",
+            json=test_data_undamaged,
+            timeout=TIMEOUT
+        )
+        
+        print(f"📊 Response Status: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Check required fields
+            clarifying_questions = data.get('clarifying_questions', [])
+            detected_issues = data.get('detected_issues', [])
+            no_visible_damage = data.get('no_visible_damage', False)
+            diagnostic_questions = data.get('diagnostic_questions', [])
+            item_type = data.get('item_type', 'Unknown')
+            damage_description = data.get('damage_description', '')
+            
+            print(f"🔧 Item Type: {item_type}")
+            print(f"💥 Damage Description: {damage_description}")
+            print(f"👁️  No Visible Damage: {no_visible_damage}")
+            print(f"🔍 Detected Issues ({len(detected_issues)}): {detected_issues}")
+            print(f"🩺 Diagnostic Questions ({len(diagnostic_questions)}): {diagnostic_questions}")
+            print(f"❓ Clarifying Questions ({len(clarifying_questions)}):")
+            
+            for i, question in enumerate(clarifying_questions, 1):
+                print(f"   {i}. {question}")
+            
+            # KEY TEST: Clarifying questions should ALWAYS be present
+            if clarifying_questions and len(clarifying_questions) >= 3:
+                print("✅ PASS: clarifying_questions populated for undamaged item (KEY REQUIREMENT)")
+                results['undamaged_item'] = True
+            else:
+                print("❌ CRITICAL FAIL: clarifying_questions missing for undamaged item!")
+                print("   This violates the requirement that clarifying_questions should ALWAYS be returned")
+                results['undamaged_item'] = False
+                
+        else:
+            print(f"❌ FAIL: API error {response.status_code}: {response.text}")
+            results['undamaged_item'] = False
+            
+    except Exception as e:
+        print(f"❌ FAIL: Exception testing undamaged item: {str(e)}")
+        results['undamaged_item'] = False
+    
+    # Summary for Clarifying Questions Feature
+    print("\n📊 CLARIFYING QUESTIONS FEATURE TEST SUMMARY")
+    print("=" * 70)
+    
+    passed_tests = sum(results.values())
+    total_tests = len(results)
+    
+    for test_name, passed in results.items():
+        status = "✅ PASS" if passed else "❌ FAIL"
+        display_name = test_name.replace('_', ' ').title()
+        print(f"  {display_name}: {status}")
+    
+    print(f"\nOverall: {passed_tests}/{total_tests} tests passed")
+    
+    if passed_tests == total_tests:
+        print("🎉 SUCCESS: Clarifying Questions feature working correctly!")
+        print("✅ CONFIRMED: clarifying_questions ALWAYS returned for both damaged and undamaged items")
+        return True
+    else:
+        print("❌ FAILURE: Clarifying Questions feature has issues!")
+        if not results['damaged_item']:
+            print("   - Issue with damaged item clarifying questions")
+        if not results['undamaged_item']:
+            print("   - CRITICAL: Issue with undamaged item clarifying questions")
+        return False
+
 def main():
-    """Run No Visible Damage Detection focused backend tests"""
-    print("🚀 FixIt Pro Backend Testing - No Visible Damage Detection Feature")
+    """Run Clarifying Questions Feature focused backend tests"""
+    print("🚀 FixIt Pro Backend Testing - Clarifying Questions Feature")
     print("=" * 70)
     print(f"Backend URL: {BASE_URL}")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print()
+    print("🎯 FOCUS: Testing that clarifying_questions are ALWAYS returned")
+    print("   - For damaged items: clarifying_questions + detected_issues")
+    print("   - For undamaged items: clarifying_questions (even with no visible damage)")
     print()
     
     # Track test results
@@ -652,22 +814,12 @@ def main():
     print("🌐 Testing API connectivity...")
     results['root'] = test_root_endpoint()
     
-    # Test 2: Main focus - No Visible Damage Detection
-    print("\n🎯 MAIN TEST: No Visible Damage Detection")
-    success1, analysis_data = test_no_visible_damage_detection()
-    results['no_visible_damage'] = success1
-    
-    # Test 3: Refine Diagnosis (only if first test passed)
-    print("\n🔧 SECONDARY TEST: Refine Diagnosis")
-    if success1:
-        success2, _ = test_refine_diagnosis()
-        results['refine_diagnosis'] = success2
-    else:
-        print("⏭️  Skipping refine-diagnosis test due to analyze-repair failure")
-        results['refine_diagnosis'] = False
+    # Test 2: Main focus - Clarifying Questions Feature
+    print("\n🎯 MAIN TEST: Clarifying Questions Feature")
+    results['clarifying_questions'] = test_clarifying_questions_feature()
     
     # Summary
-    print("\n📊 TEST SUMMARY")
+    print("\n📊 FINAL TEST SUMMARY")
     print("=" * 70)
     
     passed = sum(1 for result in results.values() if result)
@@ -676,26 +828,18 @@ def main():
     for test_name, result in results.items():
         status = "✅ PASS" if result else "❌ FAIL"
         display_name = test_name.replace('_', ' ').title()
-        if test_name == 'no_visible_damage':
-            display_name = "No Visible Damage Detection"
-        elif test_name == 'refine_diagnosis':
-            display_name = "Refine Diagnosis"
+        if test_name == 'clarifying_questions':
+            display_name = "Clarifying Questions Feature"
         print(f"  {display_name}: {status}")
     
     print(f"\nOverall: {passed}/{total} tests passed")
     
-    if analysis_data and success1:
-        print(f"\n📊 Key Response Data:")
-        print(f"   Item Type: {analysis_data.get('item_type', 'N/A')}")
-        print(f"   No Visible Damage: {analysis_data.get('no_visible_damage', False)}")
-        print(f"   Diagnostic Questions: {len(analysis_data.get('diagnostic_questions', []))}")
-        print(f"   Repair ID: {analysis_data.get('repair_id', 'N/A')}")
-    
     if passed == total:
-        print("🎉 ALL TESTS PASSED - No Visible Damage Detection working correctly!")
+        print("🎉 ALL TESTS PASSED - Clarifying Questions feature working correctly!")
+        print("✅ Backend ALWAYS returns clarifying_questions as requested")
         return True
     else:
-        print("⚠️  SOME TESTS FAILED - Issues found with No Visible Damage Detection")
+        print("⚠️  SOME TESTS FAILED - Issues found with Clarifying Questions feature")
         return False
 
 if __name__ == "__main__":
