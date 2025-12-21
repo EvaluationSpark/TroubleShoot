@@ -138,7 +138,7 @@ export default function ProgressScreen() {
   const clearAllSessions = async () => {
     Alert.alert(
       'Clear All Repairs',
-      'Are you sure you want to delete all saved repairs? This cannot be undone.',
+      'Are you sure you want to delete all your saved repairs? This cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -149,9 +149,9 @@ export default function ProgressScreen() {
               // Clear local storage
               await AsyncStorage.removeItem('repair_sessions');
               
-              // Clear backend
+              // Clear backend - only this user's sessions
               try {
-                await fetch(`${BACKEND_URL}/api/repair-sessions`, {
+                await fetch(`${BACKEND_URL}/api/repair-sessions?user_id=${userId}`, {
                   method: 'DELETE',
                 });
               } catch (e) {
@@ -160,7 +160,7 @@ export default function ProgressScreen() {
               
               // Refresh
               fetchSessions();
-              Alert.alert('Success', 'All repairs have been deleted');
+              Alert.alert('Success', 'All your repairs have been deleted');
             } catch (error) {
               console.error('Error clearing sessions:', error);
               Alert.alert('Error', 'Failed to clear repairs');
