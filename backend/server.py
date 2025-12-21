@@ -490,7 +490,9 @@ async def analyze_repair(request: RepairAnalysisRequest):
             cost_estimate=analysis.get('cost_estimate'),
             time_estimate=analysis.get('time_estimate'),
             diagram_base64=diagram_base64,
-            model_number=request.model_number  # PR #5
+            model_number=request.model_number,  # PR #5
+            no_visible_damage=analysis.get('no_visible_damage', False),
+            diagnostic_questions=analysis.get('diagnostic_questions', [])
         )
         
         # Save to database
