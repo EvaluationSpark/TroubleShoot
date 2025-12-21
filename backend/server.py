@@ -320,6 +320,8 @@ Format your response as JSON with these exact keys:
 {{
   "item_type": "...",
   "damage_description": "...",
+  "no_visible_damage": false,
+  "diagnostic_questions": [],
   "repair_difficulty": "...",
   "estimated_time": "...",
   "cost_estimate": {{
@@ -350,6 +352,26 @@ Format your response as JSON with these exact keys:
   "tools_needed": [{{"name": "...", "required": true, "estimated_cost": 10}}],
   "parts_needed": [{{"name": "...", "price": 20, "required": true, "link": "https://example.com"}}],
   "safety_tips": [...]
+}}
+
+**IF NO VISIBLE DAMAGE**, respond with:
+{{
+  "item_type": "identified item",
+  "damage_description": "No visible damage detected",
+  "no_visible_damage": true,
+  "diagnostic_questions": [
+    "What specific problem are you experiencing with this item?",
+    "Does the device/item turn on or function at all?",
+    "When did you first notice the problem?",
+    "Are there any unusual sounds, smells, or behaviors?",
+    "Has the item been dropped, exposed to water, or damaged recently?"
+  ],
+  "repair_difficulty": "unknown",
+  "confidence_score": 0,
+  "repair_steps": [],
+  "tools_needed": [],
+  "parts_needed": [],
+  "safety_tips": []
 }}
 """
         
