@@ -19,6 +19,7 @@ import LocalVendorsModal from './LocalVendorsModal';
 import VideoPlayerModal from './VideoPlayerModal';
 import { CostBreakdown, TimeBreakdown } from './CostTimeBreakdown';
 import { exportRepairAsPDF } from '../utils/pdfExport';
+import { useUser } from '../contexts/UserContext';
 
 interface RepairInstructionsModalProps {
   visible: boolean;
