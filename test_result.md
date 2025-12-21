@@ -277,6 +277,18 @@ frontend:
           agent: "testing"
           comment: "Fixed navigation error by converting from React Navigation to Expo Router structure. All 4 tabs (Home, Community, Progress, Settings) working perfectly with proper icons and styling. Navigation between tabs is smooth and error-free."
 
+  - task: "No Visible Damage Diagnostic Flow"
+    implemented: true
+    working: "NA"
+    file: "frontend/app/(tabs)/home.tsx, frontend/app/components/DiagnosticQuestionsModal.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Updated home.tsx to detect no_visible_damage response from API and display DiagnosticQuestionsModal. Updated DiagnosticQuestionsModal.tsx to support AI-generated free-text questions in addition to predefined options."
+
   - task: "Home Screen - Photo Selection"
     implemented: true
     working: true
