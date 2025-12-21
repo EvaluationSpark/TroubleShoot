@@ -738,10 +738,10 @@ async def delete_repair_session(session_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.delete("/repair-sessions")
-async def delete_all_repair_sessions():
-    """Delete all repair sessions (admin/testing)"""
+async def delete_all_repair_sessions(user_id: str = "default_user"):
+    """Delete all repair sessions for a specific user"""
     try:
-        result = await db.repair_sessions.delete_many({})
+        result = await db.repair_sessions.delete_many({"user_id": user_id})
         return {"message": f"Deleted {result.deleted_count} session(s)"}
         
     except Exception as e:
