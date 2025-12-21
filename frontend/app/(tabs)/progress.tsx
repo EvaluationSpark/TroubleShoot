@@ -22,6 +22,7 @@ import { useUser } from '../contexts/UserContext';
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function ProgressScreen() {
+  const { userId, isLoading: isUserLoading } = useUser();
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -32,17 +33,22 @@ export default function ProgressScreen() {
   // Fetch sessions when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      fetchSessions();
-    }, [])
+      if (!isUserLoading && userId) {
+        fetchSessions();
+      }
+    }, [userId, isUserLoading])
   );
 
   useEffect(() => {
-    fetchSessions();
-  }, []);
+    if (!isUserLoading && userId) {
+      fetchSessions();
+    }
+  }, [userId, isUserLoading]);
 
   const fetchBackendSessions = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/repair-sessions`);
+      // Pass user_id to only get this user's repairs
+      const response = await fetch(`${BACKEND_URL}/api/repair-sessions?user_id=${userId}`);
       if (response.ok) {
         const data = await response.json();
         return Array.isArray(data) ? data : [];
