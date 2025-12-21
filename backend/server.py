@@ -328,10 +328,10 @@ Format your response as JSON with these exact keys:
   "detected_issues": ["issue 1", "issue 2"],
   "no_visible_damage": false,
   "clarifying_questions": [
-    "I can see what appears to be [detected issue]. Can you confirm this is what you need help with?",
-    "Is the [item] currently working at all, or completely non-functional?",
-    "Have you noticed any other issues besides [main issue]?",
-    "When did you first notice this problem?"
+    "Context-specific question about the detected damage...",
+    "Functional question specific to this item type...",
+    "Question about related symptoms for this item...",
+    "Question about when/how the damage occurred..."
   ],
   "repair_difficulty": "...",
   "estimated_time": "...",
@@ -365,26 +365,77 @@ Format your response as JSON with these exact keys:
   "safety_tips": [...]
 }}
 
-**IMPORTANT - ALWAYS INCLUDE CLARIFYING QUESTIONS:**
-Whether or not you detect visible damage, ALWAYS include 3-5 clarifying questions to confirm the diagnosis with the user. These questions should:
-1. Confirm the detected issue (if damage visible): "I see [specific damage]. Is this the main problem you're trying to fix?"
-2. Check for additional issues: "Are there any other problems with this [item] besides what I can see?"
-3. Understand the context: "When did this problem start?" or "What were you doing when this happened?"
-4. Verify functionality: "Does the [item] still work partially, or is it completely non-functional?"
-5. Check for related symptoms: "Have you noticed any unusual sounds, smells, or behaviors?"
+**CRITICAL - GENERATE TASK-APPROPRIATE CLARIFYING QUESTIONS:**
+You MUST generate 3-5 highly specific questions tailored to the EXACT item type and detected issues. 
+DO NOT use generic questions. Each question must be directly relevant to the diagnosis.
 
-**IF NO VISIBLE DAMAGE**, respond with:
+**Question Generation Guidelines by Item Category:**
+
+For ELECTRONICS (phones, laptops, tablets, TVs):
+- Screen damage: "Does the touchscreen still respond to touch, or is it completely unresponsive?"
+- Screen damage: "Are there any display artifacts, lines, or discoloration beyond the crack?"
+- Power issues: "Does the device show any signs of life when plugged in (LED lights, vibration, sounds)?"
+- Battery: "Has the battery been swelling or getting unusually hot?"
+- Water damage: "Was the device exposed to any liquids? If so, what type and how long ago?"
+
+For APPLIANCES (washing machines, refrigerators, dishwashers, ovens):
+- "What error code or indicator lights are showing, if any?"
+- "At what point in the cycle does the problem occur?"
+- "Are there any unusual noises (grinding, humming, clicking) during operation?"
+- "Is there any water leaking, and if so, from where specifically?"
+- "How old is the appliance, and has it had any previous repairs?"
+
+For FURNITURE (chairs, tables, cabinets, beds):
+- "Is the damage affecting the structural stability, or is it cosmetic?"
+- "What type of wood/material is this made from?"
+- "Are the joints loose, or is it a break in the material itself?"
+- "How much weight does this piece need to support?"
+- "Are there any missing hardware pieces (screws, bolts, brackets)?"
+
+For PLUMBING (faucets, pipes, toilets):
+- "Is the leak constant or does it only occur when water is running?"
+- "What is the water pressure like in other fixtures?"
+- "Do you know if the pipes are copper, PVC, or galvanized?"
+- "Is there any water damage to surrounding areas?"
+
+For AUTOMOTIVE (cars, bikes, motorcycles):
+- "Does the issue occur at specific speeds or conditions?"
+- "Any warning lights on the dashboard?"
+- "When was the last service or oil change?"
+- "Do you hear any unusual sounds when the problem occurs?"
+
+For CLOTHING/FABRIC (tears, zippers, buttons):
+- "What is the fabric type (cotton, silk, synthetic, denim)?"
+- "Is the tear along a seam or through the fabric itself?"
+- "Do you need this to be invisible mending or functional repair?"
+
+**YOUR QUESTIONS MUST:**
+1. Reference the SPECIFIC item you identified (not "device" or "item")
+2. Reference the SPECIFIC damage you detected (not "the problem")
+3. Ask about functionality relevant to THIS type of item
+4. Help determine if there's hidden damage you can't see
+5. Gather info needed for accurate repair instructions
+
+**EXAMPLE - Good vs Bad Questions:**
+BAD (generic): "Is the item working?"
+GOOD (specific): "Can you still make calls on the phone, or is only the display affected?"
+
+BAD (generic): "When did this happen?"
+GOOD (specific): "Did the screen crack from a single drop, or has it been developing over time?"
+
+**IF NO VISIBLE DAMAGE**, generate diagnostic questions specific to the identified item:
 {{
   "item_type": "identified item",
   "damage_description": "No visible damage detected",
   "no_visible_damage": true,
   "diagnostic_questions": [
-    "What specific problem are you experiencing with this item?",
-    "Does the device/item turn on or function at all?",
-    "When did you first notice the problem?",
-    "Are there any unusual sounds, smells, or behaviors?",
-    "Has the item been dropped, exposed to water, or damaged recently?"
+    "What specific symptom or problem are you experiencing with this [specific item name]?",
+    "[Item-specific functionality question]",
+    "[Item-specific symptom question]",
+    "When did you first notice this issue with your [specific item]?",
+    "Has anything changed recently (drops, spills, power surges) that might have caused this?"
   ],
+  "clarifying_questions": [],
   "repair_difficulty": "unknown",
   "confidence_score": 0,
   "repair_steps": [],
