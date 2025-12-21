@@ -709,10 +709,11 @@ async def save_repair_session(session: SaveRepairSession):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/repair-sessions")
-async def get_repair_sessions():
-    """Get all saved repair sessions"""
+async def get_repair_sessions(user_id: str = "default_user"):
+    """Get repair sessions for a specific user"""
     try:
-        sessions = await db.repair_sessions.find().sort("updated_at", -1).to_list(100)
+        # Filter by user_id to only show that user's repairs
+        sessions = await db.repair_sessions.find({"user_id": user_id}).sort("updated_at", -1).to_list(100)
         for session in sessions:
             session['_id'] = str(session['_id'])
         return sessions
