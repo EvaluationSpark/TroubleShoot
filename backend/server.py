@@ -750,11 +750,11 @@ async def delete_all_repair_sessions(user_id: str = "default_user"):
 
 # PR #8: Repair History & Insights
 @api_router.get("/repair-insights")
-async def get_repair_insights():
-    """Get aggregated insights from repair history"""
+async def get_repair_insights(user_id: str = "default_user"):
+    """Get aggregated insights from repair history for a specific user"""
     try:
-        # Get all repair sessions
-        sessions = await db.repair_sessions.find().to_list(1000)
+        # Get repair sessions for this specific user
+        sessions = await db.repair_sessions.find({"user_id": user_id}).to_list(1000)
         
         if not sessions:
             return {
