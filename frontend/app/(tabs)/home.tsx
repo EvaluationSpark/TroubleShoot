@@ -126,12 +126,13 @@ export default function HomeScreen() {
         const data = await response.json();
         console.log('✅ Analysis response received:', data);
         
-        // Check if there are clarifying questions
-        if (data.clarifyingQuestions && data.clarifyingQuestions.length > 0) {
+        // Check if no visible damage was detected - AI needs more info
+        if (data.no_visible_damage === true && data.diagnostic_questions && data.diagnostic_questions.length > 0) {
+          console.log('🔍 No visible damage detected, showing diagnostic questions');
           setInitialAnalysis(data);
           setShowDiagnosticModal(true);
         } else {
-          // No questions, go directly to results
+          // Damage detected or repair data available - go to results
           setRepairData(data);
           
           // Check if safety gating is needed
