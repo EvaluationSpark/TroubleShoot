@@ -998,15 +998,24 @@ def create_appliance_test_image():
     return base64.b64encode(img_data).decode('utf-8')
 
 def main():
-    """Run Clarifying Questions Feature focused backend tests"""
-    print("🚀 FixIt Pro Backend Testing - Clarifying Questions Feature")
-    print("=" * 70)
+    """Run Task-Appropriate Clarifying Questions Feature Testing"""
+    print("🚀 FixIt Pro Backend Testing - Task-Appropriate Clarifying Questions Feature")
+    print("=" * 80)
     print(f"Backend URL: {BASE_URL}")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
-    print("🎯 FOCUS: Testing that clarifying_questions are ALWAYS returned")
-    print("   - For damaged items: clarifying_questions + detected_issues")
-    print("   - For undamaged items: clarifying_questions (even with no visible damage)")
+    print("🎯 REVIEW REQUEST: Test updated 'Task-Appropriate Clarifying Questions' feature")
+    print()
+    print("📋 VALIDATION CRITERIA:")
+    print("   1. Questions must reference the SPECIFIC item name (not 'device' or 'item')")
+    print("   2. Questions must reference the SPECIFIC damage detected")
+    print("   3. Questions should be relevant to the item category")
+    print("   4. Questions should NOT be generic like 'Is the item working?'")
+    print()
+    print("🧪 TEST SCENARIOS:")
+    print("   • Smartphone with cracked screen → Electronics-specific questions")
+    print("   • Chair with broken leg → Furniture-specific questions")
+    print("   • Washing machine issues → Appliance-specific questions")
     print()
     
     # Track test results
@@ -1014,15 +1023,19 @@ def main():
     
     # Test 1: Root endpoint (quick connectivity check)
     print("🌐 Testing API connectivity...")
-    results['root'] = test_root_endpoint()
+    results['connectivity'] = test_root_endpoint()
     
-    # Test 2: Main focus - Clarifying Questions Feature
-    print("\n🎯 MAIN TEST: Clarifying Questions Feature")
-    results['clarifying_questions'] = test_clarifying_questions_feature()
+    if not results['connectivity']:
+        print("\n❌ CRITICAL: Cannot connect to backend API. Stopping tests.")
+        return False
+    
+    # Test 2: Main focus - Task-Appropriate Clarifying Questions Feature
+    print("\n🎯 MAIN TEST: Task-Appropriate Clarifying Questions Feature")
+    results['task_appropriate_questions'] = test_task_appropriate_clarifying_questions()
     
     # Summary
     print("\n📊 FINAL TEST SUMMARY")
-    print("=" * 70)
+    print("=" * 80)
     
     passed = sum(1 for result in results.values() if result)
     total = len(results)
@@ -1030,18 +1043,23 @@ def main():
     for test_name, result in results.items():
         status = "✅ PASS" if result else "❌ FAIL"
         display_name = test_name.replace('_', ' ').title()
-        if test_name == 'clarifying_questions':
-            display_name = "Clarifying Questions Feature"
+        if test_name == 'task_appropriate_questions':
+            display_name = "Task-Appropriate Clarifying Questions Feature"
+        elif test_name == 'connectivity':
+            display_name = "API Connectivity"
         print(f"  {display_name}: {status}")
     
     print(f"\nOverall: {passed}/{total} tests passed")
     
-    if passed == total:
-        print("🎉 ALL TESTS PASSED - Clarifying Questions feature working correctly!")
-        print("✅ Backend ALWAYS returns clarifying_questions as requested")
+    if results.get('task_appropriate_questions', False):
+        print("\n🎉 SUCCESS: Task-Appropriate Clarifying Questions feature is working correctly!")
+        print("✅ Questions are highly specific to item types and detected damage")
+        print("✅ Questions are category-appropriate (electronics, furniture, appliances)")
+        print("✅ No generic questions detected")
         return True
     else:
-        print("⚠️  SOME TESTS FAILED - Issues found with Clarifying Questions feature")
+        print("\n❌ FAILURE: Task-Appropriate Clarifying Questions feature has issues!")
+        print("⚠️  Questions may be too generic or not item/damage-specific")
         return False
 
 if __name__ == "__main__":
