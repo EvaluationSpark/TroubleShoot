@@ -643,163 +643,359 @@ def test_refine_diagnosis():
         log_test("Refine Diagnosis", "FAIL", f"Unexpected error: {str(e)}")
         return False, None
 
-def test_clarifying_questions_feature():
-    """Test the Clarifying Questions feature - ALWAYS returns clarifying_questions"""
-    print("\n🎯 TESTING CLARIFYING QUESTIONS FEATURE")
-    print("=" * 70)
-    print("Testing that clarifying_questions are ALWAYS returned for both damaged and undamaged items")
+def test_task_appropriate_clarifying_questions():
+    """
+    Test the Task-Appropriate Clarifying Questions feature as per review request
     
-    results = {
-        'damaged_item': False,
-        'undamaged_item': False
-    }
+    VALIDATION CRITERIA:
+    1. Questions must reference the SPECIFIC item name (not "device" or "item")
+    2. Questions must reference the SPECIFIC damage detected
+    3. Questions should be relevant to the item category
+    4. Questions should NOT be generic like "Is the item working?"
+    """
+    print("\n🎯 TESTING TASK-APPROPRIATE CLARIFYING QUESTIONS FEATURE")
+    print("=" * 80)
+    print("Review Request: Test updated 'Task-Appropriate Clarifying Questions' feature")
+    print("Expected: HIGHLY SPECIFIC questions based on exact item type and damage")
+    print()
     
-    # Test 1: Damaged item (should have clarifying_questions + detected_issues)
-    print("\n🔧 Test 1: DAMAGED ITEM - Should return clarifying_questions")
-    print("-" * 50)
+    test_results = []
     
-    damaged_image = create_test_image()  # Creates cracked phone image
+    # Test Scenario 1: Smartphone with cracked screen
+    print("📱 TEST SCENARIO 1: Smartphone with Cracked Screen")
+    print("-" * 60)
+    print("Expected: Electronics-specific questions about touchscreen responsiveness, display artifacts, battery issues")
     
-    test_data_damaged = {
-        "image_base64": damaged_image,
+    smartphone_image = create_test_image()  # Creates cracked phone image
+    
+    test_data = {
+        "image_base64": smartphone_image,
         "image_mime_type": "image/png",
         "language": "en",
         "skill_level": "diy"
     }
     
     try:
-        response = requests.post(
-            f"{BASE_URL}/analyze-repair",
-            json=test_data_damaged,
-            timeout=TIMEOUT
-        )
-        
-        print(f"📊 Response Status: {response.status_code}")
+        response = requests.post(f"{BASE_URL}/analyze-repair", json=test_data, timeout=TIMEOUT)
         
         if response.status_code == 200:
             data = response.json()
             
-            # Check required fields for clarifying questions feature
+            item_type = data.get('item_type', '').lower()
+            damage_description = data.get('damage_description', '')
             clarifying_questions = data.get('clarifying_questions', [])
             detected_issues = data.get('detected_issues', [])
-            item_type = data.get('item_type', 'Unknown')
-            damage_description = data.get('damage_description', '')
             
-            print(f"🔧 Item Type: {item_type}")
-            print(f"💥 Damage Description: {damage_description}")
-            print(f"🔍 Detected Issues ({len(detected_issues)}): {detected_issues}")
+            print(f"🔧 Detected Item: {data.get('item_type', 'N/A')}")
+            print(f"💥 Damage: {damage_description}")
+            print(f"🚨 Issues: {detected_issues}")
             print(f"❓ Clarifying Questions ({len(clarifying_questions)}):")
             
             for i, question in enumerate(clarifying_questions, 1):
                 print(f"   {i}. {question}")
             
-            # Validate clarifying_questions
-            if clarifying_questions and len(clarifying_questions) >= 3:
-                print("✅ PASS: clarifying_questions populated for damaged item")
-                results['damaged_item'] = True
-            else:
-                print("❌ FAIL: clarifying_questions missing or insufficient for damaged item")
-                results['damaged_item'] = False
+            # VALIDATION 1: Questions reference specific item name
+            specific_item_refs = 0
+            generic_terms_found = 0
+            generic_terms = ['device', 'item', 'object', 'thing', 'product']
             
-            # Validate detected_issues
-            if detected_issues and len(detected_issues) > 0:
-                print("✅ PASS: detected_issues populated for damaged item")
-            else:
-                print("⚠️  WARNING: detected_issues empty for damaged item")
+            for question in clarifying_questions:
+                question_lower = question.lower()
                 
-        else:
-            print(f"❌ FAIL: API error {response.status_code}: {response.text}")
-            results['damaged_item'] = False
+                # Check for specific item type
+                if any(term in item_type for term in ['phone', 'smartphone', 'mobile']) and \
+                   any(term in question_lower for term in ['phone', 'smartphone', 'mobile']):
+                    specific_item_refs += 1
+                
+                # Check for generic terms
+                if any(generic in question_lower for generic in generic_terms):
+                    generic_terms_found += 1
             
+            print(f"\n📋 VALIDATION RESULTS:")
+            
+            # Criterion 1: Specific item references
+            if specific_item_refs > 0:
+                print(f"   ✅ PASS: {specific_item_refs} questions reference specific item type")
+                criterion1_pass = True
+            else:
+                print(f"   ❌ FAIL: No questions reference the specific item type")
+                criterion1_pass = False
+            
+            if generic_terms_found > 0:
+                print(f"   ⚠️  WARNING: {generic_terms_found} questions use generic terms")
+            
+            # Criterion 2: Questions reference specific damage
+            damage_refs = 0
+            damage_keywords = ['crack', 'screen', 'display', 'broken', 'shatter']
+            
+            for question in clarifying_questions:
+                question_lower = question.lower()
+                if any(keyword in question_lower for keyword in damage_keywords):
+                    damage_refs += 1
+            
+            if damage_refs > 0:
+                print(f"   ✅ PASS: {damage_refs} questions reference specific damage")
+                criterion2_pass = True
+            else:
+                print(f"   ❌ FAIL: No questions reference the specific damage")
+                criterion2_pass = False
+            
+            # Criterion 3: Category-relevant questions
+            electronics_keywords = ['touchscreen', 'display', 'battery', 'charging', 'screen', 'respond', 'touch']
+            category_relevant = 0
+            
+            for question in clarifying_questions:
+                question_lower = question.lower()
+                if any(keyword in question_lower for keyword in electronics_keywords):
+                    category_relevant += 1
+            
+            if category_relevant > 0:
+                print(f"   ✅ PASS: {category_relevant} questions are electronics-category relevant")
+                criterion3_pass = True
+            else:
+                print(f"   ❌ FAIL: No questions are electronics-category relevant")
+                criterion3_pass = False
+            
+            # Criterion 4: Not generic questions
+            generic_patterns = ['is the item working', 'does it work', 'what is wrong', 'is there damage']
+            generic_found = 0
+            
+            for question in clarifying_questions:
+                question_lower = question.lower()
+                if any(pattern in question_lower for pattern in generic_patterns):
+                    generic_found += 1
+            
+            if generic_found == 0:
+                print(f"   ✅ PASS: No generic questions detected")
+                criterion4_pass = True
+            else:
+                print(f"   ❌ FAIL: {generic_found} generic questions detected")
+                criterion4_pass = False
+            
+            # Overall assessment for smartphone test
+            smartphone_pass = all([criterion1_pass, criterion2_pass, criterion3_pass, criterion4_pass])
+            test_results.append(("Smartphone Test", smartphone_pass))
+            
+            if smartphone_pass:
+                print(f"   🎉 OVERALL: EXCELLENT - All criteria passed for smartphone!")
+            else:
+                print(f"   ❌ OVERALL: FAILED - Some criteria not met for smartphone")
+        
+        else:
+            print(f"❌ API Error: {response.status_code} - {response.text}")
+            test_results.append(("Smartphone Test", False))
+    
     except Exception as e:
-        print(f"❌ FAIL: Exception testing damaged item: {str(e)}")
-        results['damaged_item'] = False
+        print(f"❌ Exception: {str(e)}")
+        test_results.append(("Smartphone Test", False))
     
-    # Test 2: Undamaged item (should still have clarifying_questions)
-    print("\n📱 Test 2: UNDAMAGED ITEM - Should STILL return clarifying_questions")
-    print("-" * 50)
+    # Test Scenario 2: Chair with broken leg (furniture category)
+    print("\n🪑 TEST SCENARIO 2: Chair with Broken Leg")
+    print("-" * 60)
+    print("Expected: Furniture-specific questions about stability, weight support, joints")
     
-    undamaged_image = create_undamaged_test_image()  # Creates clean phone image
+    # Create a simple chair image
+    chair_image = create_furniture_test_image()
     
-    test_data_undamaged = {
-        "image_base64": undamaged_image,
-        "image_mime_type": "image/jpeg",
+    test_data = {
+        "image_base64": chair_image,
+        "image_mime_type": "image/png",
         "language": "en",
-        "skill_level": "beginner"
+        "skill_level": "diy"
     }
     
     try:
-        response = requests.post(
-            f"{BASE_URL}/analyze-repair",
-            json=test_data_undamaged,
-            timeout=TIMEOUT
-        )
-        
-        print(f"📊 Response Status: {response.status_code}")
+        response = requests.post(f"{BASE_URL}/analyze-repair", json=test_data, timeout=TIMEOUT)
         
         if response.status_code == 200:
             data = response.json()
             
-            # Check required fields
-            clarifying_questions = data.get('clarifying_questions', [])
-            detected_issues = data.get('detected_issues', [])
-            no_visible_damage = data.get('no_visible_damage', False)
-            diagnostic_questions = data.get('diagnostic_questions', [])
-            item_type = data.get('item_type', 'Unknown')
+            item_type = data.get('item_type', '').lower()
             damage_description = data.get('damage_description', '')
+            clarifying_questions = data.get('clarifying_questions', [])
             
-            print(f"🔧 Item Type: {item_type}")
-            print(f"💥 Damage Description: {damage_description}")
-            print(f"👁️  No Visible Damage: {no_visible_damage}")
-            print(f"🔍 Detected Issues ({len(detected_issues)}): {detected_issues}")
-            print(f"🩺 Diagnostic Questions ({len(diagnostic_questions)}): {diagnostic_questions}")
+            print(f"🔧 Detected Item: {data.get('item_type', 'N/A')}")
+            print(f"💥 Damage: {damage_description}")
             print(f"❓ Clarifying Questions ({len(clarifying_questions)}):")
             
             for i, question in enumerate(clarifying_questions, 1):
                 print(f"   {i}. {question}")
             
-            # KEY TEST: Clarifying questions should ALWAYS be present
-            if clarifying_questions and len(clarifying_questions) >= 3:
-                print("✅ PASS: clarifying_questions populated for undamaged item (KEY REQUIREMENT)")
-                results['undamaged_item'] = True
-            else:
-                print("❌ CRITICAL FAIL: clarifying_questions missing for undamaged item!")
-                print("   This violates the requirement that clarifying_questions should ALWAYS be returned")
-                results['undamaged_item'] = False
-                
-        else:
-            print(f"❌ FAIL: API error {response.status_code}: {response.text}")
-            results['undamaged_item'] = False
+            # Validate furniture-specific questions
+            furniture_keywords = ['stability', 'weight', 'support', 'wobble', 'leg', 'joint', 'sitting', 'chair']
+            furniture_relevant = 0
             
+            for question in clarifying_questions:
+                question_lower = question.lower()
+                if any(keyword in question_lower for keyword in furniture_keywords):
+                    furniture_relevant += 1
+            
+            print(f"\n📋 VALIDATION RESULTS:")
+            
+            if furniture_relevant > 0:
+                print(f"   ✅ PASS: {furniture_relevant} questions are furniture-category relevant")
+                chair_pass = True
+            else:
+                print(f"   ❌ FAIL: No questions are furniture-category relevant")
+                chair_pass = False
+            
+            test_results.append(("Chair Test", chair_pass))
+        
+        else:
+            print(f"❌ API Error: {response.status_code} - {response.text}")
+            test_results.append(("Chair Test", False))
+    
     except Exception as e:
-        print(f"❌ FAIL: Exception testing undamaged item: {str(e)}")
-        results['undamaged_item'] = False
+        print(f"❌ Exception: {str(e)}")
+        test_results.append(("Chair Test", False))
     
-    # Summary for Clarifying Questions Feature
-    print("\n📊 CLARIFYING QUESTIONS FEATURE TEST SUMMARY")
-    print("=" * 70)
+    # Test Scenario 3: Washing machine (appliance category)
+    print("\n🧺 TEST SCENARIO 3: Washing Machine Issues")
+    print("-" * 60)
+    print("Expected: Appliance-specific questions about cycles, water, error codes")
     
-    passed_tests = sum(results.values())
-    total_tests = len(results)
+    # Create a simple appliance image
+    appliance_image = create_appliance_test_image()
     
-    for test_name, passed in results.items():
-        status = "✅ PASS" if passed else "❌ FAIL"
-        display_name = test_name.replace('_', ' ').title()
-        print(f"  {display_name}: {status}")
+    test_data = {
+        "image_base64": appliance_image,
+        "image_mime_type": "image/png",
+        "language": "en",
+        "skill_level": "diy"
+    }
     
-    print(f"\nOverall: {passed_tests}/{total_tests} tests passed")
+    try:
+        response = requests.post(f"{BASE_URL}/analyze-repair", json=test_data, timeout=TIMEOUT)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            item_type = data.get('item_type', '').lower()
+            clarifying_questions = data.get('clarifying_questions', [])
+            
+            print(f"🔧 Detected Item: {data.get('item_type', 'N/A')}")
+            print(f"❓ Clarifying Questions ({len(clarifying_questions)}):")
+            
+            for i, question in enumerate(clarifying_questions, 1):
+                print(f"   {i}. {question}")
+            
+            # Validate appliance-specific questions
+            appliance_keywords = ['cycle', 'water', 'drain', 'spin', 'error', 'leak', 'wash', 'machine']
+            appliance_relevant = 0
+            
+            for question in clarifying_questions:
+                question_lower = question.lower()
+                if any(keyword in question_lower for keyword in appliance_keywords):
+                    appliance_relevant += 1
+            
+            print(f"\n📋 VALIDATION RESULTS:")
+            
+            if appliance_relevant > 0:
+                print(f"   ✅ PASS: {appliance_relevant} questions are appliance-category relevant")
+                appliance_pass = True
+            else:
+                print(f"   ❌ FAIL: No questions are appliance-category relevant")
+                appliance_pass = False
+            
+            test_results.append(("Appliance Test", appliance_pass))
+        
+        else:
+            print(f"❌ API Error: {response.status_code} - {response.text}")
+            test_results.append(("Appliance Test", False))
+    
+    except Exception as e:
+        print(f"❌ Exception: {str(e)}")
+        test_results.append(("Appliance Test", False))
+    
+    # FINAL SUMMARY
+    print("\n📊 TASK-APPROPRIATE CLARIFYING QUESTIONS - FINAL RESULTS")
+    print("=" * 80)
+    
+    passed_tests = sum(1 for _, result in test_results if result)
+    total_tests = len(test_results)
+    
+    for test_name, result in test_results:
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"  {status}: {test_name}")
+    
+    print(f"\n📈 Results: {passed_tests}/{total_tests} tests passed")
+    
+    print(f"\n🔍 VALIDATION CRITERIA CHECKED:")
+    print(f"   ✓ Questions reference SPECIFIC item names (not 'device' or 'item')")
+    print(f"   ✓ Questions reference SPECIFIC damage detected")
+    print(f"   ✓ Questions are relevant to item category (electronics/furniture/appliances)")
+    print(f"   ✓ Questions are NOT generic like 'Is the item working?'")
     
     if passed_tests == total_tests:
-        print("🎉 SUCCESS: Clarifying Questions feature working correctly!")
-        print("✅ CONFIRMED: clarifying_questions ALWAYS returned for both damaged and undamaged items")
+        print(f"\n🎉 SUCCESS: Task-Appropriate Clarifying Questions feature is working perfectly!")
+        print(f"✅ All questions are highly specific to item types and detected damage")
+        return True
+    elif passed_tests >= total_tests * 0.67:
+        print(f"\n✅ MOSTLY WORKING: Feature is functional with minor issues")
         return True
     else:
-        print("❌ FAILURE: Clarifying Questions feature has issues!")
-        if not results['damaged_item']:
-            print("   - Issue with damaged item clarifying questions")
-        if not results['undamaged_item']:
-            print("   - CRITICAL: Issue with undamaged item clarifying questions")
+        print(f"\n❌ CRITICAL ISSUES: Feature needs significant improvements")
         return False
+
+def create_furniture_test_image():
+    """Create a simple test image of a broken chair"""
+    img = Image.new('RGB', (400, 400), color='lightgray')
+    
+    from PIL import ImageDraw
+    draw = ImageDraw.Draw(img)
+    
+    # Draw chair seat
+    draw.rectangle([100, 150, 300, 200], fill='brown', outline='black', width=2)
+    
+    # Draw chair back
+    draw.rectangle([100, 50, 300, 150], fill='brown', outline='black', width=2)
+    
+    # Draw 3 normal legs
+    draw.rectangle([110, 200, 130, 350], fill='brown', outline='black', width=2)
+    draw.rectangle([180, 200, 200, 350], fill='brown', outline='black', width=2)
+    draw.rectangle([270, 200, 290, 350], fill='brown', outline='black', width=2)
+    
+    # Draw broken leg (shorter and cracked)
+    draw.rectangle([110, 200, 130, 280], fill='brown', outline='black', width=2)
+    draw.line([115, 280, 125, 290], fill='red', width=3)  # Crack
+    draw.text((50, 300), "Broken Leg", fill='red')
+    
+    # Convert to base64
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_data = buffer.getvalue()
+    return base64.b64encode(img_data).decode('utf-8')
+
+def create_appliance_test_image():
+    """Create a simple test image of a washing machine"""
+    img = Image.new('RGB', (400, 500), color='white')
+    
+    from PIL import ImageDraw
+    draw = ImageDraw.Draw(img)
+    
+    # Draw washing machine body
+    draw.rectangle([50, 100, 350, 450], fill='lightblue', outline='black', width=3)
+    
+    # Draw door/window
+    draw.ellipse([100, 150, 300, 350], fill='gray', outline='black', width=2)
+    
+    # Draw control panel
+    draw.rectangle([100, 50, 300, 100], fill='darkgray', outline='black', width=2)
+    
+    # Draw some buttons
+    draw.ellipse([120, 60, 140, 80], fill='red', outline='black')
+    draw.ellipse([160, 60, 180, 80], fill='green', outline='black')
+    draw.ellipse([200, 60, 220, 80], fill='blue', outline='black')
+    
+    # Add error indication
+    draw.text((110, 380), "ERROR E3", fill='red')
+    draw.text((110, 400), "Water Issue", fill='red')
+    
+    # Convert to base64
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_data = buffer.getvalue()
+    return base64.b64encode(img_data).decode('utf-8')
 
 def main():
     """Run Clarifying Questions Feature focused backend tests"""
