@@ -48,6 +48,33 @@ def create_test_image():
     img_data = buffer.getvalue()
     return base64.b64encode(img_data).decode('utf-8')
 
+def create_undamaged_test_image():
+    """Create a simple test image of an undamaged phone for no visible damage testing"""
+    # Create a simple image representing an undamaged phone
+    img = Image.new('RGB', (300, 600), color='lightblue')
+    
+    # Add some basic phone-like features (screen, home button)
+    from PIL import ImageDraw
+    draw = ImageDraw.Draw(img)
+    
+    # Draw phone outline
+    draw.rectangle([20, 20, 280, 580], outline='black', width=3)
+    
+    # Draw screen area (no cracks or damage)
+    draw.rectangle([40, 80, 260, 480], fill='black', outline='gray')
+    
+    # Draw home button
+    draw.ellipse([130, 500, 170, 540], fill='gray', outline='black')
+    
+    # Add text to indicate it's working
+    draw.text((100, 300), "Working Phone", fill='white')
+    
+    # Convert to base64
+    buffer = BytesIO()
+    img.save(buffer, format='JPEG')
+    img_data = buffer.getvalue()
+    return base64.b64encode(img_data).decode('utf-8')
+
 # Test data
 SAMPLE_IMAGE_B64 = create_test_image()
 
