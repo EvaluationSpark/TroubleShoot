@@ -75,7 +75,8 @@ export default function ProgressScreen() {
 
   const fetchInsights = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/repair-insights`);
+      // Pass user_id to only get this user's insights
+      const response = await fetch(`${BACKEND_URL}/api/repair-insights?user_id=${userId}`);
       if (response.ok) {
         const data = await response.json();
         return data;
