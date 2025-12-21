@@ -77,6 +77,9 @@ class RepairAnalysisResponse(BaseModel):
     time_estimate: Optional[TimeEstimate] = None
     # PR #5 field
     model_number: Optional[str] = None
+    # No Visible Damage Detection fields
+    no_visible_damage: Optional[bool] = False
+    diagnostic_questions: Optional[List[str]] = []
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class TroubleshootQuestion(BaseModel):
