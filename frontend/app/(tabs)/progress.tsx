@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import InsightsSection from '../components/InsightsSection';
 import RepairInstructionsModal from '../components/RepairInstructionsModal';
+import { useUser } from '../contexts/UserContext';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
