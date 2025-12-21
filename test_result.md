@@ -129,6 +129,18 @@ backend:
           agent: "testing"
           comment: "POST /api/analyze-repair endpoint working correctly. Gemini AI integration functional, returns all required fields (repair_id, item_type, damage_description, repair_difficulty, estimated_time, repair_steps, tools_needed, parts_needed, safety_tips). AI properly analyzes images and provides meaningful responses. Data is saved to MongoDB repairs collection."
 
+  - task: "No Visible Damage Detection"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Backend updated to detect when no visible damage is present in an image. Returns no_visible_damage: true with diagnostic_questions array. Frontend updated to handle this response and show DiagnosticQuestionsModal with AI-generated questions."
+
   - task: "Save Repair Session API"
     implemented: true
     working: true
