@@ -33,6 +33,7 @@ const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 export default function HomeScreen() {
   const { theme } = useTheme();
   const { skillLevel } = useSkillLevel();
+  const responsive = useResponsive();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [modelNumber, setModelNumber] = useState<string>('');
   const [showModelInput, setShowModelInput] = useState(false); // PR #5: Only show if needed
@@ -42,6 +43,17 @@ export default function HomeScreen() {
   const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
   const [showSafetyGating, setShowSafetyGating] = useState(false);
   const [initialAnalysis, setInitialAnalysis] = useState<any>(null);
+
+  // Responsive styles
+  const responsiveStyles = {
+    contentMaxWidth: responsive.isTablet ? responsive.contentMaxWidth : '100%',
+    padding: responsive.isTablet ? 32 : 20,
+    heroFontSize: responsive.isTablet ? 42 : 32,
+    heroSubtitleSize: responsive.isTablet ? 18 : 15,
+    buttonPadding: responsive.isTablet ? 20 : 16,
+    imagePreviewHeight: responsive.isTablet ? 320 : 220,
+    featureCardSize: responsive.isTablet ? 100 : 80,
+  };
 
   const pickImage = async (useCamera: boolean) => {
     try {
