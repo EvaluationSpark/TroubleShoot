@@ -578,7 +578,7 @@ export default function HomeScreen() {
             <GamificationCard />
 
             {/* Features Grid */}
-            <View style={styles.featuresGrid}>
+            <View style={[styles.featuresGrid, responsive.isTablet && styles.tabletFeaturesGrid]}>
               {[
                 { icon: 'bulb', title: 'AI-Powered', color: theme.colors.primary },
                 { icon: 'construct', title: 'Step-by-Step', color: theme.colors.accent },
@@ -589,14 +589,21 @@ export default function HomeScreen() {
                   key={index}
                   intensity={theme.colors.glassBlur}
                   tint={theme.colors.glassTint}
-                  style={[styles.featureCard, { borderColor: theme.colors.glassBorder }]}
+                  style={[
+                    styles.featureCard, 
+                    { borderColor: theme.colors.glassBorder },
+                    responsive.isTablet && { minWidth: responsive.cardWidth }
+                  ]}
                 >
                   <View style={[styles.featureIconContainer, { backgroundColor: `${feature.color}20` }]}>
-                    <Ionicons name={feature.icon as any} size={24} color={feature.color} />
+                    <Ionicons name={feature.icon as any} size={responsive.isTablet ? 28 : 24} color={feature.color} />
                   </View>
-                  <Text style={[styles.featureText, { color: theme.colors.textSecondary }]}>{feature.title}</Text>
+                  <Text style={[styles.featureText, { color: theme.colors.textSecondary, fontSize: responsive.isTablet ? 15 : 13 }]}>{feature.title}</Text>
                 </BlurView>
               ))}
+            </View>
+                </>
+              )}
             </View>
           </ScrollView>
         </SafeAreaView>
