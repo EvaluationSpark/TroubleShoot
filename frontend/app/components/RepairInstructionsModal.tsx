@@ -32,6 +32,7 @@ export default function RepairInstructionsModal({
   repairData,
   onClose,
 }: RepairInstructionsModalProps) {
+  const { userId } = useUser();
   const [activeTab, setActiveTab] = useState('steps');
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
   const [showDetailModal, setShowDetailModal] = useState(false);
