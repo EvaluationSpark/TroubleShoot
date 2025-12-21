@@ -223,6 +223,11 @@ Carefully examine this image and perform a comprehensive visual inspection:
    - Root cause: What likely caused this damage?
    - Damage severity: Minor cosmetic vs. functional failure
    - Hidden damage potential: What might NOT be visible?
+   
+   **IMPORTANT**: If NO VISIBLE DAMAGE is detected:
+   - Set "no_visible_damage" to true
+   - Still identify the item type
+   - Generate diagnostic_questions to help user identify the problem
 
 3. MATERIAL ANALYSIS:
    - What materials are involved? (plastic type, metal type, glass, fabric, etc.)
@@ -251,9 +256,16 @@ IMPORTANT: ALWAYS provide complete repair instructions, even for critical/danger
 - Clearly state risks at the beginning of repair_steps
 - The user wants to see the process even if they should call a pro
 
+**IF NO DAMAGE IS VISIBLE**: 
+- Set "no_visible_damage": true
+- Set "damage_description": "No visible damage detected"
+- Include "diagnostic_questions": an array of 4-6 questions to help identify the problem
+- Questions should be specific to the item type
+- Example questions: "Does the device turn on?", "Are there any unusual sounds?", "When did the problem start?"
+
 Please provide:
 1. Item Type (e.g., 'Smartphone', 'Chair', 'Laptop', etc.)
-2. Damage Description (what's broken)
+2. Damage Description (what's broken) - or "No visible damage detected"
 3. Repair Difficulty (easy/medium/hard)
 4. COST ESTIMATE (USD):
    - Low: Minimum cost (parts only)
