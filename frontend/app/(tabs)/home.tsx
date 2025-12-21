@@ -26,6 +26,7 @@ import GamificationCard from '../components/GamificationCard';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSkillLevel } from '../contexts/SkillLevelContext';
 import { RiskLevel } from '../types/models';
+import { useResponsive } from '../hooks/useResponsive';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
