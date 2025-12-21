@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-FixIt Pro Backend API Test Suite - PR #4 Cost/Time Estimation Testing
-Focus: Testing the enhanced /api/analyze-repair endpoint with cost_estimate and time_estimate fields
+FixIt Pro Backend API Test Suite - Clarifying Questions Feature Testing
+Focus: Testing the updated /api/analyze-repair endpoint to ensure clarifying_questions are ALWAYS returned
 """
 
 import requests
