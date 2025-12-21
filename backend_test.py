@@ -506,9 +506,140 @@ def test_error_handling():
         log_test("Error Handling", "FAIL", f"Exception: {str(e)}")
         return False
 
+def test_no_visible_damage_detection():
+    """Test the no visible damage detection feature"""
+    print("🔍 Testing No Visible Damage Detection Feature...")
+    
+    # Create test image of undamaged phone
+    test_image_b64 = create_undamaged_test_image()
+    
+    # Test data for analyze-repair endpoint
+    test_data = {
+        "image_base64": test_image_b64,
+        "image_mime_type": "image/jpeg",
+        "language": "en",
+        "skill_level": "diy"
+    }
+    
+    try:
+        print(f"📡 Sending request to: {BASE_URL}/analyze-repair")
+        response = requests.post(
+            f"{BASE_URL}/analyze-repair",
+            json=test_data,
+            headers={"Content-Type": "application/json"},
+            timeout=TIMEOUT
+        )
+        
+        print(f"📊 Response Status: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            log_test("No Visible Damage Detection", "INFO", "API Response received successfully")
+            
+            # Check for no_visible_damage field
+            no_visible_damage = data.get('no_visible_damage', False)
+            print(f"🔍 no_visible_damage: {no_visible_damage}")
+            
+            # Check for diagnostic_questions field
+            diagnostic_questions = data.get('diagnostic_questions', [])
+            print(f"❓ diagnostic_questions count: {len(diagnostic_questions)}")
+            
+            if diagnostic_questions:
+                print("📝 Diagnostic Questions:")
+                for i, question in enumerate(diagnostic_questions, 1):
+                    print(f"   {i}. {question}")
+            
+            # Verify expected behavior for no visible damage
+            if no_visible_damage:
+                log_test("No Visible Damage Detection", "PASS", "no_visible_damage correctly detected as True")
+                
+                if diagnostic_questions and len(diagnostic_questions) >= 3:
+                    log_test("Diagnostic Questions", "PASS", f"Provided {len(diagnostic_questions)} diagnostic questions")
+                    return True, data
+                else:
+                    log_test("Diagnostic Questions", "FAIL", "diagnostic_questions missing or insufficient")
+                    return False, data
+            else:
+                log_test("No Visible Damage Detection", "FAIL", f"no_visible_damage should be True for undamaged item. Damage: {data.get('damage_description', 'N/A')}")
+                return False, data
+                
+        else:
+            log_test("No Visible Damage Detection", "FAIL", f"API returned status {response.status_code}: {response.text}")
+            return False, None
+            
+    except requests.exceptions.Timeout:
+        log_test("No Visible Damage Detection", "FAIL", "Request timed out")
+        return False, None
+    except requests.exceptions.ConnectionError:
+        log_test("No Visible Damage Detection", "FAIL", "Could not connect to backend API")
+        return False, None
+    except Exception as e:
+        log_test("No Visible Damage Detection", "FAIL", f"Unexpected error: {str(e)}")
+        return False, None
+
+def test_refine_diagnosis():
+    """Test the refine-diagnosis endpoint with diagnostic answers"""
+    print("\n🔧 Testing Refine Diagnosis Feature...")
+    
+    # Sample diagnostic answers
+    test_data = {
+        "item_type": "Smartphone",
+        "initial_analysis": {
+            "damage_description": "No visible damage detected",
+            "repair_id": "test-repair-123"
+        },
+        "diagnostic_answers": {
+            "q1": "The phone won't turn on at all",
+            "q2": "It was working fine yesterday",
+            "q3": "No, it hasn't been dropped recently",
+            "q4": "The battery was at about 50% when it stopped working",
+            "q5": "No unusual sounds or smells"
+        }
+    }
+    
+    try:
+        print(f"📡 Sending request to: {BASE_URL}/refine-diagnosis")
+        response = requests.post(
+            f"{BASE_URL}/refine-diagnosis",
+            json=test_data,
+            headers={"Content-Type": "application/json"},
+            timeout=TIMEOUT
+        )
+        
+        print(f"📊 Response Status: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            log_test("Refine Diagnosis", "INFO", "API Response received successfully")
+            
+            refined_diagnosis = data.get('refined_diagnosis', {})
+            if refined_diagnosis:
+                log_test("Refine Diagnosis", "PASS", "Refined diagnosis provided")
+                print(f"   Diagnosis: {refined_diagnosis.get('refined_diagnosis', 'N/A')}")
+                
+                # Check if repair steps are provided
+                repair_steps = refined_diagnosis.get('repair_steps', [])
+                if repair_steps:
+                    print(f"   Repair steps provided: {len(repair_steps)}")
+                    return True, data
+                else:
+                    print("⚠️  Minor: No repair steps in refined diagnosis")
+                    return True, data
+            else:
+                log_test("Refine Diagnosis", "FAIL", "No refined diagnosis in response")
+                return False, data
+                
+        else:
+            log_test("Refine Diagnosis", "FAIL", f"API returned status {response.status_code}: {response.text}")
+            return False, None
+            
+    except Exception as e:
+        log_test("Refine Diagnosis", "FAIL", f"Unexpected error: {str(e)}")
+        return False, None
+
 def main():
-    """Run PR #4 focused backend tests"""
-    print("🚀 FixIt Pro Backend Testing - PR #4: Cost/Time Estimation")
+    """Run No Visible Damage Detection focused backend tests"""
+    print("🚀 FixIt Pro Backend Testing - No Visible Damage Detection Feature")
     print("=" * 70)
     print(f"Backend URL: {BASE_URL}")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -521,10 +652,19 @@ def main():
     print("🌐 Testing API connectivity...")
     results['root'] = test_root_endpoint()
     
-    # Test 2: Main focus - Analyze repair with PR #4 cost/time estimation
-    print("\n🎯 MAIN TEST: PR #4 Cost/Time Estimation")
-    repair_id = test_analyze_repair_pr4()
-    results['pr4_cost_time'] = repair_id is not None
+    # Test 2: Main focus - No Visible Damage Detection
+    print("\n🎯 MAIN TEST: No Visible Damage Detection")
+    success1, analysis_data = test_no_visible_damage_detection()
+    results['no_visible_damage'] = success1
+    
+    # Test 3: Refine Diagnosis (only if first test passed)
+    print("\n🔧 SECONDARY TEST: Refine Diagnosis")
+    if success1:
+        success2, _ = test_refine_diagnosis()
+        results['refine_diagnosis'] = success2
+    else:
+        print("⏭️  Skipping refine-diagnosis test due to analyze-repair failure")
+        results['refine_diagnosis'] = False
     
     # Summary
     print("\n📊 TEST SUMMARY")
@@ -536,17 +676,26 @@ def main():
     for test_name, result in results.items():
         status = "✅ PASS" if result else "❌ FAIL"
         display_name = test_name.replace('_', ' ').title()
-        if test_name == 'pr4_cost_time':
-            display_name = "PR #4: Cost/Time Estimation"
+        if test_name == 'no_visible_damage':
+            display_name = "No Visible Damage Detection"
+        elif test_name == 'refine_diagnosis':
+            display_name = "Refine Diagnosis"
         print(f"  {display_name}: {status}")
     
     print(f"\nOverall: {passed}/{total} tests passed")
     
+    if analysis_data and success1:
+        print(f"\n📊 Key Response Data:")
+        print(f"   Item Type: {analysis_data.get('item_type', 'N/A')}")
+        print(f"   No Visible Damage: {analysis_data.get('no_visible_damage', False)}")
+        print(f"   Diagnostic Questions: {len(analysis_data.get('diagnostic_questions', []))}")
+        print(f"   Repair ID: {analysis_data.get('repair_id', 'N/A')}")
+    
     if passed == total:
-        print("🎉 ALL TESTS PASSED - PR #4 Cost/Time Estimation working correctly!")
+        print("🎉 ALL TESTS PASSED - No Visible Damage Detection working correctly!")
         return True
     else:
-        print("⚠️  SOME TESTS FAILED - Issues found with PR #4 implementation")
+        print("⚠️  SOME TESTS FAILED - Issues found with No Visible Damage Detection")
         return False
 
 if __name__ == "__main__":
