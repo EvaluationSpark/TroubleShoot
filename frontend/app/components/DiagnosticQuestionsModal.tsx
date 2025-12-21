@@ -177,12 +177,27 @@ export default function DiagnosticQuestionsModal({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(false);
+  const [freeTextAnswer, setFreeTextAnswer] = useState('');
 
-  // Get questions for this item type or use default
+  // Check if we have AI-generated diagnostic questions
+  const aiGeneratedQuestions = initialAnalysis?.diagnostic_questions || [];
+  const hasAIQuestions = aiGeneratedQuestions.length > 0;
+
+  // Get questions - prefer AI-generated, fallback to predefined
   const itemKey = Object.keys(DIAGNOSTIC_QUESTIONS).find((key) =>
     itemType.toLowerCase().includes(key)
   );
-  const questions = DIAGNOSTIC_QUESTIONS[itemKey || 'default'].questions;
+  
+  // Convert AI questions to the same format as predefined questions
+  const questions = hasAIQuestions 
+    ? aiGeneratedQuestions.map((q: string, index: number) => ({
+        id: index + 1,
+        question: q,
+        options: null, // AI questions are free-text
+        isFreeText: true,
+      }))
+    : DIAGNOSTIC_QUESTIONS[itemKey || 'default'].questions;
+  
   const currentQuestion = questions[currentQuestionIndex];
 
   const handleSelectOption = async (option: string) => {
@@ -192,10 +207,16 @@ export default function DiagnosticQuestionsModal({
     // Move to next question or finish
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setFreeTextAnswer(''); // Reset free text for next question
     } else {
       // All questions answered, get refined diagnosis
       await getRefinedDiagnosis(newAnswers);
     }
+  };
+
+  const handleFreeTextSubmit = async () => {
+    if (!freeTextAnswer.trim()) return;
+    await handleSelectOption(freeTextAnswer.trim());
   };
 
   const getRefinedDiagnosis = async (allAnswers: Record<number, string>) => {
