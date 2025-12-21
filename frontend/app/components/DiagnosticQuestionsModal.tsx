@@ -307,6 +307,38 @@ export default function DiagnosticQuestionsModal({
                 </View>
               </View>
 
+              {/* Detected Issues Card - Show what AI found before asking questions */}
+              {currentQuestionIndex === 0 && initialAnalysis?.damage_description && initialAnalysis.damage_description !== 'No visible damage detected' && (
+                <BlurView
+                  intensity={theme.colors.glassBlur}
+                  tint={theme.colors.glassTint}
+                  style={[styles.detectedIssuesCard, { borderColor: theme.colors.warning + '40' }]}
+                >
+                  <View style={styles.detectedIssuesHeader}>
+                    <Ionicons name="eye" size={20} color={theme.colors.warning} />
+                    <Text style={[styles.detectedIssuesTitle, { color: theme.colors.warning }]}>
+                      What I Detected
+                    </Text>
+                  </View>
+                  <Text style={[styles.detectedIssuesText, { color: theme.colors.text }]}>
+                    {initialAnalysis.damage_description}
+                  </Text>
+                  {initialAnalysis.detected_issues?.length > 0 && (
+                    <View style={styles.issuesList}>
+                      {initialAnalysis.detected_issues.map((issue: string, idx: number) => (
+                        <View key={idx} style={styles.issueItem}>
+                          <View style={[styles.issueBullet, { backgroundColor: theme.colors.warning }]} />
+                          <Text style={[styles.issueText, { color: theme.colors.textSecondary }]}>{issue}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                  <Text style={[styles.confirmText, { color: theme.colors.textTertiary }]}>
+                    Please answer a few quick questions to confirm this diagnosis
+                  </Text>
+                </BlurView>
+              )}
+
               {/* Question Card */}
               <BlurView
                 intensity={theme.colors.glassBlur}
