@@ -209,9 +209,215 @@ export default function HomeScreen() {
           {/* Main Content */}
           <ScrollView 
             style={styles.content}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { 
+                padding: responsiveStyles.padding,
+                alignItems: responsive.isTablet ? 'center' : 'stretch',
+              }
+            ]}
             showsVerticalScrollIndicator={false}
           >
+            {/* iPad-optimized content wrapper */}
+            <View style={[
+              styles.contentWrapper,
+              { maxWidth: responsive.isTablet ? responsive.contentMaxWidth : '100%' }
+            ]}>
+              {/* Two-column layout for iPad landscape */}
+              {responsive.isTablet && responsive.isLandscape ? (
+                <View style={styles.tabletLandscapeContainer}>
+                  {/* Left column - Hero + Image */}
+                  <View style={styles.tabletLeftColumn}>
+                    {/* Hero Section */}
+                    <BlurView
+                      intensity={theme.colors.glassBlur}
+                      tint={theme.colors.glassTint}
+                      style={[styles.heroCard, { borderColor: theme.colors.glassBorder }]}
+                    >
+                      <View style={styles.heroContent}>
+                        <Text style={[styles.heroTitle, { color: theme.colors.text, fontSize: responsiveStyles.heroFontSize }]}>
+                          Fix Anything,{'\n'}Anywhere
+                        </Text>
+                        <Text style={[styles.heroSubtitle, { color: theme.colors.textSecondary, fontSize: responsiveStyles.heroSubtitleSize }]}>
+                          Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI
+                        </Text>
+                      </View>
+                    </BlurView>
+
+                    {/* Image Preview Card */}
+                    {selectedImage ? (
+                      <BlurView
+                        intensity={theme.colors.glassBlur}
+                        tint={theme.colors.glassTint}
+                        style={[styles.imagePreviewCard, { borderColor: theme.colors.glassBorder, height: responsiveStyles.imagePreviewHeight }]}
+                      >
+                        <Image source={{ uri: selectedImage }} style={styles.previewImage} />
+                        {loading && (
+                          <View style={styles.loadingOverlay}>
+                            <ActivityIndicator size="large" color={theme.colors.primary} />
+                            <Text style={[styles.loadingText, { color: theme.colors.text }]}>Analyzing with AI...</Text>
+                          </View>
+                        )}
+                      </BlurView>
+                    ) : (
+                      <BlurView
+                        intensity={theme.colors.glassBlur}
+                        tint={theme.colors.glassTint}
+                        style={[styles.placeholderCard, { borderColor: theme.colors.glassBorder, height: responsiveStyles.imagePreviewHeight }]}
+                      >
+                        <LinearGradient
+                          colors={theme.gradients.primary}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={[styles.placeholderIcon, { width: responsiveStyles.featureCardSize, height: responsiveStyles.featureCardSize, borderRadius: responsiveStyles.featureCardSize / 2 }]}
+                        >
+                          <Ionicons name="camera" size={responsive.isTablet ? 56 : 48} color="#fff" />
+                        </LinearGradient>
+                        <Text style={[styles.placeholderTitle, { color: theme.colors.text, fontSize: responsive.isTablet ? 22 : 18 }]}>No Image Selected</Text>
+                        <Text style={[styles.placeholderSubtitle, { color: theme.colors.textSecondary, fontSize: responsive.isTablet ? 16 : 14 }]}>
+                          Take a photo or choose from gallery to get started
+                        </Text>
+                      </BlurView>
+                    )}
+                  </View>
+
+                  {/* Right column - Actions + Features */}
+                  <View style={styles.tabletRightColumn}>
+                    {/* Action Buttons */}
+                    <View style={[styles.buttonContainer, { flexDirection: 'column' }]}>
+                      {!selectedImage ? (
+                        <>
+                          <TouchableOpacity
+                            style={[styles.buttonWrapper, { marginBottom: 12 }]}
+                            onPress={() => pickImage(true)}
+                            disabled={loading}
+                          >
+                            <LinearGradient
+                              colors={theme.gradients.primary}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 1, y: 1 }}
+                              style={[styles.primaryButton, { padding: responsiveStyles.buttonPadding }]}
+                            >
+                              <Ionicons name="camera" size={28} color="#fff" />
+                              <Text style={[styles.primaryButtonText, { fontSize: responsive.isTablet ? 18 : 16 }]}>Take Photo</Text>
+                            </LinearGradient>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={styles.buttonWrapper}
+                            onPress={() => pickImage(false)}
+                            disabled={loading}
+                          >
+                            <BlurView
+                              intensity={theme.colors.glassBlur}
+                              tint={theme.colors.glassTint}
+                              style={[styles.secondaryButton, { borderColor: theme.colors.primary, padding: responsiveStyles.buttonPadding }]}
+                            >
+                              <Ionicons name="images" size={28} color={theme.colors.primary} />
+                              <Text style={[styles.secondaryButtonText, { color: theme.colors.primary, fontSize: responsive.isTablet ? 18 : 16 }]}>Choose from Gallery</Text>
+                            </BlurView>
+                          </TouchableOpacity>
+                        </>
+                      ) : (
+                        <>
+                          <TouchableOpacity
+                            style={[styles.buttonWrapper, { marginBottom: 12 }]}
+                            onPress={() => {
+                              if (selectedImage) {
+                                analyzeImage(selectedImage);
+                              }
+                            }}
+                            disabled={loading}
+                          >
+                            <LinearGradient
+                              colors={theme.gradients.primary}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 1, y: 1 }}
+                              style={[styles.primaryButton, { padding: responsiveStyles.buttonPadding }]}
+                            >
+                              <Ionicons name="flash" size={28} color="#fff" />
+                              <Text style={[styles.primaryButtonText, { fontSize: responsive.isTablet ? 18 : 16 }]}>
+                                {loading ? 'Analyzing...' : 'Analyze & Get Repair Guide'}
+                              </Text>
+                            </LinearGradient>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={styles.buttonWrapper}
+                            onPress={() => setSelectedImage(null)}
+                            disabled={loading}
+                          >
+                            <BlurView
+                              intensity={theme.colors.glassBlur}
+                              tint={theme.colors.glassTint}
+                              style={[styles.secondaryButton, { borderColor: theme.colors.textSecondary, padding: responsiveStyles.buttonPadding }]}
+                            >
+                              <Ionicons name="refresh" size={24} color={theme.colors.textSecondary} />
+                              <Text style={[styles.secondaryButtonText, { color: theme.colors.textSecondary }]}>Select Different Image</Text>
+                            </BlurView>
+                          </TouchableOpacity>
+                        </>
+                      )}
+                    </View>
+
+                    {/* Model Number Input */}
+                    {selectedImage && (
+                      <BlurView
+                        intensity={theme.colors.glassBlur}
+                        tint={theme.colors.glassTint}
+                        style={[styles.modelInputCard, { borderColor: theme.colors.glassBorder }]}
+                      >
+                        <View style={styles.modelInputHeader}>
+                          <Ionicons name="pricetag" size={20} color={theme.colors.primary} />
+                          <Text style={[styles.modelInputTitle, { color: theme.colors.text }]}>
+                            Model Number {modelNumber ? '✓' : '(Optional)'}
+                          </Text>
+                        </View>
+                        <TextInput
+                          style={[styles.modelInput, { 
+                            color: theme.colors.text,
+                            borderColor: modelNumber ? theme.colors.success : theme.colors.glassBorder,
+                            backgroundColor: theme.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                          }]}
+                          placeholder="e.g., XR-2000, ABC123"
+                          placeholderTextColor={theme.colors.textTertiary}
+                          value={modelNumber}
+                          onChangeText={setModelNumber}
+                          autoCapitalize="characters"
+                          returnKeyType="done"
+                        />
+                      </BlurView>
+                    )}
+
+                    {/* Gamification Progress Card */}
+                    <GamificationCard />
+
+                    {/* Features Grid - 2x2 on tablet landscape */}
+                    <View style={[styles.featuresGrid, { flexDirection: 'row', flexWrap: 'wrap' }]}>
+                      {[
+                        { icon: 'bulb', title: 'AI-Powered', color: theme.colors.primary },
+                        { icon: 'construct', title: 'Step-by-Step', color: theme.colors.accent },
+                        { icon: 'shield-checkmark', title: 'Safety Tips', color: theme.colors.success },
+                        { icon: 'people', title: 'Community', color: theme.colors.warning },
+                      ].map((feature, index) => (
+                        <BlurView
+                          key={index}
+                          intensity={theme.colors.glassBlur}
+                          tint={theme.colors.glassTint}
+                          style={[styles.featureCard, { borderColor: theme.colors.glassBorder, width: '48%', marginBottom: 8 }]}
+                        >
+                          <View style={[styles.featureIconContainer, { backgroundColor: `${feature.color}20` }]}>
+                            <Ionicons name={feature.icon as any} size={24} color={feature.color} />
+                          </View>
+                          <Text style={[styles.featureText, { color: theme.colors.textSecondary }]}>{feature.title}</Text>
+                        </BlurView>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                /* Standard portrait/phone layout */
+                <>
             {/* Hero Section */}
             <BlurView
               intensity={theme.colors.glassBlur}
@@ -219,8 +425,8 @@ export default function HomeScreen() {
               style={[styles.heroCard, { borderColor: theme.colors.glassBorder }]}
             >
               <View style={styles.heroContent}>
-                <Text style={[styles.heroTitle, { color: theme.colors.text }]}>Fix Anything,{' \n'}Anywhere</Text>
-                <Text style={[styles.heroSubtitle, { color: theme.colors.textSecondary }]}>
+                <Text style={[styles.heroTitle, { color: theme.colors.text, fontSize: responsiveStyles.heroFontSize }]}>Fix Anything,{'\n'}Anywhere</Text>
+                <Text style={[styles.heroSubtitle, { color: theme.colors.textSecondary, fontSize: responsiveStyles.heroSubtitleSize }]}>
                   Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI
                 </Text>
               </View>
@@ -231,7 +437,7 @@ export default function HomeScreen() {
               <BlurView
                 intensity={theme.colors.glassBlur}
                 tint={theme.colors.glassTint}
-                style={[styles.imagePreviewCard, { borderColor: theme.colors.glassBorder }]}
+                style={[styles.imagePreviewCard, { borderColor: theme.colors.glassBorder, height: responsiveStyles.imagePreviewHeight }]}
               >
                 <Image source={{ uri: selectedImage }} style={styles.previewImage} />
                 {loading && (
@@ -245,18 +451,18 @@ export default function HomeScreen() {
               <BlurView
                 intensity={theme.colors.glassBlur}
                 tint={theme.colors.glassTint}
-                style={[styles.placeholderCard, { borderColor: theme.colors.glassBorder }]}
+                style={[styles.placeholderCard, { borderColor: theme.colors.glassBorder, height: responsiveStyles.imagePreviewHeight }]}
               >
                 <LinearGradient
                   colors={theme.gradients.primary}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
-                  style={styles.placeholderIcon}
+                  style={[styles.placeholderIcon, { width: responsiveStyles.featureCardSize, height: responsiveStyles.featureCardSize, borderRadius: responsiveStyles.featureCardSize / 2 }]}
                 >
-                  <Ionicons name="camera" size={48} color="#fff" />
+                  <Ionicons name="camera" size={responsive.isTablet ? 56 : 48} color="#fff" />
                 </LinearGradient>
-                <Text style={[styles.placeholderTitle, { color: theme.colors.text }]}>No Image Selected</Text>
-                <Text style={[styles.placeholderSubtitle, { color: theme.colors.textSecondary }]}>
+                <Text style={[styles.placeholderTitle, { color: theme.colors.text, fontSize: responsive.isTablet ? 22 : 18 }]}>No Image Selected</Text>
+                <Text style={[styles.placeholderSubtitle, { color: theme.colors.textSecondary, fontSize: responsive.isTablet ? 16 : 14 }]}>
                   Take a photo or choose from gallery to get started
                 </Text>
               </BlurView>
