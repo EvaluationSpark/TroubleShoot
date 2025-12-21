@@ -895,4 +895,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
+  // iPad/Tablet Responsive Styles
+  contentWrapper: {
+    width: '100%',
+  },
+  tabletLandscapeContainer: {
+    flexDirection: 'row',
+    gap: 24,
+  },
+  tabletLeftColumn: {
+    flex: 1,
+    gap: 20,
+  },
+  tabletRightColumn: {
+    flex: 1,
+    gap: 20,
+  },
+  tabletFeaturesGrid: {
+    gap: 16,
+  },
 });
