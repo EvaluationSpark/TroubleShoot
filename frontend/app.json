@@ -3,7 +3,7 @@
     "name": "FixIntel AI",
     "slug": "fixintel-ai",
     "version": "1.0.5",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "fixintel",
     "userInterfaceStyle": "automatic",
@@ -30,10 +30,18 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.fixintel.ai",
       "buildNumber": "1.0.5",
+      "requireFullScreen": false,
       "infoPlist": {
         "NSCameraUsageDescription": "FixIntel AI needs camera access to analyze broken items for repair diagnostics.",
         "NSPhotoLibraryUsageDescription": "FixIntel AI needs photo library access to select images for repair analysis.",
-        "NSLocationWhenInUseUsageDescription": "FixIntel AI needs your location to find local repair professionals near you."
+        "NSLocationWhenInUseUsageDescription": "FixIntel AI needs your location to find local repair professionals near you.",
+        "UIRequiresFullScreen": false,
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ]
       }
     },
     "androidStatusBar": {
