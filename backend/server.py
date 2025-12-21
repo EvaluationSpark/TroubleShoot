@@ -508,7 +508,9 @@ async def analyze_repair(request: RepairAnalysisRequest):
             diagram_base64=diagram_base64,
             model_number=request.model_number,  # PR #5
             no_visible_damage=analysis.get('no_visible_damage', False),
-            diagnostic_questions=analysis.get('diagnostic_questions', [])
+            diagnostic_questions=analysis.get('diagnostic_questions', []),
+            clarifying_questions=analysis.get('clarifying_questions', []),
+            detected_issues=analysis.get('detected_issues', [])
         )
         
         # Save to database
