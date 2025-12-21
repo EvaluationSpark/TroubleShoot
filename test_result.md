@@ -447,7 +447,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Task-Appropriate Clarifying Questions Feature"
+    - "User-Specific Repair Sessions Feature"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
