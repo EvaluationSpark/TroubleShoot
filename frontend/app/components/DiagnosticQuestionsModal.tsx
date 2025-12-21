@@ -318,65 +318,110 @@ export default function DiagnosticQuestionsModal({
                     colors={theme.gradients.primary}
                     style={styles.iconGradient}
                   >
-                    <Ionicons name="help-circle" size={32} color="#fff" />
+                    <Ionicons name={hasAIQuestions ? "chatbubble-ellipses" : "help-circle"} size={32} color="#fff" />
                   </LinearGradient>
                 </View>
+                {hasAIQuestions && (
+                  <View style={[styles.aiTag, { backgroundColor: theme.colors.primary + '20' }]}>
+                    <Text style={[styles.aiTagText, { color: theme.colors.primary }]}>AI Analysis</Text>
+                  </View>
+                )}
                 <Text style={[styles.questionText, { color: theme.colors.text }]}>
                   {currentQuestion.question}
                 </Text>
                 <Text style={[styles.questionSubtext, { color: theme.colors.textSecondary }]}>
-                  Select the option that best describes your situation:
+                  {currentQuestion.isFreeText 
+                    ? 'Type your answer below to help us diagnose the issue:'
+                    : 'Select the option that best describes your situation:'}
                 </Text>
               </BlurView>
 
-              {/* Options */}
-              <View style={styles.optionsContainer}>
-                {currentQuestion.options.map((option: string, index: number) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => handleSelectOption(option)}
-                    activeOpacity={0.7}
+              {/* Options or Free Text Input */}
+              {currentQuestion.isFreeText ? (
+                <View style={styles.freeTextContainer}>
+                  <BlurView
+                    intensity={theme.colors.glassBlur}
+                    tint={theme.colors.glassTint}
+                    style={[styles.textInputCard, { borderColor: theme.colors.glassBorder }]}
                   >
-                    <BlurView
-                      intensity={theme.colors.glassBlur}
-                      tint={theme.colors.glassTint}
-                      style={[
-                        styles.optionCard,
-                        {
-                          borderColor: answers[currentQuestion.id] === option
-                            ? theme.colors.primary
-                            : theme.colors.glassBorder,
-                          borderWidth: answers[currentQuestion.id] === option ? 2 : 1,
-                        },
-                      ]}
+                    <TextInput
+                      style={[styles.textInput, { color: theme.colors.text }]}
+                      placeholder="Describe the issue..."
+                      placeholderTextColor={theme.colors.textTertiary}
+                      value={freeTextAnswer}
+                      onChangeText={setFreeTextAnswer}
+                      multiline
+                      numberOfLines={4}
+                      textAlignVertical="top"
+                    />
+                  </BlurView>
+                  <TouchableOpacity
+                    onPress={handleFreeTextSubmit}
+                    disabled={!freeTextAnswer.trim()}
+                    style={{ opacity: freeTextAnswer.trim() ? 1 : 0.5 }}
+                  >
+                    <LinearGradient
+                      colors={theme.gradients.primary}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.submitButton}
                     >
-                      <View style={styles.optionContent}>
-                        <Text
-                          style={[
-                            styles.optionText,
-                            {
-                              color: answers[currentQuestion.id] === option
-                                ? theme.colors.primary
-                                : theme.colors.text,
-                            },
-                          ]}
-                        >
-                          {option}
-                        </Text>
-                      </View>
-                      <Ionicons
-                        name={answers[currentQuestion.id] === option ? 'checkmark-circle' : 'chevron-forward'}
-                        size={24}
-                        color={
-                          answers[currentQuestion.id] === option
-                            ? theme.colors.primary
-                            : theme.colors.textTertiary
-                        }
-                      />
-                    </BlurView>
+                      <Text style={styles.submitButtonText}>
+                        {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Get Diagnosis'}
+                      </Text>
+                      <Ionicons name="arrow-forward" size={20} color="#fff" />
+                    </LinearGradient>
                   </TouchableOpacity>
-                ))}
-              </View>
+                </View>
+              ) : (
+                <View style={styles.optionsContainer}>
+                  {currentQuestion.options && currentQuestion.options.map((option: string, index: number) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => handleSelectOption(option)}
+                      activeOpacity={0.7}
+                    >
+                      <BlurView
+                        intensity={theme.colors.glassBlur}
+                        tint={theme.colors.glassTint}
+                        style={[
+                          styles.optionCard,
+                          {
+                            borderColor: answers[currentQuestion.id] === option
+                              ? theme.colors.primary
+                              : theme.colors.glassBorder,
+                            borderWidth: answers[currentQuestion.id] === option ? 2 : 1,
+                          },
+                        ]}
+                      >
+                        <View style={styles.optionContent}>
+                          <Text
+                            style={[
+                              styles.optionText,
+                              {
+                                color: answers[currentQuestion.id] === option
+                                  ? theme.colors.primary
+                                  : theme.colors.text,
+                              },
+                            ]}
+                          >
+                            {option}
+                          </Text>
+                        </View>
+                        <Ionicons
+                          name={answers[currentQuestion.id] === option ? 'checkmark-circle' : 'chevron-forward'}
+                          size={24}
+                          color={
+                            answers[currentQuestion.id] === option
+                              ? theme.colors.primary
+                              : theme.colors.textTertiary
+                          }
+                        />
+                      </BlurView>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
 
               {/* Help Text */}
               <BlurView
