@@ -266,6 +266,21 @@ backend:
         - working: true
           agent: "testing"
           comment: "CLARIFYING QUESTIONS FEATURE TESTING COMPLETED: Backend now ALWAYS returns clarifying_questions field for both damaged and undamaged items as requested. Tested with damaged phone (cracked screen) - returned 4 clarifying questions + 3 detected issues. Tested with undamaged phone - returned 5 clarifying questions even with no_visible_damage=true. All required fields present: clarifying_questions, detected_issues, damage_description, repair_steps, tools_needed, parts_needed, safety_tips. Feature working perfectly as specified in review request."
+        - working: true
+          agent: "testing"
+          comment: "TASK-APPROPRIATE CLARIFYING QUESTIONS TESTING COMPLETED: Comprehensive validation of the updated feature per review request. EXCELLENT RESULTS: (1) Smartphone test - 4 highly specific questions about touchscreen responsiveness, display artifacts, all referencing 'smartphone' specifically, (2) Chair test - 5 furniture-specific questions about break type, attachment, wood type, all category-appropriate, (3) Washing machine test - 4 appliance-specific questions about water flow, error codes, leaks. ALL VALIDATION CRITERIA MET: Questions reference specific item names (not generic 'device'), reference specific damage detected, are category-relevant (electronics/furniture/appliances), and contain no generic patterns. Feature is production-ready and exceeds requirements."
+
+  - task: "Task-Appropriate Clarifying Questions Feature"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "COMPREHENSIVE TESTING COMPLETED per review request: The AI now generates HIGHLY SPECIFIC clarifying questions based on exact item type and damage detected. Validated all criteria: (1) Questions reference SPECIFIC item names - smartphone questions mention 'smartphone', chair questions mention 'chair', washing machine questions mention 'washing machine' (not generic 'device' or 'item'), (2) Questions reference SPECIFIC damage - screen crack questions ask about 'touchscreen responsiveness' and 'display artifacts', broken leg questions ask about 'break type' and 'attachment', (3) Questions are item-category relevant - electronics questions about battery/display, furniture questions about stability/joints, appliance questions about cycles/error codes, (4) No generic questions like 'Is the item working?' detected. Feature working perfectly with 3/3 test scenarios passed. Production-ready."
 
 frontend:
   - task: "Bottom Tab Navigation"
