@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-FixIt Pro Backend API Test Suite - Clarifying Questions Feature Testing
-Focus: Testing the updated /api/analyze-repair endpoint to ensure clarifying_questions are ALWAYS returned
+FixIt Pro Backend API Test Suite - Task-Appropriate Clarifying Questions Feature Testing
+Focus: Testing the updated "Task-Appropriate Clarifying Questions" feature as per review request
+
+VALIDATION CRITERIA:
+1. Questions must reference the SPECIFIC item name (not "device" or "item")
+2. Questions must reference the SPECIFIC damage detected
+3. Questions should be relevant to the item category (electronics, appliances, furniture, etc.)
+4. Questions should NOT be generic like "Is the item working?"
 """
 
 import requests
