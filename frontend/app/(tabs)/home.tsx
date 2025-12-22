@@ -34,6 +34,7 @@ const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 export default function HomeScreen() {
   const { theme } = useTheme();
   const { skillLevel } = useSkillLevel();
+  const { t, language } = useLanguage();
   const responsive = useResponsive();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [modelNumber, setModelNumber] = useState<string>('');
