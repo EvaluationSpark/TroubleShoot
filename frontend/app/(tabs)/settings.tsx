@@ -191,6 +191,18 @@ export default function SettingsScreen() {
               />
             </View>
 
+            {/* Language Section */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Language</Text>
+              
+              <MenuItem
+                icon="language"
+                title="App Language"
+                subtitle={getCurrentLanguageName()}
+                onPress={() => setShowLanguagePicker(true)}
+              />
+            </View>
+
             {/* Skill Level Section */}
             <View style={styles.section}>
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Experience Level</Text>
