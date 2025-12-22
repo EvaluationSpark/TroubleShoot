@@ -286,9 +286,9 @@ export default function HomeScreen() {
                         >
                           <Ionicons name="camera" size={responsive.isTablet ? 56 : 48} color="#fff" />
                         </LinearGradient>
-                        <Text style={[styles.placeholderTitle, { color: theme.colors.text, fontSize: responsive.isTablet ? 22 : 18 }]}>No Image Selected</Text>
+                        <Text style={[styles.placeholderTitle, { color: theme.colors.text, fontSize: responsive.isTablet ? 22 : 18 }]}>{t('noImageSelected')}</Text>
                         <Text style={[styles.placeholderSubtitle, { color: theme.colors.textSecondary, fontSize: responsive.isTablet ? 16 : 14 }]}>
-                          Take a photo or choose from gallery to get started
+                          {t('snapPhotoSubtitle')}
                         </Text>
                       </BlurView>
                     )}
