@@ -312,7 +312,7 @@ export default function HomeScreen() {
                               style={[styles.primaryButton, { padding: responsiveStyles.buttonPadding }]}
                             >
                               <Ionicons name="camera" size={28} color="#fff" />
-                              <Text style={[styles.primaryButtonText, { fontSize: responsive.isTablet ? 18 : 16 }]}>Take Photo</Text>
+                              <Text style={[styles.primaryButtonText, { fontSize: responsive.isTablet ? 18 : 16 }]}>{t('takePhoto')}</Text>
                             </LinearGradient>
                           </TouchableOpacity>
 
