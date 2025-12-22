@@ -133,6 +133,7 @@ export default function HomeScreen() {
           image_mime_type: 'image/jpeg',
           skill_level: skillLevel,
           model_number: modelNumber || undefined,
+          language: language, // Pass current language for AI responses
         }),
       });
 
