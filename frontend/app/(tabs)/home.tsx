@@ -249,10 +249,10 @@ export default function HomeScreen() {
                     >
                       <View style={styles.heroContent}>
                         <Text style={[styles.heroTitle, { color: theme.colors.text, fontSize: responsiveStyles.heroFontSize }]}>
-                          Fix Anything,{'\n'}Anywhere
+                          {t('fixAnything')}{'\n'}{t('anywhere')}
                         </Text>
                         <Text style={[styles.heroSubtitle, { color: theme.colors.textSecondary, fontSize: responsiveStyles.heroSubtitleSize }]}>
-                          Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI
+                          {t('heroSubtitle')}
                         </Text>
                       </View>
                     </BlurView>
