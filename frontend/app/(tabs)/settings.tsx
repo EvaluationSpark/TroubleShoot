@@ -576,4 +576,48 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 12,
   },
+  // Language Picker Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  languageModal: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    maxHeight: '70%',
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  languageList: {
+    maxHeight: 400,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    gap: 12,
+  },
+  languageFlag: {
+    fontSize: 28,
+  },
+  languageName: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
