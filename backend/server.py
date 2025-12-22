@@ -182,7 +182,7 @@ class LocalVendor(BaseModel):
 # ============ HELPER FUNCTIONS ============
 
 async def analyze_broken_item(image_base64: str, language: str = "en", skill_level: str = "diy", model_number: Optional[str] = None, mime_type: str = "image/jpeg") -> Dict[str, Any]:
-    """Analyze a broken item using Gemini Vision API"""
+    """Analyze a broken item using Google Gemini Vision API"""
     try:
         # Adapt instructions based on skill level
         skill_context = {
@@ -193,10 +193,7 @@ async def analyze_broken_item(image_base64: str, language: str = "en", skill_lev
         
         skill_prompt = skill_context.get(skill_level.lower(), skill_context["diy"])
         
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"analysis_{uuid.uuid4()}",
-            system_message=f"""You are an expert repair technician with 20+ years of experience across electronics, appliances, furniture, automotive, and more. You have exceptional visual analysis skills and can identify problems from images with high accuracy.
+        system_message = f"""You are an expert repair technician with 20+ years of experience across electronics, appliances, furniture, automotive, and more. You have exceptional visual analysis skills and can identify problems from images with high accuracy.
 
 Your expertise includes:
 - Visual damage assessment and root cause analysis
@@ -208,13 +205,11 @@ Your expertise includes:
 - Cost estimation based on current market prices
 
 {skill_prompt}"""
-        )
-        
-        chat.with_model("gemini", "gemini-2.5-flash-image-preview")
         
         model_context = f"\nMODEL NUMBER PROVIDED: {model_number}\nUse this model number to provide MORE ACCURATE parts specifications, compatibility information, and model-specific repair steps." if model_number else ""
         
-        prompt = f"""
+        prompt = f"""{system_message}
+
 VISUAL ANALYSIS INSTRUCTIONS:
 Carefully examine this image and perform a comprehensive visual inspection:
 
