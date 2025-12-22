@@ -25,6 +25,7 @@ import SafetyGatingModal from '../components/SafetyGatingModal';
 import GamificationCard from '../components/GamificationCard';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSkillLevel } from '../contexts/SkillLevelContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { RiskLevel } from '../types/models';
 import { useResponsive } from '../hooks/useResponsive';
 
