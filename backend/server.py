@@ -447,17 +447,25 @@ GOOD (specific): "Did the screen crack from a single drop, or has it been develo
 }}
 """
         
-        msg = UserMessage(
-            text=prompt,
-            file_contents=[ImageContent(image_base64=image_base64)]
-        )
+        # Use Google Gemini directly instead of LlmChat
+        model = genai.GenerativeModel('gemini-2.0-flash')
         
-        response = await chat.send_message(msg)
+        # Decode and prepare the image
+        image_data = base64.b64decode(image_base64)
+        
+        # Create the image part for Gemini
+        image_part = {
+            "mime_type": mime_type,
+            "data": image_data
+        }
+        
+        # Send the request
+        response = model.generate_content([prompt, image_part])
         
         # Parse JSON response
         import json
         # Remove markdown code blocks if present
-        response_text = response.strip()
+        response_text = response.text.strip()
         if response_text.startswith('```'):
             response_text = response_text.split('```')[1]
             if response_text.startswith('json'):
