@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { translations } from '../i18n/translations';
 
 type TranslationKeys = keyof typeof translations.en;
@@ -15,6 +16,23 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 const LANGUAGE_KEY = '@fixintel_language';
 
+// Helper functions to work across web and native
+const storage = {
+  getItem: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+    return AsyncStorage.getItem(key);
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+      return;
+    }
+    await AsyncStorage.setItem(key, value);
+  }
+};
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState('en');
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +43,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const loadSavedLanguage = async () => {
     try {
-      const savedLang = await AsyncStorage.getItem(LANGUAGE_KEY);
+      const savedLang = await storage.getItem(LANGUAGE_KEY);
       console.log('[Language] Loaded saved language:', savedLang);
       if (savedLang && translations[savedLang as keyof typeof translations]) {
         setLanguageState(savedLang);
@@ -40,7 +58,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLanguage = async (lang: string) => {
     try {
       console.log('[Language] Setting language to:', lang);
-      await AsyncStorage.setItem(LANGUAGE_KEY, lang);
+      await storage.setItem(LANGUAGE_KEY, lang);
       setLanguageState(lang);
     } catch (error) {
       console.error('[Language] Error saving language:', error);
