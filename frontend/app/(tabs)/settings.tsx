@@ -9,6 +9,7 @@ import {
   Alert,
   ImageBackground,
   Animated,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +20,16 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useSkillLevel } from '../contexts/SkillLevelContext';
 import { SkillLevel } from '../types/models';
 import { requestNotificationPermissions, checkNotificationPermissions } from '../utils/notifications';
+import { saveLanguagePreference, getCurrentLanguage } from '../i18n';
+
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+];
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -26,6 +37,8 @@ export default function SettingsScreen() {
   const { skillLevel, setSkillLevel, skillLevelLabel, skillLevelDescription } = useSkillLevel();
   const [notifications, setNotifications] = useState(false);
   const [showSkillLevelPicker, setShowSkillLevelPicker] = useState(false);
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+  const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const scaleAnim = new Animated.Value(1);
 
   useEffect(() => {
