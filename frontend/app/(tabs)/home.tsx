@@ -438,9 +438,9 @@ export default function HomeScreen() {
               style={[styles.heroCard, { borderColor: theme.colors.glassBorder }]}
             >
               <View style={styles.heroContent}>
-                <Text style={[styles.heroTitle, { color: theme.colors.text, fontSize: responsiveStyles.heroFontSize }]}>Fix Anything,{'\n'}Anywhere</Text>
+                <Text style={[styles.heroTitle, { color: theme.colors.text, fontSize: responsiveStyles.heroFontSize }]}>{t('fixAnything')}{'\n'}{t('anywhere')}</Text>
                 <Text style={[styles.heroSubtitle, { color: theme.colors.textSecondary, fontSize: responsiveStyles.heroSubtitleSize }]}>
-                  Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI
+                  {t('heroSubtitle')}
                 </Text>
               </View>
             </BlurView>
@@ -456,7 +456,7 @@ export default function HomeScreen() {
                 {loading && (
                   <View style={styles.loadingOverlay}>
                     <ActivityIndicator size="large" color={theme.colors.primary} />
-                    <Text style={[styles.loadingText, { color: theme.colors.text }]}>Analyzing with AI...</Text>
+                    <Text style={[styles.loadingText, { color: theme.colors.text }]}>{t('loading')}</Text>
                   </View>
                 )}
               </BlurView>
@@ -474,9 +474,9 @@ export default function HomeScreen() {
                 >
                   <Ionicons name="camera" size={responsive.isTablet ? 56 : 48} color="#fff" />
                 </LinearGradient>
-                <Text style={[styles.placeholderTitle, { color: theme.colors.text, fontSize: responsive.isTablet ? 22 : 18 }]}>No Image Selected</Text>
+                <Text style={[styles.placeholderTitle, { color: theme.colors.text, fontSize: responsive.isTablet ? 22 : 18 }]}>{t('noImageSelected')}</Text>
                 <Text style={[styles.placeholderSubtitle, { color: theme.colors.textSecondary, fontSize: responsive.isTablet ? 16 : 14 }]}>
-                  Take a photo or choose from gallery to get started
+                  {t('snapPhotoSubtitle')}
                 </Text>
               </BlurView>
             )}
@@ -497,7 +497,7 @@ export default function HomeScreen() {
                       style={styles.primaryButton}
                     >
                       <Ionicons name="camera" size={24} color="#fff" />
-                      <Text style={styles.primaryButtonText}>Take Photo</Text>
+                      <Text style={styles.primaryButtonText}>{t('takePhoto')}</Text>
                     </LinearGradient>
                   </TouchableOpacity>
 
