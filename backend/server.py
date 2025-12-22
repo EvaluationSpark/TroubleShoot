@@ -545,12 +545,19 @@ async def analyze_repair(request: RepairAnalysisRequest):
         )
         
         # Create response
+        # Handle estimated_time which could be string or dict
+        estimated_time = analysis.get('estimated_time', 'Unknown')
+        if isinstance(estimated_time, dict):
+            total = estimated_time.get('total', 0)
+            unit = estimated_time.get('unit', 'minutes')
+            estimated_time = f"{total} {unit}"
+        
         response = RepairAnalysisResponse(
             repair_id=repair_id,
             item_type=analysis.get('item_type', 'Unknown'),
             damage_description=analysis.get('damage_description', ''),
             repair_difficulty=analysis.get('repair_difficulty', 'medium'),
-            estimated_time=analysis.get('estimated_time', 'Unknown'),
+            estimated_time=estimated_time,
             repair_steps=analysis.get('repair_steps', []),
             tools_needed=analysis.get('tools_needed', []),
             parts_needed=analysis.get('parts_needed', []),
