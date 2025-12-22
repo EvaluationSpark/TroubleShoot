@@ -8,12 +8,16 @@ interface LanguageContextType {
   language: string;
   setLanguage: (lang: string) => Promise<void>;
   t: (key: TranslationKeys) => string;
+  isLoading: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+const LANGUAGE_KEY = '@fixintel_language';
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState('en');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadSavedLanguage();
@@ -21,31 +25,36 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const loadSavedLanguage = async () => {
     try {
-      const savedLang = await AsyncStorage.getItem('app_language');
+      const savedLang = await AsyncStorage.getItem(LANGUAGE_KEY);
+      console.log('[Language] Loaded saved language:', savedLang);
       if (savedLang && translations[savedLang as keyof typeof translations]) {
         setLanguageState(savedLang);
       }
     } catch (error) {
-      console.error('Error loading language:', error);
+      console.error('[Language] Error loading language:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const setLanguage = async (lang: string) => {
     try {
-      await AsyncStorage.setItem('app_language', lang);
+      console.log('[Language] Setting language to:', lang);
+      await AsyncStorage.setItem(LANGUAGE_KEY, lang);
       setLanguageState(lang);
     } catch (error) {
-      console.error('Error saving language:', error);
+      console.error('[Language] Error saving language:', error);
     }
   };
 
   const t = useCallback((key: TranslationKeys): string => {
     const langTranslations = translations[language as keyof typeof translations] || translations.en;
-    return (langTranslations as any)[key] || (translations.en as any)[key] || key;
+    const translation = (langTranslations as any)[key] || (translations.en as any)[key] || key;
+    return translation;
   }, [language]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isLoading }}>
       {children}
     </LanguageContext.Provider>
   );
