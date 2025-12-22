@@ -18,9 +18,9 @@ import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSkillLevel } from '../contexts/SkillLevelContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { SkillLevel } from '../types/models';
 import { requestNotificationPermissions, checkNotificationPermissions } from '../utils/notifications';
-import { saveLanguagePreference, getCurrentLanguage } from '../i18n';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -35,10 +35,10 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { theme, themeMode, toggleTheme } = useTheme();
   const { skillLevel, setSkillLevel, skillLevelLabel, skillLevelDescription } = useSkillLevel();
+  const { language, setLanguage, t } = useLanguage();
   const [notifications, setNotifications] = useState(false);
   const [showSkillLevelPicker, setShowSkillLevelPicker] = useState(false);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
-  const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const scaleAnim = new Animated.Value(1);
 
   useEffect(() => {
