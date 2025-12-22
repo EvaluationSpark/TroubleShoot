@@ -8,8 +8,11 @@ export const translations = {
     
     // Home Screen
     fixYourItems: 'Fix Your Items',
-    snapPhotoSubtitle: 'Snap a photo of broken items and get AI-powered repair instructions',
-    noImageSelected: 'No image selected',
+    fixAnything: 'Fix Anything,',
+    anywhere: 'Anywhere',
+    heroSubtitle: 'Snap a photo of any broken item and get instant, expert repair guidance powered by advanced AI',
+    snapPhotoSubtitle: 'Take a photo or choose from gallery to get started',
+    noImageSelected: 'No Image Selected',
     takePhoto: 'Take Photo',
     chooseGallery: 'Choose from Gallery',
     analyzeRepair: 'Analyze & Get Repair Guide',
@@ -20,22 +23,32 @@ export const translations = {
     toolsAndParts: 'Tools and parts needed',
     visualDiagrams: 'Visual repair diagrams',
     safetyTipsWarnings: 'Safety tips and warnings',
+    aiPowered: 'AI-Powered',
+    stepByStep: 'Step-by-Step',
+    safetyTipsFeature: 'Safety Tips',
+    communityFeature: 'Community',
     
     // Repair Instructions
     repairGuide: 'Repair Guide',
     instructions: 'Instructions',
     tools: 'Tools & Parts',
     safety: 'Safety',
+    videos: 'Videos',
     repairSteps: 'Repair Steps',
     toolsNeeded: 'Tools Needed',
     partsNeeded: 'Parts Needed',
     safetyTips: 'Safety Tips',
+    moreDetails: 'More Details',
+    findWhereToBuy: 'Find Where to Buy',
+    watchTutorial: 'Watch Tutorial',
     
     // Actions
     moreHelp: 'More Help',
     saveForLater: 'Save for Later',
     wasHelpful: 'Was this helpful?',
     buyOnAmazon: 'Buy on Amazon',
+    findLocalPros: 'Find Local Pros',
+    exportPDF: 'Export as PDF',
     
     // Community
     communityRepairs: 'Community Repairs',
