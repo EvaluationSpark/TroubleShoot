@@ -512,7 +512,7 @@ export default function HomeScreen() {
                       style={[styles.secondaryButton, { borderColor: theme.colors.primary }]}
                     >
                       <Ionicons name="images" size={24} color={theme.colors.primary} />
-                      <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>Gallery</Text>
+                      <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>{t('chooseGallery')}</Text>
                     </BlurView>
                   </TouchableOpacity>
                 </>
@@ -539,7 +539,7 @@ export default function HomeScreen() {
                     >
                       <Ionicons name="flash" size={24} color="#fff" />
                       <Text style={styles.primaryButtonText}>
-                        {loading ? 'Analyzing...' : 'Analyze & Get Repair Guide'}
+                        {loading ? t('loading') : t('analyzeRepair')}
                       </Text>
                     </LinearGradient>
                   </TouchableOpacity>
