@@ -350,7 +350,7 @@ export default function HomeScreen() {
                             >
                               <Ionicons name="flash" size={28} color="#fff" />
                               <Text style={[styles.primaryButtonText, { fontSize: responsive.isTablet ? 18 : 16 }]}>
-                                {loading ? 'Analyzing...' : 'Analyze & Get Repair Guide'}
+                                {loading ? t('loading') : t('analyzeRepair')}
                               </Text>
                             </LinearGradient>
                           </TouchableOpacity>
