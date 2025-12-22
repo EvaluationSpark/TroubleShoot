@@ -77,6 +77,26 @@ export default function SettingsScreen() {
     toggleTheme();
   };
 
+  const handleLanguageChange = async (langCode: string) => {
+    const success = await saveLanguagePreference(langCode);
+    if (success) {
+      setCurrentLang(langCode);
+      setShowLanguagePicker(false);
+      Alert.alert(
+        'Language Changed',
+        'Please restart the app for the language change to take full effect.',
+        [{ text: 'OK' }]
+      );
+    } else {
+      Alert.alert('Error', 'Failed to change language');
+    }
+  };
+
+  const getCurrentLanguageName = () => {
+    const lang = LANGUAGES.find(l => l.code === currentLang);
+    return lang ? `${lang.flag} ${lang.name}` : '🇺🇸 English';
+  };
+
   const MenuItem = ({ icon, title, subtitle, onPress, showArrow = true, rightComponent }: any) => (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
       <BlurView
