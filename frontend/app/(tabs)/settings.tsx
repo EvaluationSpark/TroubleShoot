@@ -78,22 +78,12 @@ export default function SettingsScreen() {
   };
 
   const handleLanguageChange = async (langCode: string) => {
-    const success = await saveLanguagePreference(langCode);
-    if (success) {
-      setCurrentLang(langCode);
-      setShowLanguagePicker(false);
-      Alert.alert(
-        'Language Changed',
-        'Please restart the app for the language change to take full effect.',
-        [{ text: 'OK' }]
-      );
-    } else {
-      Alert.alert('Error', 'Failed to change language');
-    }
+    await setLanguage(langCode);
+    setShowLanguagePicker(false);
   };
 
   const getCurrentLanguageName = () => {
-    const lang = LANGUAGES.find(l => l.code === currentLang);
+    const lang = LANGUAGES.find(l => l.code === language);
     return lang ? `${lang.flag} ${lang.name}` : '🇺🇸 English';
   };
 
