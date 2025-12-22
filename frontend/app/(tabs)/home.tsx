@@ -327,7 +327,7 @@ export default function HomeScreen() {
                               style={[styles.secondaryButton, { borderColor: theme.colors.primary, padding: responsiveStyles.buttonPadding }]}
                             >
                               <Ionicons name="images" size={28} color={theme.colors.primary} />
-                              <Text style={[styles.secondaryButtonText, { color: theme.colors.primary, fontSize: responsive.isTablet ? 18 : 16 }]}>Choose from Gallery</Text>
+                              <Text style={[styles.secondaryButtonText, { color: theme.colors.primary, fontSize: responsive.isTablet ? 18 : 16 }]}>{t('chooseGallery')}</Text>
                             </BlurView>
                           </TouchableOpacity>
                         </>
