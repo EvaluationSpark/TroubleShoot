@@ -365,6 +365,64 @@ export default function SettingsScreen() {
           </ScrollView>
         </SafeAreaView>
       </LinearGradient>
+
+      {/* Language Picker Modal */}
+      <Modal
+        visible={showLanguagePicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowLanguagePicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <BlurView
+            intensity={theme.colors.glassBlur}
+            tint={theme.colors.glassTint}
+            style={[styles.languageModal, { borderColor: theme.colors.glassBorder }]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Select Language</Text>
+              <TouchableOpacity onPress={() => setShowLanguagePicker(false)}>
+                <Ionicons name="close" size={24} color={theme.colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.languageList}>
+              {LANGUAGES.map((lang) => (
+                <TouchableOpacity
+                  key={lang.code}
+                  style={[
+                    styles.languageOption,
+                    {
+                      backgroundColor: currentLang === lang.code 
+                        ? `${theme.colors.primary}20` 
+                        : 'transparent',
+                      borderColor: currentLang === lang.code 
+                        ? theme.colors.primary 
+                        : theme.colors.glassBorder,
+                    },
+                  ]}
+                  onPress={() => handleLanguageChange(lang.code)}
+                >
+                  <Text style={styles.languageFlag}>{lang.flag}</Text>
+                  <Text style={[
+                    styles.languageName,
+                    { 
+                      color: currentLang === lang.code 
+                        ? theme.colors.primary 
+                        : theme.colors.text 
+                    }
+                  ]}>
+                    {lang.name}
+                  </Text>
+                  {currentLang === lang.code && (
+                    <Ionicons name="checkmark-circle" size={24} color={theme.colors.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </BlurView>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 }
