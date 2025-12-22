@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { translations } from './translations';
+import { translations } from '../i18n/translations';
 
 type TranslationKeys = keyof typeof translations.en;
 
