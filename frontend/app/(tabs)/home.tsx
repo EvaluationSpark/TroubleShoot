@@ -268,7 +268,7 @@ export default function HomeScreen() {
                         {loading && (
                           <View style={styles.loadingOverlay}>
                             <ActivityIndicator size="large" color={theme.colors.primary} />
-                            <Text style={[styles.loadingText, { color: theme.colors.text }]}>Analyzing with AI...</Text>
+                            <Text style={[styles.loadingText, { color: theme.colors.text }]}>{t('loading')}</Text>
                           </View>
                         )}
                       </BlurView>
