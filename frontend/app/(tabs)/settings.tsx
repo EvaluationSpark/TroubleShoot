@@ -383,10 +383,10 @@ export default function SettingsScreen() {
                   style={[
                     styles.languageOption,
                     {
-                      backgroundColor: currentLang === lang.code 
+                      backgroundColor: language === lang.code 
                         ? `${theme.colors.primary}20` 
                         : 'transparent',
-                      borderColor: currentLang === lang.code 
+                      borderColor: language === lang.code 
                         ? theme.colors.primary 
                         : theme.colors.glassBorder,
                     },
@@ -397,14 +397,14 @@ export default function SettingsScreen() {
                   <Text style={[
                     styles.languageName,
                     { 
-                      color: currentLang === lang.code 
+                      color: language === lang.code 
                         ? theme.colors.primary 
                         : theme.colors.text 
                     }
                   ]}>
                     {lang.name}
                   </Text>
-                  {currentLang === lang.code && (
+                  {language === lang.code && (
                     <Ionicons name="checkmark-circle" size={24} color={theme.colors.primary} />
                   )}
                 </TouchableOpacity>
