@@ -182,8 +182,10 @@ export default function DiagnosticQuestionsModal({
   const [loading, setLoading] = useState(false);
   const [freeTextAnswer, setFreeTextAnswer] = useState('');
 
-  // Check if we have AI-generated diagnostic questions
-  const aiGeneratedQuestions = initialAnalysis?.diagnostic_questions || [];
+  // Check if we have AI-generated diagnostic questions (could be from clarifying_questions or diagnostic_questions)
+  const aiGeneratedQuestions = initialAnalysis?.clarifying_questions?.length > 0 
+    ? initialAnalysis.clarifying_questions 
+    : initialAnalysis?.diagnostic_questions || [];
   const hasAIQuestions = aiGeneratedQuestions.length > 0;
 
   // Get questions - prefer AI-generated, fallback to predefined
@@ -192,13 +194,26 @@ export default function DiagnosticQuestionsModal({
   );
   
   // Convert AI questions to the same format as predefined questions
+  // New format: questions can be objects with {question, options} or plain strings
   const questions = hasAIQuestions 
-    ? aiGeneratedQuestions.map((q: string, index: number) => ({
-        id: index + 1,
-        question: q,
-        options: null, // AI questions are free-text
-        isFreeText: true,
-      }))
+    ? aiGeneratedQuestions.map((q: any, index: number) => {
+        // Handle new format: {question: "...", options: [...]}
+        if (typeof q === 'object' && q.question) {
+          return {
+            id: index + 1,
+            question: q.question,
+            options: q.options || null,
+            isFreeText: !q.options || q.options.length === 0,
+          };
+        }
+        // Handle old format: plain string
+        return {
+          id: index + 1,
+          question: q,
+          options: null,
+          isFreeText: true,
+        };
+      })
     : DIAGNOSTIC_QUESTIONS[itemKey || 'default'].questions;
   
   const currentQuestion = questions[currentQuestionIndex];
