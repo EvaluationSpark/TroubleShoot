@@ -58,6 +58,10 @@ class TimeEstimate(BaseModel):
     total: float  # minutes
     unit: str = "minutes"
 
+class ClarifyingQuestion(BaseModel):
+    question: str
+    options: List[str] = []
+
 class RepairAnalysisResponse(BaseModel):
     repair_id: str
     item_type: str
@@ -80,8 +84,8 @@ class RepairAnalysisResponse(BaseModel):
     model_number: Optional[str] = None
     # No Visible Damage Detection fields
     no_visible_damage: Optional[bool] = False
-    diagnostic_questions: Optional[List[str]] = []
-    clarifying_questions: Optional[List[str]] = []
+    diagnostic_questions: Optional[List[Any]] = []  # Can be strings or ClarifyingQuestion dicts
+    clarifying_questions: Optional[List[Any]] = []  # Can be strings or ClarifyingQuestion dicts
     detected_issues: Optional[List[str]] = []
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
