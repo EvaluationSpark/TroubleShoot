@@ -325,10 +325,14 @@ Format your response as JSON with these exact keys:
   "detected_issues": ["issue 1", "issue 2"],
   "no_visible_damage": false,
   "clarifying_questions": [
-    "Context-specific question about the detected damage...",
-    "Functional question specific to this item type...",
-    "Question about related symptoms for this item...",
-    "Question about when/how the damage occurred..."
+    {{
+      "question": "Context-specific question about the detected damage?",
+      "options": ["Option A", "Option B", "Option C", "Other/Not sure"]
+    }},
+    {{
+      "question": "Functional question specific to this item type?",
+      "options": ["Yes, it works normally", "Partially working", "Not working at all", "Haven't tested"]
+    }}
   ],
   "repair_difficulty": "...",
   "estimated_time": "...",
@@ -362,9 +366,49 @@ Format your response as JSON with these exact keys:
   "safety_tips": [...]
 }}
 
-**CRITICAL - GENERATE TASK-APPROPRIATE CLARIFYING QUESTIONS:**
-You MUST generate 3-5 highly specific questions tailored to the EXACT item type and detected issues. 
+**CRITICAL - GENERATE TASK-APPROPRIATE CLARIFYING QUESTIONS WITH MULTIPLE-CHOICE OPTIONS:**
+You MUST generate 3-5 highly specific questions tailored to the EXACT item type and detected issues.
+Each question MUST include 3-5 multiple-choice options that are relevant and helpful.
+Always include "Other/Not sure" as the last option.
 DO NOT use generic questions. Each question must be directly relevant to the diagnosis.
+
+**Question Format - ALWAYS use this structure:**
+{{
+  "question": "Your specific question here?",
+  "options": ["Specific option 1", "Specific option 2", "Specific option 3", "Other/Not sure"]
+}}
+
+**Example Questions by Category:**
+
+For ELECTRONICS (phones, laptops, tablets, TVs):
+{{
+  "question": "Does the touchscreen still respond to touch?",
+  "options": ["Yes, fully responsive", "Partially responsive (some areas work)", "Completely unresponsive", "Not sure/Haven't tested"]
+}}
+{{
+  "question": "Are there any display issues beyond the visible damage?",
+  "options": ["No, display looks normal", "Lines or artifacts on screen", "Discoloration or dark spots", "Screen flickering", "Other/Not sure"]
+}}
+
+For APPLIANCES (washing machines, refrigerators, dishwashers):
+{{
+  "question": "When does the problem occur?",
+  "options": ["At startup", "During the cycle", "At the end of cycle", "Constantly/All the time", "Intermittently"]
+}}
+{{
+  "question": "Are there any unusual sounds?",
+  "options": ["Grinding noise", "Humming/buzzing", "Clicking", "No unusual sounds", "Other sound"]
+}}
+
+For FURNITURE (chairs, tables, cabinets):
+{{
+  "question": "Is the furniture still usable?",
+  "options": ["Yes, fully functional", "Usable but unstable", "Not safe to use", "Only cosmetic damage"]
+}}
+{{
+  "question": "What material is this made from?",
+  "options": ["Solid wood", "Plywood/MDF", "Metal", "Plastic", "Not sure"]
+}}
 
 **Question Generation Guidelines by Item Category:**
 
