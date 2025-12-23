@@ -346,7 +346,7 @@ export default function SettingsScreen() {
             {/* Footer */}
             <View style={styles.footer}>
               <Text style={[styles.footerText, { color: theme.colors.textTertiary }]}>
-                Made with ❤️ by FixIntel Team
+                Made with ❤️ by Fix Stuff Team
               </Text>
               <Text style={[styles.footerText, { color: theme.colors.textTertiary }]}>
                 © 2025 Fix Stuff. All rights reserved.
