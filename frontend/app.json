@@ -14,7 +14,7 @@
         "projectId": "9d5fce54-6e1a-4587-ae9a-34b363c59406"
       }
     },
-    "description": "AI-powered repair guide app that helps you fix broken items with step-by-step instructions, tutorial videos, and local repair shop recommendations.",
+    "description": "AI Repair Guide - Get step-by-step instructions to fix broken items with AI-powered analysis, tutorial videos, and local repair shop recommendations.",
     "notification": {
       "icon": "./assets/images/icon.png",
       "color": "#00D9FF",
