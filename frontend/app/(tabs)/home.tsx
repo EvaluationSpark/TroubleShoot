@@ -212,7 +212,7 @@ export default function HomeScreen() {
                   style={styles.logoImage}
                 />
                 <View>
-                  <Text style={[styles.appName, { color: theme.colors.text }]}>FixIntel AI</Text>
+                  <Text style={[styles.appName, { color: theme.colors.text }]}>Fix Stuff</Text>
                   <Text style={[styles.appTagline, { color: theme.colors.primary }]}>Intelligent Repair</Text>
                 </View>
               </View>

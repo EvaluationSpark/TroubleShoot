@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Cost & Time Breakdown Components
+ * Fix Stuff - Cost & Time Breakdown Components
  * Company: RentMouse
  */
 

@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Insights Section Component
+ * Fix Stuff - Insights Section Component
  * Company: RentMouse
  * PR #8: Repair History & Insights
  */

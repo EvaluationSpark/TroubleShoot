@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Skill Level Context
+ * Fix Stuff - Skill Level Context
  * Company: RentMouse
  * Manages user skill level across the app
  */

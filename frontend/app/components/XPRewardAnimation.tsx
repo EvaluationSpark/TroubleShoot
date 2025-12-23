@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - XP Reward Animation Component
+ * Fix Stuff - XP Reward Animation Component
  * Company: RentMouse
  * Gamification System
  */

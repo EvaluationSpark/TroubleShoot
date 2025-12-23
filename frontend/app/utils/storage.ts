@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Storage & Migration System
+ * Fix Stuff - Storage & Migration System
  * Company: RentMouse
  * Handles AsyncStorage with versioning and safe migrations
  */

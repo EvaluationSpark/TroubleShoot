@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - TypeScript Data Models
+ * Fix Stuff - TypeScript Data Models
  * Company: RentMouse
  * Location: Edmonton, Alberta, Canada
  */

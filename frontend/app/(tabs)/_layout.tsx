@@ -27,7 +27,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'FixIntel AI',
+          title: 'Fix Stuff',
           tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
           headerShown: false,
         }}

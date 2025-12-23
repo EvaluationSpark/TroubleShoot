@@ -310,7 +310,7 @@ export const translations = {
     noSavedRepairs: 'Keine gespeicherten Reparaturen',
     
     // Settings
-    customizeExperience: 'Passen Sie Ihre FixIntel AI Erfahrung an',
+    customizeExperience: 'Passen Sie Ihre Fix Stuff Erfahrung an',
     appearance: 'Erscheinungsbild',
     darkMode: 'Dunkler Modus',
     lightMode: 'Heller Modus',
@@ -338,7 +338,7 @@ export const translations = {
     faqsTutorials: 'FAQs, Anleitungen und Kontakt',
     legalTerms: 'Rechtliche Bedingungen',
     dataProtection: 'Wie wir Ihre Daten schützen',
-    aboutFixIntel: 'Über FixIntel AI',
+    aboutFixIntel: 'Über Fix Stuff',
     learnMore: 'Erfahren Sie mehr über unsere Mission',
     rateApp: 'App bewerten',
     shareFeedback: 'Teilen Sie Ihr Feedback mit uns',

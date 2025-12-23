@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Safety Gating Modal
+ * Fix Stuff - Safety Gating Modal
  * Company: RentMouse
  * Prevents users from attempting dangerous high-risk repairs
  */

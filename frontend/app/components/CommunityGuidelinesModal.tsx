@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Community Guidelines Modal
+ * Fix Stuff - Community Guidelines Modal
  * Company: RentMouse
  * PR #6: Community Moderation
  */

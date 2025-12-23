@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Report Modal Component
+ * Fix Stuff - Report Modal Component
  * Company: RentMouse
  * PR #6: Community Moderation
  */

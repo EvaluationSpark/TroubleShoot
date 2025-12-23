@@ -1,5 +1,5 @@
 /**
- * FixIntel AI - Professional Logo Component
+ * Fix Stuff - Professional Logo Component
  * Company: RentMouse
  * Modern SVG-based logo with gradient and geometric design
  */

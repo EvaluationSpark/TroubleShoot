@@ -131,7 +131,7 @@ export default function SettingsScreen() {
             <View style={styles.header}>
               <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Settings</Text>
               <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
-                Customize your FixIntel AI experience
+                Customize your Fix Stuff experience
               </Text>
             </View>
 
@@ -149,7 +149,7 @@ export default function SettingsScreen() {
               >
                 <Text style={styles.appIcon}>🔧</Text>
               </LinearGradient>
-              <Text style={[styles.appName, { color: theme.colors.text }]}>FixIntel AI</Text>
+              <Text style={[styles.appName, { color: theme.colors.text }]}>Fix Stuff</Text>
               <Text style={[styles.versionText, { color: theme.colors.textSecondary }]}>Version 1.0.0</Text>
               <View style={styles.badgeContainer}>
                 <View style={[styles.badge, { backgroundColor: `${theme.colors.success}20` }]}>
@@ -330,16 +330,16 @@ export default function SettingsScreen() {
               
               <MenuItem
                 icon="information-circle"
-                title="About FixIntel AI"
+                title="About Fix Stuff"
                 subtitle="Learn more about our mission"
-                onPress={() => Alert.alert('FixIntel AI', 'Intelligent repair assistant powered by advanced AI technology.')}
+                onPress={() => Alert.alert('Fix Stuff', 'Intelligent repair assistant powered by advanced AI technology.')}
               />
               
               <MenuItem
                 icon="star"
                 title="Rate This App"
                 subtitle="Share your feedback with us"
-                onPress={() => Alert.alert('Thank You!', 'Rate FixIntel AI in the App Store')}
+                onPress={() => Alert.alert('Thank You!', 'Rate Fix Stuff in the App Store')}
               />
             </View>
 
@@ -349,7 +349,7 @@ export default function SettingsScreen() {
                 Made with ❤️ by FixIntel Team
               </Text>
               <Text style={[styles.footerText, { color: theme.colors.textTertiary }]}>
-                © 2025 FixIntel AI. All rights reserved.
+                © 2025 Fix Stuff. All rights reserved.
               </Text>
             </View>
           </ScrollView>
