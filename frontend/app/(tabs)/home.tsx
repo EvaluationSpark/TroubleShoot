@@ -213,7 +213,7 @@ export default function HomeScreen() {
                 />
                 <View>
                   <Text style={[styles.appName, { color: theme.colors.text }]}>Fix Stuff</Text>
-                  <Text style={[styles.appTagline, { color: theme.colors.primary }]}>Intelligent Repair</Text>
+                  <Text style={[styles.appTagline, { color: theme.colors.primary }]}>AI Repair Guide</Text>
                 </View>
               </View>
             </View>
