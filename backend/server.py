@@ -1734,13 +1734,8 @@ async def search_parts(request: Dict[str, Any]):
                 search_query = f"{part_name} {model_number} {item_type}"
             search_query += " buy price"
             
-            # Use AI to search and find real product links
-            chat = LlmChat(
-                api_key=EMERGENT_LLM_KEY,
-                session_id=f"parts_search_{uuid.uuid4()}",
-                system_message="You are a helpful assistant that finds real product listings for repair parts."
-            )
-            chat.with_model("gemini", "gemini-2.5-flash")
+            # Use Gemini to search and find real product links
+            system_message = "You are a helpful assistant that finds real product listings for repair parts."
             
             prompt = f"""Search for this repair part and provide REAL purchase options:
 
@@ -1773,8 +1768,7 @@ IMPORTANT:
 - For eBay: https://www.ebay.com/sch/i.html?_nkw=SEARCH+TERMS
 - Replace spaces with + in URLs"""
 
-            msg = UserMessage(text=prompt)
-            response = await chat.send_message(msg)
+            response = await call_gemini(prompt, system_message)
             
             # Parse the response
             response_text = response.strip()
