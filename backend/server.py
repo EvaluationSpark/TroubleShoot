@@ -543,7 +543,7 @@ async def generate_repair_diagram(item_type: str, repair_steps: List[str]) -> Op
         from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
         import base64
         
-        image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        image_gen = OpenAIImageGeneration(api_key=OPENAI_API_KEY)
         
         # Create a detailed prompt for an informative repair infographic
         steps_text = '\n'.join(f'{i+1}. {step}' for i, step in enumerate(repair_steps[:6]))
@@ -1538,7 +1538,7 @@ IMPORTANT: Only include videos you are confident exist on YouTube."""
             from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
             import base64
             
-            image_gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+            image_gen = OpenAIImageGeneration(api_key=OPENAI_API_KEY)
             
             # Create a clear, instructional diagram
             image_prompt = f"""Create a clear, simple instructional diagram showing: {step_text} for {item_type} repair.
