@@ -737,13 +737,8 @@ async def troubleshoot(question: TroubleshootQuestion):
         if not repair:
             raise HTTPException(status_code=404, detail="Repair not found")
         
-        # Use AI to provide follow-up guidance
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"troubleshoot_{question.repair_id}",
-            system_message="You are a helpful repair technician providing troubleshooting guidance."
-        )
-        chat.with_model("gemini", "gemini-2.5-flash")
+        # Use Gemini to provide follow-up guidance
+        system_message = "You are a helpful repair technician providing troubleshooting guidance."
         
         context = f"""Item: {repair.get('item_type')}
 Damage: {repair.get('damage_description')}
@@ -752,8 +747,7 @@ User Answer: {question.user_answer}"""
         
         prompt = f"{context}\n\nBased on this answer, provide specific next steps or ask a follow-up question to diagnose the issue better."
         
-        msg = UserMessage(text=prompt)
-        response = await chat.send_message(msg)
+        response = await call_gemini(prompt, system_message)
         
         return {"guidance": response, "follow_up_question": None}
         
