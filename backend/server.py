@@ -1425,13 +1425,8 @@ async def get_step_details(request: Dict[str, Any]):
         item_type = request.get('item_type', 'Unknown')
         repair_type = request.get('repair_type', '')
         
-        # Use AI to generate ultra-detailed instructions
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"step_detail_{uuid.uuid4()}",
-            system_message="You are an expert repair instructor who provides extremely detailed, beginner-friendly instructions."
-        )
-        chat.with_model("gemini", "gemini-2.5-flash")
+        # Use Gemini to generate ultra-detailed instructions
+        system_message = "You are an expert repair instructor who provides extremely detailed, beginner-friendly instructions."
         
         prompt = f"""Break down this repair step into SIMPLIFIED SUB-STEPS for a complete beginner:
 
@@ -1478,19 +1473,13 @@ Format your response EXACTLY like this:
 
 Make every instruction crystal clear - assume the person has never done any repair work before."""
         
-        msg = UserMessage(text=prompt)
-        response = await chat.send_message(msg)
+        response = await call_gemini(prompt, system_message)
         detailed_instructions = response.strip()
         
         # Search for relevant tutorial videos for this specific step
         step_videos = []
         try:
-            video_chat = LlmChat(
-                api_key=EMERGENT_LLM_KEY,
-                session_id=f"step_videos_{uuid.uuid4()}",
-                system_message="You are an expert at finding specific YouTube repair tutorials."
-            )
-            video_chat.with_model("gemini", "gemini-2.5-flash")
+            video_system = "You are an expert at finding specific YouTube repair tutorials."
             
             video_prompt = f"""Find 2-3 REAL YouTube videos that specifically show how to: {step_text}
 For item: {item_type}
@@ -1515,8 +1504,7 @@ Format as JSON array:
 
 IMPORTANT: Only include videos you are confident exist on YouTube."""
 
-            video_msg = UserMessage(text=video_prompt)
-            video_response = await video_chat.send_message(video_msg)
+            video_response = await call_gemini(video_prompt, video_system)
             
             # Parse video response
             video_text = video_response.strip()
