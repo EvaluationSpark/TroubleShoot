@@ -9,7 +9,7 @@ import base64
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://fixgenius-4.preview.emergentagent.com/api"
+BASE_URL = "https://airepair-service.preview.emergentagent.com/api"
 
 # A more realistic broken phone screen image (base64 encoded)
 BROKEN_PHONE_IMAGE = """iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="""

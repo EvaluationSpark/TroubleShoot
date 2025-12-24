@@ -11,7 +11,7 @@ from io import BytesIO
 from PIL import Image
 import sys
 
-BACKEND_URL = "https://fixgenius-4.preview.emergentagent.com/api"
+BACKEND_URL = "https://airepair-service.preview.emergentagent.com/api"
 
 def create_undamaged_image():
     """Create an undamaged phone image"""

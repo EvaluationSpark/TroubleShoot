@@ -22,7 +22,7 @@ from PIL import Image
 from io import BytesIO
 
 # Configuration
-BASE_URL = "https://fixgenius-4.preview.emergentagent.com/api"
+BASE_URL = "https://airepair-service.preview.emergentagent.com/api"
 TIMEOUT = 60  # Increased for AI analysis
 
 def create_test_image():

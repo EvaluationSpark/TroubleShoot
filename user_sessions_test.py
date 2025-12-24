@@ -16,7 +16,7 @@ import uuid
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://fixgenius-4.preview.emergentagent.com/api"
+BACKEND_URL = "https://airepair-service.preview.emergentagent.com/api"
 
 def test_save_repair_session_with_user_id():
     """Test POST /api/save-repair-session with different user_ids"""
