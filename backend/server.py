@@ -1639,13 +1639,8 @@ async def get_tutorial_videos(request: Dict[str, Any]):
             except Exception as yt_error:
                 logger.warning(f"YouTube API error: {str(yt_error)}")
         
-        # Fallback: Use AI to generate search-based video suggestions with real video IDs
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"videos_{uuid.uuid4()}",
-            system_message="You are an expert at finding YouTube repair tutorials. You have access to search YouTube."
-        )
-        chat.with_model("gemini", "gemini-2.5-flash")
+        # Fallback: Use Gemini to generate search-based video suggestions with real video IDs
+        system_message = "You are an expert at finding YouTube repair tutorials. You have access to search YouTube."
         
         prompt = f"""Search YouTube for real repair tutorial videos about: {item_type}
 Issue: {damage_description}
@@ -1677,8 +1672,7 @@ Format as JSON array:
 
 IMPORTANT: Only include videos you are confident actually exist on YouTube."""
         
-        msg = UserMessage(text=prompt)
-        response = await chat.send_message(msg)
+        response = await call_gemini(prompt, system_message)
         
         # Parse JSON response
         import json
