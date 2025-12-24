@@ -659,13 +659,8 @@ async def refine_diagnosis(request: Dict[str, Any]):
         # Build context from diagnostic answers
         answers_text = "\n".join([f"Q{qid}: {answer}" for qid, answer in diagnostic_answers.items()])
         
-        # Use AI to refine the diagnosis
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"refine_{uuid.uuid4()}",
-            system_message="You are an expert repair technician. Refine the repair diagnosis based on user's answers to diagnostic questions."
-        )
-        chat.with_model("gemini", "gemini-2.5-flash")
+        # Use Gemini to refine the diagnosis
+        system_message = "You are an expert repair technician. Refine the repair diagnosis based on user's answers to diagnostic questions."
         
         prompt = f"""Based on the initial analysis and user's diagnostic answers, provide a refined, more accurate diagnosis and repair plan.
 
@@ -696,8 +691,7 @@ Format your response as JSON with these exact keys:
   "confidence_level": "high/medium/low"
 }}"""
         
-        msg = UserMessage(text=prompt)
-        response = await chat.send_message(msg)
+        response = await call_gemini(prompt, system_message)
         
         # Parse the response
         import json
