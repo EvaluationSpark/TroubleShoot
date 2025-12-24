@@ -24,6 +24,21 @@ db = client[os.environ['DB_NAME']]
 GOOGLE_API_KEY = os.environ.get('GOOGLE_GENERATIVE_AI_API_KEY')
 genai.configure(api_key=GOOGLE_API_KEY)
 
+# OpenAI API Key for image generation (optional)
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+
+# Helper function to call Gemini API
+async def call_gemini(prompt: str, system_message: str = "") -> str:
+    """Call Google Gemini API with a text prompt"""
+    try:
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        full_prompt = f"{system_message}\n\n{prompt}" if system_message else prompt
+        response = model.generate_content(full_prompt)
+        return response.text
+    except Exception as e:
+        logger.error(f"Gemini API error: {str(e)}")
+        raise
+
 # Create the main app
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
